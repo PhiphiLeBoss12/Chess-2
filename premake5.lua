@@ -51,7 +51,8 @@ project "Chess"
 		links
 		{
 			"SDL2",
-			"SDL2main"
+			"SDL2main",
+			"SDL2_image"
 		}
 		postbuildcommands ("xcopy ..\\libs\\windows\\dlls\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")
 

@@ -17,4 +17,3 @@ Window* initWindow(WindowData* data);
 
 // Destroys the window and quits SDL
 void destroyWindow(Window* window);
-
