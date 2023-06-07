@@ -32,8 +32,8 @@ STRUCTURES:
 		a bougé (bool)
 
 REPARTITION:
-	affichage :
-	struture : 
+	affichage : Toto
+	structure : 
 	fonctions de deplacements :
 	calcul des possibilités :
 	verif plateau pour un joueur :
