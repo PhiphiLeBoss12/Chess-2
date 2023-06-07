@@ -52,7 +52,6 @@ project "Chess"
 		staticruntime "On"
 		systemversion "latest"
 		libdirs ("libs/linux")
-
 		links
 		{
 			"SDL2",
