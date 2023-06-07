@@ -26,7 +26,8 @@ project "Chess"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.c"
+		"%{prj.name}/src/**.c",
+		"%{prj.name}/src/vendor/**.c",
 	}
 
 	includedirs
@@ -40,12 +41,12 @@ project "Chess"
 		staticruntime "On"
 		systemversion "latest"
 		libdirs ("libs/windows")
-
 		links
 		{
 			"SDL2",
 			"SDL2main"
 		}
+		postbuildcommands ("xcopy ..\\libs\\windows\\dlls\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")
 
 	filter "system:linux"
 		staticruntime "On"
