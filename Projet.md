@@ -27,7 +27,7 @@
 	- a bougé (bool)
 
 ## REPARTITION:
-- affichage :
+- affichage : Toto
 - struture : 
 - fonctions de deplacements :
 - calcul des possibilités :

@@ -1,10 +1,9 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <stdint.h>
 
 typedef struct WindowData {
 	const char* title;
-	uint32_t width, height;
+	int width, height;
 } WindowData;
 
 typedef struct Window {
@@ -18,3 +17,4 @@ Window* initWindow(WindowData* data);
 
 // Destroys the window and quits SDL
 void destroyWindow(Window* window);
+
