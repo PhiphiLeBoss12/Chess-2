@@ -55,6 +55,7 @@ project "Chess"
 			"SDL2_image"
 		}
 		postbuildcommands ("xcopy ..\\libs\\windows\\dlls\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")
+		postbuildcommands ("xcopy ..\\dev-assets\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")
 
 	-- If the project is generated on Linux it will apply these rules
 	filter "system:linux"

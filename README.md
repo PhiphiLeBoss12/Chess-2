@@ -1,6 +1,10 @@
 # Chess 2
 ## The long awaited sequel
 
+## Ajouter un fichier pour l'utiliser dans le programme
+
+Il faut le mettre dans le dossier `dev-assets/`. L'entièreté du dossier est copiée pour être envoyée dans le même dossier que l'exécutable.
+
 ## Comment ça marche premake ?
 
 [Docs de premake](https://premake.github.io/docs/)
