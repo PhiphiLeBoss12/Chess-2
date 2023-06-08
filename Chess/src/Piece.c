@@ -1,8 +1,40 @@
 #include "Piece.h"
 
-Piece *createPiece(TypePiece type, TypeColor color, int x, int y, Board *board) {
-	if (!(0 <= x && x < 8 && 0 <= y && y < 8)) { //check if coord is in the table
+SDL_Texture *chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
+	char* path;
+	if (color == WHITE)
+		path = "White_";
+	else
+		path = "Black_";
+
+	switch (type) {
+	case PAWN:
+		strcat(path, "Pawn");
+		break;
+	case BISHOP:
+		strcat(path, "Bishop");
+		break;
+	case KNIGHT:
+		strcat(path, "Knight");
+		break;
+	case ROOK:
+		strcat(path, "Rook");
+		break;
+	case QUEEN:
+		strcat(path, "Queen");
+		break;
+	case KING:
+		strcat(path, "King");
+		break;
+	}
+	printf("%s", path);
+	return createTexture(window, path);
+}
+
+Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window *window) {//, Board *board) {
+	if (!(0 <= x && x < SIZE && 0 <= y && y < SIZE)) { //check if coord is in the table
 		printf("Failed : This piece isn't in the table.");
+		__debugbreak();
 		return NULL;
 	}
 	Piece* piece;
@@ -11,9 +43,10 @@ Piece *createPiece(TypePiece type, TypeColor color, int x, int y, Board *board) 
 	piece->color = color;
 	piece->x = x;
 	piece->y = y;
-	piece->hasMoved = 1; //False
-	piece->hasMovedOnce = 1; //False
-	board->table[x][y] = piece; //put the piece in the board
+	piece->hasMoved = 0; //False
+	piece->hasMovedOnce = 0; //False
+	piece->texture = chooseTexturePiece(type, color, window);
+	//board->table[x][y] = piece; //put the piece in the board
 	return piece;
 }
 
@@ -39,10 +72,8 @@ void showTypePiece(TypePiece type) { //function to debug
 		break;
 	}
 }
-
-
-void showCoordPiece(Piece* piece) {
-	switch (piece->x) {
+void showCoord(int x, int y) {
+	switch (x) {
 	case 0:
 		printf("A");
 		break;
@@ -68,7 +99,12 @@ void showCoordPiece(Piece* piece) {
 		printf("H");
 		break;
 	}
-	printf("%d",piece->y+1);
+	printf("%d", y + 1);
+}
+
+
+void showCoordPiece(Piece* piece) {
+	showCoord(piece->x, piece->y);
 }
 
 void showPiece(Piece* piece) { 
@@ -85,9 +121,9 @@ void movePiece(Piece* piece, int x, int y, Board *board) {
 	board->table[x][y] = piece;
 }
 
-Case *movePosibilitiesPawn(Piece* piece, Board *board) {
+Case *movePosibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities) {
 	Case* tab;
-	int index = 0;
+	int index = 0; //index in the table
 	tab = malloc(sizeof(Case) * 4);
 	Case casePos;
 	//To move 1 case
@@ -98,7 +134,7 @@ Case *movePosibilitiesPawn(Piece* piece, Board *board) {
 		index++;
 	}
 	//To move 2 cases
-	if (board->table[piece->x][piece->y + 1] == NULL && board->table[piece->x][piece->y + 2] == NULL && piece->hasMovedOnce != 0) { 
+	if (board->table[piece->x][piece->y + 1] == NULL && board->table[piece->x][piece->y + 2] == NULL && piece->hasMovedOnce == 0) { 
 		casePos.x = piece->x;
 		casePos.y = piece->y + 2;
 		tab[index] = casePos;
@@ -106,7 +142,7 @@ Case *movePosibilitiesPawn(Piece* piece, Board *board) {
 	}
 	//Left move
 	if (piece->x - 1 >= 0) { //Verify border
-		if (board->table[piece->x - 1][piece->y + 1] == NULL || board->table[piece->x - 1][piece->y + 1]->color != piece->color) {
+		if (board->table[piece->x - 1][piece->y + 1] != NULL && board->table[piece->x - 1][piece->y + 1]->color != piece->color) {
 			casePos.x = piece->x - 1;
 			casePos.y = piece->y + 1;
 			tab[index] = casePos;
@@ -114,16 +150,64 @@ Case *movePosibilitiesPawn(Piece* piece, Board *board) {
 		}
 	}
 	//Right move
-	if (piece->x + 1 >= 0) { //Verify border
-		if (board->table[piece->x + 1][piece->y + 1] == NULL || board->table[piece->x + 1][piece->y + 1]->color != piece->color) {
+	if (piece->x + 1 <= SIZE) { //Verify border
+		if (board->table[piece->x + 1][piece->y + 1] != NULL && board->table[piece->x + 1][piece->y + 1]->color != piece->color) {
 			casePos.x = piece->x + 1;
 			casePos.y = piece->y + 1;
 			tab[index] = casePos;
 			index++;
 		}
 	}
+	*sizeTabPossibilities = index;
 	return tab;
 }
+/*
+Case* movePosibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities) {
+	Case* tab;
+	Case casePos;
+	tab = malloc(sizeof(Case) * 13);
+	int index = 0;
+	int i, mult, X, Y;
+	//Right diagonal
+	for (int power = 1; power < 3; power++) { //Left and Right
+		mult = pow((-1), power);
+		for (i = 1; i < SIZE; i++) { //1 to 7 (top line)
+			X = piece->x + i * mult;
+			Y = piece->y + i * mult;
+			if (board->table[X][Y] == NULL || board->table[X][Y]->color != piece->color) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+				if (board->table[X][Y]->color != piece->color) {
+					break; //We're out of the loop because there will be no more accessible pieces in front
+				}
+			}
+		}
+		for (i = -1; i > -SIZE; i--) { //-1 to -7 (bottom line)
+			X = piece->x + i * mult;
+			Y = piece->y + i * mult;
+			if (board->table[X][Y] == NULL || board->table[X][Y]->color != piece->color) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+				if (board->table[X][Y]->color != piece->color) {
+					break; //We're out of the loop because there will be no more accessible pieces in front
+				}
+			}
+		}
+	}
+	*sizeTabPossibilities = index;
+	return tab;
+*/
+/*
+Case* movePosibilitiesKnight(Piece* piece, Board* board) {
+	Case* tab;
+	Case casePos;
+	tab = malloc(sizeof(Case) * 8);
+	int index = 0;
+}*/
 
 
 
