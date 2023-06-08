@@ -9,11 +9,11 @@
 
 int main(int argc, char* argv[])
 {
-    Board *board;
-    board->size = 64;
-    Piece* piece;
-    piece = createPiece(PAWN, WHITE, 0,0);
-    showPiece(piece);
+    // Board *board;
+    // board->size = 64;
+    // Piece* piece;
+    // piece = createPiece(PAWN, WHITE, 0,0);
+    // showPiece(piece);
 
     return 0;
 }
