@@ -63,6 +63,12 @@ void handleEvents(Window* window) {
 				window->width = event.window.data1;
 				window->height = event.window.data2;
 			}
+			// if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
+			// 	int width, height;
+			// 	SDL_GetWindowSize(window, &width, &height);
+			// 	window->width = width;
+			// 	window->height = height;
+			// }
 			break;
 
 		case SDL_MOUSEMOTION:

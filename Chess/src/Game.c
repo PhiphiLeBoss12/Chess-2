@@ -39,8 +39,8 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 }
 
 void drawBoard(Window* window, Board* board, int squareSize) {
-	for (unsigned int i = 7; i >= 0; i--) {
-		for (unsigned int j = 0; j < 8; j++) {
+	for (int i = 7; i >= 0; i--) {
+		for (int j = 0; j < 8; j++) {
 			if (board->selectedX == j && board->selectedY == i)
 				setDrawColor(window, 255, 0, 0, 255);
 			else if ((i + j) % 2 == 0)
