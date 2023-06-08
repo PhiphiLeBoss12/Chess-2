@@ -4,9 +4,9 @@
 
 // Feel free to add more parameters in these functions
 // Main game loop
-void game(Window* window);
+void game();
 // Clean everything
-void cleanup(Window* window);
+void cleanup(Window* window, Board* board);
 
 // Gets the input
 void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize);

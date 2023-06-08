@@ -22,6 +22,13 @@ Board* createBoard(int size) {
 	return board;
 }
 
+void destroyBoard(Board* board) {
+	for (int i = 0; i < 8; i++) {
+		free(board->table[i]);
+	}
+	free(board->table);
+	free(board);
+}
 
 Board* displayBoardConsole(Board* board) {
 	for (int x = 0; x < board->size; x++) {

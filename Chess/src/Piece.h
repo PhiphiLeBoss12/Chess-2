@@ -2,6 +2,8 @@
 
 SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color);
 Piece* initPiece(TypePiece type, TypeColor color, int x, int y); //, Board* board);
+void destroyPiece(Piece* piece);
+
 void showTypePiece(TypePiece type);
 void showCoord(int x, int y);
 void showCoordPiece(Piece* piece);

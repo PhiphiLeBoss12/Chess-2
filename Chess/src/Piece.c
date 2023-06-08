@@ -10,22 +10,22 @@ SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window)
 
 	switch (type) {
 	case PAWN:
-		strcat(path, "Pawn");
+		strcat(path, "Pawn.png");
 		break;
 	case BISHOP:
-		strcat(path, "Bishop");
+		strcat(path, "Bishop.png");
 		break;
 	case KNIGHT:
-		strcat(path, "Knight");
+		strcat(path, "Knight.png");
 		break;
 	case ROOK:
-		strcat(path, "Rook");
+		strcat(path, "Rook.png");
 		break;
 	case QUEEN:
-		strcat(path, "Queen");
+		strcat(path, "Queen.png");
 		break;
 	case KING:
-		strcat(path, "King");
+		strcat(path, "King.png");
 		break;
 	}
 	printf("%s", path);
@@ -49,6 +49,11 @@ Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window *window) 
 	piece->texture = chooseTexturePiece(type, color, window);
 	//board->table[x][y] = piece; //put the piece in the board
 	return piece;
+}
+
+void destroyPiece(Piece* piece) {
+	destroyTexture(piece->texture);
+	free(piece);
 }
 
 void showTypePiece(TypePiece type) { //function to debug
