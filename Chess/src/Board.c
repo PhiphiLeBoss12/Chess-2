@@ -15,6 +15,7 @@ Board* createBoard(int size) {
 		}
 	}
 
+	board->size = size;
 	board->selectedX = -1;
 	board->selectedY = -1;
 
