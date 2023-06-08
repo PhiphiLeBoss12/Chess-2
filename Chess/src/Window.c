@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
 
-Window* initWindow(WindowData* data) {
-	int flags = IMG_INIT_AVIF | IMG_INIT_JPG | IMG_INIT_JXL | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
+Window* initWindow(const char* title, unsigned int width, unsigned int height) {
+	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("Failed to initialize SDL! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -15,7 +15,7 @@ Window* initWindow(WindowData* data) {
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
-	window->window = SDL_CreateWindow(data->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, data->width, data->height, SDL_WINDOW_SHOWN);
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	if (!window->window) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -26,6 +26,8 @@ Window* initWindow(WindowData* data) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+
+	window->shouldClose = 0;
 
 	return window;
 }
@@ -39,6 +41,35 @@ void destroyWindow(Window* window) {
 	SDL_Quit();
 }
 
+void handleEvents(Window* window) {
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+				window->shouldClose = 1;
+			break;
+		}
+	}
+}
+
+void clear(Window* window) {
+	SDL_RenderClear(window->renderer);
+}
+
+void presentWindow(Window* window) {
+	SDL_RenderPresent(window->renderer);
+}
+
+void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	SDL_SetRenderDrawColor(window->renderer, r, g, b, a);
+}
+
+void drawRect(Window* window, Rect* rect) {
+	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
+	SDL_RenderFillRect(window->renderer, &sdlRect);
+}
+
 SDL_Texture* createTexture(Window* window, const char* path) {
 	SDL_Surface* surface = IMG_Load(path);
 	if (!surface) {
@@ -50,6 +81,12 @@ SDL_Texture* createTexture(Window* window, const char* path) {
 		printf("Failed to create texture from surface! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+}
+
+void drawTexture(Window* window, Rect* rect, SDL_Texture* texture) {
+	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
+	if (SDL_RenderCopyEx(window->renderer, texture, NULL, &sdlRect, rect->angle, NULL, SDL_FLIP_NONE) < 0)
+		printf("Failed to copy texture! SDL error: %s\n", SDL_GetError());
 }
 
 void destroyTexture(SDL_Texture* texture) {
