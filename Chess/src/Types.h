@@ -21,6 +21,7 @@ typedef struct StructPiece {
 typedef struct StructBoard {
 	int size;
 	Piece * **table; //table of 64 squares
+	int selectedX, selectedY;
 } Board;
 
 typedef struct StructPlayer {
