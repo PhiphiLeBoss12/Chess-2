@@ -8,9 +8,9 @@ Board* createBoard(int size) {
 	Board* board = (Board*)malloc(sizeof(Board));
 
 	board->table = (Piece***)malloc(size * sizeof(Piece**));
-	for (int y = 0; y < size; y++) {
-		board->table[y] = (Piece**)malloc(size * sizeof(Piece*));
-		for (int x = 0; x < size; x++) {
+	for (int x = 0; x < size; x++) {
+		board->table[x] = (Piece**)malloc(size * sizeof(Piece*));
+		for (int y = 0; y < size; y++) {
 			board->table[x][y] = NULL;
 		}
 	}
@@ -32,7 +32,7 @@ Board* displayBoardConsole(Board* board) {
 			else {
 				printf("X");
 			}
-			printf("\n");
 		}
+		printf("\n");
 	}
 }

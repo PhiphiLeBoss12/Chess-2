@@ -8,12 +8,17 @@
 
 int main(int argc, char* argv[])
 {
-    Window* window = initWindow("Chess 2", 800, 800);
-    game(window);
-    cleanup(window);
+
+    printf("test");
 
     Board* board = createBoard(8);
     displayBoardConsole(board);
+
+    printf("test");
+    
+    Window* window = initWindow("Chess 2", 800, 800);
+    game(window);
+    cleanup(window);
 
     return 0;
 }
