@@ -2,12 +2,18 @@
 #include <SDL2/SDL.h>
 
 // Simple structure to hold window information
+// Do not modify the fields please :(
 typedef struct Window {
-	SDL_Window* window; // pas touche
-	SDL_Renderer* renderer; // pas touche
+	SDL_Window* window;
+	SDL_Renderer* renderer;
+
+	int width, height; // Size of the window
+
 	int shouldClose; // 1 if the user closes the window (eg. clicking the x or Alt-F4), 0 otherwise
+
 	int mousePosX, mousePosY; // Position of the mouse cursor
 	int mouseRightButton, mouseLeftButton, mouseMiddleButton; // 1 if the button is clicked, 0 otherwise
+
 	unsigned int keyDown; // The most recent key pressed SDL name. The name of the key always starts with SDLK_
 } Window;
 
