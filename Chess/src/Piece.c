@@ -1,6 +1,7 @@
 #include "Piece.h"
+#include <string.h>
 
-SDL_Texture *chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
+SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
 	char* path;
 	if (color == WHITE)
 		path = "White_";

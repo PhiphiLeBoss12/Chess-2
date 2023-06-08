@@ -1,6 +1,6 @@
 #include "Types.h"
 
-SDL_Texture chooseTexturePiece(TypePiece type, TypeColor color);
+SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color);
 Piece* initPiece(TypePiece type, TypeColor color, int x, int y); //, Board* board);
 void showTypePiece(TypePiece type);
 void showCoord(int x, int y);
