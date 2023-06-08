@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include "Piece.h"
+#include "Board.h"
 #include "Window.h"
 #include <math.h>
 
@@ -9,7 +10,8 @@
 
 int main(int argc, char* argv[])
 {
-    // Board *board;
+    Board *board;
+    board = createBoard(8);
     // board->size = 64;
     // Piece* piece;
     // piece = createPiece(PAWN, WHITE, 0,0);
