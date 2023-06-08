@@ -113,6 +113,7 @@ SDL_Texture* createTexture(Window* window, const char* path) {
 		printf("Failed to create texture from surface! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+	return texture;
 }
 
 void drawTexture(Window* window, Rect* rect, SDL_Texture* texture) {
