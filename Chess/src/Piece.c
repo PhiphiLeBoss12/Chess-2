@@ -2,11 +2,11 @@
 #include <string.h>
 
 SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
-	char* path;
+	char path[100];
 	if (color == WHITE)
-		path = "White_";
+		strcpy(path, "White_");
 	else
-		path = "Black_";
+		strcpy(path, "Black_");
 
 	switch (type) {
 	case PAWN:
