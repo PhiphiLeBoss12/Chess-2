@@ -18,7 +18,7 @@ typedef struct StructPiece {
 
 typedef struct StructBoard {
 	int size;
-	Piece table[8][8]; //table of 64 squares
+	Piece * **table; //table of 64 squares
 } Board;
 
 typedef struct StructPlayer {
