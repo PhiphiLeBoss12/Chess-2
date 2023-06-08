@@ -50,7 +50,7 @@ void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned cha
 void drawRect(Window* window, Rect* rect);
 
 // Creates a texture from the file path
-// // Only JPG and PNG formats are supported!
+// Only JPG and PNG formats are supported!
 // You need to destroy the texture once you don't need it anymore
 SDL_Texture* createTexture(Window* window, const char* path);
 

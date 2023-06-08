@@ -59,16 +59,9 @@ void handleEvents(Window* window) {
 		case SDL_WINDOWEVENT:
 			if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				window->shouldClose = 1;
-			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 				window->width = event.window.data1;
 				window->height = event.window.data2;
-			}
-			if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
-				int width, height;
-				SDL_GetWindowSize(window, &width, &height);
-				SDL_GetWindowSizeInPixels(window, &width, &height);
-				window->width = width;
-				window->height = height;
 			}
 			break;
 

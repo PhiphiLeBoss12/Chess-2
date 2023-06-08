@@ -2,7 +2,6 @@
 #include "Window.h"
 #include <stdio.h>
 
-
 void game(Window* window) {
 	Board* board = createBoard(8);
 
@@ -11,16 +10,16 @@ void game(Window* window) {
 		setDrawColor(window, 64, 64, 64, 255);
 		clear(window);
 
-		drawBoard(window, board, window->width > window->height ? window->height / 8 : window->width / 8);
+		int squareSize = min(window->width, window->height) / 8;
+		drawBoard(window, board, squareSize);
 
 		presentWindow(window);
 
 		int x, y;
 		if (window->mouseLeftButton) {
-			getInputOnBoard(window, &x, &y, 100);
+			getInputOnBoard(window, &x, &y, squareSize);
 			board->selectedX = x;
 			board->selectedY = y;
-			printf("%d %d\n", x, y);
 		}
 	}
 }
@@ -33,9 +32,8 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 	int x = window->mousePosX;
 	int y = window->mousePosY;
 
-	// We consider that the board is filling the whole screen
-	*boardX = x / (int)squareSize;
-	*boardY = y / (int)squareSize;
+	*boardX = x / squareSize;
+	*boardY = y / squareSize;
 }
 
 void drawBoard(Window* window, Board* board, int squareSize) {
