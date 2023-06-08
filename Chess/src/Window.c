@@ -15,7 +15,7 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	if (!window->window) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -27,12 +27,18 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		return NULL;
 	}
 
+	window->width = width;
+	window->height = height;
+
 	window->shouldClose = 0;
+
 	window->mousePosX = 0;
 	window->mousePosY = 0;
 	window->mouseRightButton = 0;
 	window->mouseLeftButton = 0;
 	window->mouseMiddleButton = 0;
+
+	window->keyDown = SDLK_UNKNOWN;
 
 	return window;
 }
@@ -53,6 +59,10 @@ void handleEvents(Window* window) {
 		case SDL_WINDOWEVENT:
 			if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				window->shouldClose = 1;
+			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+				window->width = event.window.data1;
+				window->height = event.window.data2;
+			}
 			break;
 
 		case SDL_MOUSEMOTION:

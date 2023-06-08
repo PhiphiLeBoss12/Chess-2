@@ -1,4 +1,4 @@
 #pragma once
-#include "types.h"
+#include "Types.h"
 
-Board* createBoard(int sizeX, int sizeY);
+Board* createBoard(int size);
