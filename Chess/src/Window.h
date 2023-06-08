@@ -36,7 +36,7 @@ void clear(Window* window);
 void presentWindow(Window* window);
 
 // Sets the color for drawing several primitives
-// The color is in RGBA format, 0-255
+// The color is in RGBA format, 0-255 where 0 is no color and 255 is full color
 void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 // Draws a Rect with the last selected draw color
