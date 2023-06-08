@@ -12,12 +12,13 @@ typedef struct StructPiece {
 	TypeColor color;
 	int x;
 	int y;
-	int hasMoved; //if the piece has moved
+	int hasMoved; //if the piece has moved in this turn
+	int hasMovedOnce; //if the piece has moved one time
 } Piece;
 
 typedef struct StructBoard {
 	int size;
-	Piece table[8][8]; //table of 64 squares
+	Piece * **table; //table of 64 squares
 } Board;
 
 typedef struct StructPlayer {
@@ -25,5 +26,10 @@ typedef struct StructPlayer {
 	TypeColor color;
 	TypeState check;
 } Player;
+
+typedef struct StructCase {
+	int x;
+	int y;
+} Case;
 
 
