@@ -1,6 +1,6 @@
 #include "Piece.h"
 
-Piece *createPiece(TypePiece type, TypeColor color, int x, int y) {//, Board board) {
+Piece *createPiece(TypePiece type, TypeColor color, int x, int y, Board *board) {
 	if (!(0 <= x && x < 8 && 0 <= y && y < 8)) { //check if coord is in the table
 		printf("Failed : This piece isn't in the table.");
 		return NULL;
@@ -13,7 +13,7 @@ Piece *createPiece(TypePiece type, TypeColor color, int x, int y) {//, Board boa
 	piece->y = y;
 	piece->hasMoved = 1; //False
 	piece->hasMovedOnce = 1; //False
-	//board.table[x][y] = *piece; //put the piece in the board
+	board->table[x][y] = piece; //put the piece in the board
 	return piece;
 }
 
@@ -78,29 +78,49 @@ void showPiece(Piece* piece) {
 	printf("\n");
 }
 
-void movePiece(Piece* piece, int x, int y) {
-	//board.table[x][y] = NULL;
+void movePiece(Piece* piece, int x, int y, Board *board) {
+	board->table[x][y] = NULL;
 	piece->x = x;
 	piece->y = y;
-	//board.table[x][y] = *piece;
+	board->table[x][y] = piece;
 }
 
-Case *movePosibilitiesPawn(Piece* piece) { //Board board) {
+Case *movePosibilitiesPawn(Piece* piece, Board *board) {
 	Case* tab;
 	int index = 0;
-	tab = malloc(sizeof(Case) * 4); //27 possibilities max
+	tab = malloc(sizeof(Case) * 4);
 	Case casePos;
-	if (board.table[piece->x][piece->y + 1] == NULL) { //To move 1 case
+	//To move 1 case
+	if (board->table[piece->x][piece->y + 1] == NULL) { 
 		casePos.x = piece->x;
 		casePos.y = piece->y + 1;
 		tab[index] = casePos;
 		index++;
 	}
-	if (board.table[piece->x][piece->y + 1] == NULL && board.table[piece->x][piece->y + 2] == NULL && piece->hasMovedOnce != 0) { //To move 2 cases
+	//To move 2 cases
+	if (board->table[piece->x][piece->y + 1] == NULL && board->table[piece->x][piece->y + 2] == NULL && piece->hasMovedOnce != 0) { 
 		casePos.x = piece->x;
 		casePos.y = piece->y + 2;
 		tab[index] = casePos;
 		index++;
+	}
+	//Left move
+	if (piece->x - 1 >= 0) { //Verify border
+		if (board->table[piece->x - 1][piece->y + 1] == NULL || board->table[piece->x - 1][piece->y + 1]->color != piece->color) {
+			casePos.x = piece->x - 1;
+			casePos.y = piece->y + 1;
+			tab[index] = casePos;
+			index++;
+		}
+	}
+	//Right move
+	if (piece->x + 1 >= 0) { //Verify border
+		if (board->table[piece->x + 1][piece->y + 1] == NULL || board->table[piece->x + 1][piece->y + 1]->color != piece->color) {
+			casePos.x = piece->x + 1;
+			casePos.y = piece->y + 1;
+			tab[index] = casePos;
+			index++;
+		}
 	}
 	return tab;
 }
