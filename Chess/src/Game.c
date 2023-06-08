@@ -4,18 +4,22 @@
 
 
 void game(Window* window) {
+	Board* board = createBoard(8);
+
 	while (!window->shouldClose) {
 		handleEvents(window);
 		setDrawColor(window, 64, 64, 64, 255);
 		clear(window);
 
-		drawBoard(window, window->width > window->height ? window->height / 8 : window->width / 8);
+		drawBoard(window, board, window->width > window->height ? window->height / 8 : window->width / 8);
 
 		presentWindow(window);
 
 		int x, y;
 		if (window->mouseLeftButton) {
 			getInputOnBoard(window, &x, &y, 100);
+			board->selectedX = x;
+			board->selectedY = y;
 			printf("%d %d\n", x, y);
 		}
 	}
@@ -34,10 +38,12 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 	*boardY = y / (int)squareSize;
 }
 
-void drawBoard(Window* window, int squareSize) {
-	for (unsigned int i = 0; i < 8; i++) {
+void drawBoard(Window* window, Board* board, int squareSize) {
+	for (unsigned int i = 7; i >= 0; i--) {
 		for (unsigned int j = 0; j < 8; j++) {
-			if ((i + j) % 2 == 0)
+			if (board->selectedX == j && board->selectedY == i)
+				setDrawColor(window, 255, 0, 0, 255);
+			else if ((i + j) % 2 == 0)
 				setDrawColor(window, 200, 200, 200, 255);
 			else
 				setDrawColor(window, 64, 64, 64, 255);

@@ -7,7 +7,7 @@ typedef enum EnumPiece { PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING } TypePiece;
 typedef enum EnumColor { WHITE, BLACK } TypeColor;
 typedef enum EnumState { COOL, CHECK, CHECKMATE } TypeState; //game status
 
-char PiecesNames[6] = { 'P', 'B', 'N', 'R', 'Q', 'K' };
+static const char PiecesNames[6] = { 'P', 'B', 'N', 'R', 'Q', 'K' };
 
 typedef struct StructPiece {
 	TypePiece type;
@@ -21,6 +21,7 @@ typedef struct StructPiece {
 typedef struct StructBoard {
 	int size;
 	Piece * **table; //table of 64 squares
+	int selectedX, selectedY;
 } Board;
 
 typedef struct StructPlayer {
