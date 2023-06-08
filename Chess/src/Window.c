@@ -28,6 +28,11 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 	}
 
 	window->shouldClose = 0;
+	window->mousePosX = 0;
+	window->mousePosY = 0;
+	window->mouseRightButton = 0;
+	window->mouseLeftButton = 0;
+	window->mouseMiddleButton = 0;
 
 	return window;
 }
@@ -48,6 +53,33 @@ void handleEvents(Window* window) {
 		case SDL_WINDOWEVENT:
 			if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				window->shouldClose = 1;
+			break;
+
+		case SDL_MOUSEMOTION:
+			window->mousePosX = event.motion.x;
+			window->mousePosY = event.motion.y;
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			switch (event.button.button) {
+			case SDL_BUTTON_LEFT: window->mouseLeftButton = 1; break;
+			case SDL_BUTTON_RIGHT: window->mouseRightButton = 1; break;
+			case SDL_BUTTON_MIDDLE: window->mouseMiddleButton = 1; break;
+			}
+			break;
+		case SDL_MOUSEBUTTONUP:
+			switch (event.button.button) {
+			case SDL_BUTTON_LEFT: window->mouseLeftButton = 0; break;
+			case SDL_BUTTON_RIGHT: window->mouseRightButton = 0; break;
+			case SDL_BUTTON_MIDDLE: window->mouseMiddleButton = 0; break;
+			}
+			break;
+
+		case SDL_KEYDOWN:
+			window->keyDown = event.key.keysym.sym;
+			break;
+		case SDL_KEYUP:
+			window->keyDown = SDLK_UNKNOWN;
 			break;
 		}
 	}
