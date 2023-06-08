@@ -78,11 +78,56 @@ void showPiece(Piece* piece) {
 	printf("\n");
 }
 
-void movePiece(Piece* piece, int x, int y, Board *board) {
-	board->table[x][y] = NULL;
+/* movePiece
+	utilité :	¤ déplacer une pièce sur l'échiquier
+				¤ manger un ennemi
+	input :	¤ Piece* piece (pièce à déplacer)
+			¤ int x, int y (nouvelle position)
+			¤ Board* board (plateau du jeu)
+			¤ Player* playNice (joueur à qui app la pièce)
+			¤ Player* playBad (joeur adverse)
+	output :	¤ void (rien) */
+void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad) {
+	board->table[piece->x][piece->y] = NULL; //ancienne position
+	if (board->table[x][y] != NULL) { //si ennemi
+		int pos = getPosVideEaten(*playNice); //où il y a un emplacement vide dans eaten
+		playNice->eaten[pos] = board->table[x][y]; //ajout ennemi à la liste eaten du player
+		int pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y])); //recherche la pièce mangé dans la liste du joueur adverse
+		playBad->table[pos2] = NULL; //suppression de la pièce mangé
+	}
 	piece->x = x;
 	piece->y = y;
-	board->table[x][y] = piece;
+	board->table[x][y] = piece; //pièce déplacer
+}
+
+/* searchPieceInTablePlay
+	utilité :	¤ trouver la position d'une pièce d'un player
+	input :	¤ Player play (le joueur)
+			¤ Piece piece (la pièce)
+	output :	¤ la position de la pièce
+				¤ -1 si non trouvé */
+int searchPieceInTablePlay(Player play, Piece piece) {
+	int pos = -1;
+	for (int i = 0; i < 16; i++) {
+		if ((play.table[i]->x == piece.x) && (play.table[i]->y == piece.y)) {
+			pos = i;
+		}
+	}
+	return pos;
+}
+
+/* getPosVideEaten
+	utilité :	¤ trouver une position vide dans eaten
+	input :	¤ Player play (le joueur)
+	output :	¤ int (la position) */
+int getPosVideEaten(Player play) {
+	Piece* tempo = play.eaten[0];
+	int i = 0;
+	while (tempo != NULL) {
+		i += 1;
+		tempo = play.eaten[i];
+	}
+	return i;
 }
 
 Case *movePosibilitiesPawn(Piece* piece, Board *board) {

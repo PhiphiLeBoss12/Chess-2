@@ -25,9 +25,10 @@ typedef struct StructBoard {
 } Board;
 
 typedef struct StructPlayer {
-	Piece **table;
+	Piece * *table; //tableau pièce joueur
 	TypeColor color;
 	TypeState check;
+	Piece * *eaten; //tableau pièce adverse mangé
 } Player;
 
 typedef struct StructCase {
