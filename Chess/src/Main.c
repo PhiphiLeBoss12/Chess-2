@@ -12,5 +12,8 @@ int main(int argc, char* argv[])
     game(window);
     cleanup(window);
 
+    Board* board = createBoard(8);
+    displayBoardConsole(board);
+
     return 0;
 }

@@ -18,12 +18,17 @@ Board* createBoard(int size) {
 	return board;
 }
 
-/*
+
 Board* displayBoardConsole(Board* board) {
 	for (int x = 0; x < board->size; x++) {
 		for (int y = 0; y < board->size; y++) {
-			printf("");PieceCorrespondance
+			if (board->table[x][y] != NULL) {
+				printf("$c ", PiecesNames[(board->table[x][y])->type]);
+			}
+			else {
+				printf("X");
+			}
+			printf("\n");
 		}
 	}
 }
-*/
