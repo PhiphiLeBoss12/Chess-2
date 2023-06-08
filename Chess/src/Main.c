@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include "Type.h"
+#include "Types.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600

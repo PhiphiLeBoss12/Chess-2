@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef enum EnumPiece{PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING} TypePiece;
-typedef enum EnumColor {WHITE, BLACK} TypeColor;
-typedef enum EnumState {COOL, CHECK, CHECKMATE} TypeState; //game status
+typedef enum EnumPiece { PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING } TypePiece;
+typedef enum EnumColor { WHITE, BLACK } TypeColor;
+typedef enum EnumState { COOL, CHECK, CHECKMATE } TypeState; //game status
 
 typedef struct StructPiece {
 	TypePiece type;
