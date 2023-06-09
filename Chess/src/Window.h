@@ -49,6 +49,9 @@ void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned cha
 // The angle field is ignored
 void drawRect(Window* window, Rect* rect);
 
+// Draws a circle centered at (x,y) of radius radius
+void drawCircle(Window* window, int x, int y, int radius);
+
 // Creates a texture from the file path
 // Only JPG and PNG formats are supported!
 // You need to destroy the texture once you don't need it anymore
