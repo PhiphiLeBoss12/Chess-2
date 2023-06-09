@@ -12,7 +12,9 @@ void showPiece(Piece* piece);
 Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities);
 Case* movePossibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities);
 Case* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities);
-//Case* movePossibilitiesKnight(Piece* piece, Board* board);
+Case* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilities);
+//Case* movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities);
+
 
 void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
 int searchPieceInTablePlay(Player play, Piece piece);
