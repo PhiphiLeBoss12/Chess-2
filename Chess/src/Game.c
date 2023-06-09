@@ -12,14 +12,23 @@ void game() {
 	// Player* p2 = initPlayers(BLACK, window);
 	// putInBoard(p1, board);
 	// putInBoard(p2, board);
+	/*Player *player1 = initPlayers(WHITE, window);
+	Player* player2 = initPlayers(BLACK, window);
+	putInBoard(player1, board);
+	putInBoard(player2, board);*/
 
-	Piece* piece = initPiece(PAWN, WHITE, 5, 5, window);
-	board->table[5][5] = piece;
+
+	/*Piece* piece1 = initPiece(BISHOP, WHITE, 1, 1, window);
+	board->table[1][1] = piece1;
+
+	Piece* piece2 = initPiece(PAWN, BLACK, 2, 2, window);
+	piece2->hasMovedOnce = 1;
+	board->table[2][2] = piece2;*/
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
 		handleEvents(window);
-		setDrawColor(window, 64, 64, 64, 255);
+		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
 
 		int squareSize = min(window->width, window->height) / 8;
@@ -100,6 +109,7 @@ void drawPossibilities(Window* window, Board* board, int squareSize) {
 		int x = possibilities[i].x * squareSize + squareSize / 2;
 		int y = possibilities[i].y * squareSize + squareSize / 2;
 		int radius = squareSize / 2 - squareSize / 10;
+		setDrawColor(window, 128, 128, 128, 128);
 		drawCircle(window, x, y, radius);
 	}
 }

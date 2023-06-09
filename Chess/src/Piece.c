@@ -172,15 +172,12 @@ int getPosVideEaten(Player play) {
 Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities) {
 	switch (piece->type) {
 	case PAWN:
-		//printf("possibility Pawn\n");
 		return movePossibilitiesPawn(piece, board, sizeTabPossibilities);
 		break;
 	case BISHOP:
-		//printf("possibility Bishop\n");
 		return movePossibilitiesBishop(piece, board, sizeTabPossibilities);
 		break;
 	case KNIGHT:
-		//printf("possibility Knight\n");
 		return movePossibilitiesKnight(piece, board, sizeTabPossibilities);
 		break;
 	default:
@@ -299,21 +296,23 @@ Case* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilit
 				mult2 = pow((-1), power2);
 				X = piece->x + add * mult;
 				Y = piece->y + (2*mult2) / mult;
-				if (board->table[X][Y] == NULL) {
-					casePos.x = X;
-					casePos.y = Y;
-					tab[index] = casePos;
-					index++;
-
-				}
-				else {
-					if (board->table[X][Y]->color != piece->color) {
+				if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
+					if (board->table[X][Y] == NULL) {
 						casePos.x = X;
 						casePos.y = Y;
 						tab[index] = casePos;
 						index++;
+
 					}
-				}
+					else {
+						if (board->table[X][Y]->color != piece->color) {
+							casePos.x = X;
+							casePos.y = Y;
+							tab[index] = casePos;
+							index++;
+						}
+					}
+				}	
 			}
 		}
 	}
