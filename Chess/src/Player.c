@@ -18,7 +18,7 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 	player->eaten = (Piece**)malloc(16 * sizeof(Piece*));
 	for (int i = 0; i < 16; i++)
 	{
-		player->eaten = NULL;
+		player->eaten[i] = NULL;
 	}
 	int pawn, pieces;
 	if (coloor==WHITE)
