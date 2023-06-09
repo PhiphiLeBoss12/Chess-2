@@ -47,6 +47,12 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 	return player;
 }
 
+void freePlayer(Player* player) {
+	free(player->table);
+	free(player->eaten);
+	free(player);
+}
+
 void printPlayer(Player* player) {
 	printf("\nPLAYER :\n");
 	printf("-Color : %d\n", player->color);
