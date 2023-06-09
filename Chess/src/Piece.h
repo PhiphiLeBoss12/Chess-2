@@ -5,7 +5,7 @@ Piece* initPiece(TypePiece type, TypeColor color, int x, int y, Window* window);
 void destroyPiece(Piece* piece);
 
 void showTypePiece(TypePiece type);
-void showCoord(int x, int y);
+char* showCoord(int x, int y);
 void showCoordPiece(Piece* piece);
 void showPiece(Piece* piece);
 

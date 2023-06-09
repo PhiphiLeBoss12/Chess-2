@@ -14,8 +14,6 @@ void game() {
 	putInBoard(players[0], board);
 	putInBoard(players[1], board);
 
-	showCoordPiece(p1->table[0]);
-
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
 	int leftButtonHeld = 0;
@@ -54,7 +52,7 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 	*boardY = y / squareSize;
 }
 
-Case* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
+Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
 	if (!selectedPiece)
 		return NULL;
 	if (board->selectedX == -1 || board->selectedY == -1)
@@ -100,7 +98,7 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 
 void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize) {
 	if (!possibilities)
-		return NULL;
+		return;
 
 	for (int i = 0; i < numPossibilities; i++) {
 		int x = possibilities[i].x * squareSize + squareSize / 2;
@@ -111,7 +109,7 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	}
 }
 
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Case* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays) {
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays) {
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
