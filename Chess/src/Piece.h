@@ -21,3 +21,5 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
 int searchPieceInTablePlay(Player play, Piece piece);
 int getPosVideEaten(Player play);
+void affTabPlayer(Player play);
+void affEatenPlayer(Player play);
