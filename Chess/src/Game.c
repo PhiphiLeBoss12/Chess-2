@@ -51,7 +51,7 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 }
 
 void drawBoard(Window* window, Board* board, int squareSize) {
-	for (int i = 7; i >= 0; i--) {
+	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if (board->selectedX == j && board->selectedY == i)
 				setDrawColor(window, 255, 0, 0, 255);
@@ -65,8 +65,12 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 			rect.y = i * squareSize;
 			rect.width = squareSize;
 			rect.height = squareSize;
+			rect.angle = 0.0f;
 
 			drawRect(window, &rect);
+
+			if (board->table[j][i])
+				drawTexture(window, &rect, board->table[j][i]->texture);
 		}
 	}
 }
