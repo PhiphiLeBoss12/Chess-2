@@ -8,22 +8,12 @@ void game() {
 	// INIT
 	Window* window = initWindow("Chess 2", 800, 800);
 	Board* board = createBoard(8);
-	// Player* p1 = initPlayers(WHITE, window);
-	// Player* p2 = initPlayers(BLACK, window);
-	// putInBoard(p1, board);
-	// putInBoard(p2, board);
-	/*Player *player1 = initPlayers(WHITE, window);
-	Player* player2 = initPlayers(BLACK, window);
-	putInBoard(player1, board);
-	putInBoard(player2, board);*/
+	Player* p1 = initPlayers(WHITE, window);
+	Player* p2 = initPlayers(BLACK, window);
+	putInBoard(p1, board);
+	putInBoard(p2, board);
 
-
-	/*Piece* piece1 = initPiece(BISHOP, WHITE, 1, 1, window);
-	board->table[1][1] = piece1;
-
-	Piece* piece2 = initPiece(PAWN, BLACK, 2, 2, window);
-	piece2->hasMovedOnce = 1;
-	board->table[2][2] = piece2;*/
+	int leftButtonHeld = 0;
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
@@ -37,11 +27,14 @@ void game() {
 		presentWindow(window);
 
 		int x, y;
-		if (window->mouseLeftButton) {
+		if (window->mouseLeftButton && !leftButtonHeld) {
 			getInputOnBoard(window, &x, &y, squareSize);
 			board->selectedX = x;
 			board->selectedY = y;
+			leftButtonHeld = 1;
 		}
+		if (!window->mouseLeftButton)
+			leftButtonHeld = 0;
 	}
 
 	// CLEANUP
