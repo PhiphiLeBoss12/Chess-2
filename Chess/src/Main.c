@@ -4,6 +4,7 @@
 #include "Board.h"
 #include "Window.h"
 #include "Game.h"
+#include "Player.h"
 #include <math.h>
 
 int main(int argc, char* argv[])
@@ -13,6 +14,8 @@ int main(int argc, char* argv[])
 
     Player* p1 = initPlayers(WHITE);
     Player* p2 = initPlayers(BLACK);
+
+    printf("test1 %d\n", p1->color);
 
     printPlayer(p1);
 

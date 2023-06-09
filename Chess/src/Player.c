@@ -11,7 +11,7 @@ typedef struct StructPlayer {
 
 Player* initPlayers(TypeColor coloor) {
 	Player* player;
-	player = (Player*)malloc(sizeof(struct StructPlayer));
+	player = (Player*)malloc(sizeof(Player));
 	player->color = coloor;
 	player->check = 0;
 	player->table = (Piece**)malloc(16 * sizeof(Piece*));
