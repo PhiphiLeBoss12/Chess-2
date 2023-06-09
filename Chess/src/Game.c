@@ -8,10 +8,11 @@ void game() {
 	// INIT
 	Window* window = initWindow("Chess 2", 800, 800);
 	Board* board = createBoard(8);
-	Player* p1 = initPlayers(WHITE, window);
-	Player* p2 = initPlayers(BLACK, window);
-	putInBoard(p1, board);
-	putInBoard(p2, board);
+	Player* players[2];
+	players[0] = initPlayers(WHITE, window);
+	players[1] = initPlayers(BLACK, window);
+	putInBoard(players[0], board);
+	putInBoard(players[1], board);
 
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
@@ -20,11 +21,11 @@ void game() {
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
+		squareSize = min(window->width, window->height) / 8;
+
 		handleEvents(window);
 		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
-
-		squareSize = min(window->width, window->height) / 8;
 
 		int numPossibilities = 0;
 		Case* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
@@ -34,48 +35,11 @@ void game() {
 
 		presentWindow(window);
 
-		if (window->mouseLeftButton && !leftButtonHeld) {
-			int x, y;
-			getInputOnBoard(window, &x, &y, squareSize);
-
-			if (board->table[x][y]) {
-				board->selectedX = x;
-				board->selectedY = y;
-			}
-			
-			for (int i = 0; i < numPossibilities; i++) {
-				if (x == possibilities[i].x && y == possibilities[i].y) {
-					board->selectedX = x;
-					board->selectedY = y;
-				}
-
-				if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && whoPlays == selectedPiece->color) {
-					movePiece(selectedPiece, board->selectedX, board->selectedY, board, p1, p2);
-					whoPlays = whoPlays == WHITE ? BLACK : WHITE; // Change the color
-					// Unselect the square
-					board->selectedX = -1;
-					board->selectedY = -1;
-					Player* tempo = p1;
-					p1 = p2;
-					p2 = tempo;
-				}
-			}
-
-			if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
-				selectedPiece = board->table[board->selectedX][board->selectedY];
-
-			leftButtonHeld = 1;
-		}
-		if (!window->mouseLeftButton)
-			leftButtonHeld = 0;
-
-		// Free the possibilities
-		if (possibilities)
-			free(possibilities);
+		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 	}
 
-	freePlayer(p1);
-	freePlayer(p2);
+	freePlayer(players[0]);
+	freePlayer(players[1]);
 	destroyBoard(board);
 	destroyWindow(window);
 }
@@ -143,4 +107,43 @@ void drawPossibilities(Window* window, Board* board, Case* possibilities, int nu
 		setDrawColor(window, 128, 128, 128, 128);
 		drawCircle(window, x, y, radius);
 	}
+}
+
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Case* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays) {
+	static int leftButtonHeld = 0;
+
+	if (window->mouseLeftButton && !leftButtonHeld) {
+		int x, y;
+		getInputOnBoard(window, &x, &y, squareSize);
+
+		if (board->table[x][y]) {
+			board->selectedX = x;
+			board->selectedY = y;
+		}
+
+		for (int i = 0; i < numPossibilities; i++) {
+			if (x == possibilities[i].x && y == possibilities[i].y) {
+				board->selectedX = x;
+				board->selectedY = y;
+			}
+
+			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
+				movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
+				// Unselect the square
+				board->selectedX = -1;
+				board->selectedY = -1;
+				Player* tempo = players[0];
+				players[0] = players[1];
+				players[1] = tempo;
+			}
+		}
+
+		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
+			*selectedPiece = board->table[board->selectedX][board->selectedY];
+
+		leftButtonHeld = 1;
+	}
+	if (!window->mouseLeftButton)
+		leftButtonHeld = 0;
 }
