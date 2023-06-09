@@ -171,30 +171,45 @@ int getPosVideEaten(Player play) {
 	return i;
 }
 
-Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities) {
+Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities, Player* playNice, Player* playBad) {
+	Case* tab;
 	switch (piece->type) {
 	case PAWN:
-		return movePossibilitiesPawn(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesPawn(piece, board, sizeTabPossibilities);
 		break;
 	case BISHOP:
-		return movePossibilitiesBishop(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesBishop(piece, board, sizeTabPossibilities);
 		break;
 	case KNIGHT:
-		return movePossibilitiesKnight(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesKnight(piece, board, sizeTabPossibilities);
 		break;
 	case ROOK:
-		return movePossibilitiesRook(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesRook(piece, board, sizeTabPossibilities);
 		break;
 	case QUEEN:
-		return movePossibilitiesQueen(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesQueen(piece, board, sizeTabPossibilities);
 		break;
 	case KING:
-		return movePossibilitiesKing(piece, board, sizeTabPossibilities);
+		tab = movePossibilitiesKing(piece, board, sizeTabPossibilities);
 		break;
 	default:
 		*sizeTabPossibilities = 0;
 		return NULL;
 	}
+	//Verify check
+	/*
+	Case* newTab;
+	int index = 0;
+	Board tempBoard = *board;
+	for (int i = 0; i < *sizeTabPossibilities; i++) {
+		movePiece(piece, tab[i].x, tab[i].y, &tempBoard, playNice, playBad);
+		if (!isCheck(tempBoard, piece->color)) {
+			newTab[index] = tab[i];
+			index++;
+		}
+	}
+	return newTab;*/
+	return tab;
 }
 
 Case *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities) {
