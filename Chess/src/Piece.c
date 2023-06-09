@@ -141,6 +141,66 @@ void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Playe
 	piece->hasMovedOnce = 1;
 }
 
+void affTabPlayer(Player play) {
+	for (int i = 0; i < 16; i++) {
+		if (play.table[i] != NULL) {
+			switch (play.table[i]->type) {
+				case 0:
+					printf("P ");
+					break;
+				case 1:
+					printf("F ");
+					break;
+				case 2:
+					printf("C ");
+					break;
+				case 3:
+					printf("T ");
+					break;
+				case 4:
+					printf("Q ");
+					break;
+				case 5:
+					printf("R ");
+					break;
+			}
+		}
+		else {
+			printf("_ ");
+		}
+	}
+}
+
+void affEatenPlayer(Player play) {
+	for (int i = 0; i < 16; i++) {
+		if (play.eaten[i] != NULL) {
+			switch (play.eaten[i]->type) {
+			case 0:
+				printf("P ");
+				break;
+			case 1:
+				printf("F ");
+				break;
+			case 2:
+				printf("C ");
+				break;
+			case 3:
+				printf("T ");
+				break;
+			case 4:
+				printf("Q ");
+				break;
+			case 5:
+				printf("R ");
+				break;
+			}
+		}
+		else {
+			printf("_ ");
+		}
+	}
+}
+
 /* searchPieceInTablePlay
 	utilit� :	� trouver la position d'une pi�ce d'un player
 	input :	� Player play (le joueur)
@@ -150,8 +210,10 @@ void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Playe
 int searchPieceInTablePlay(Player play, Piece piece) {
 	int pos = -1;
 	for (int i = 0; i < 16; i++) {
-		if ((play.table[i]->x == piece.x) && (play.table[i]->y == piece.y)) {
-			pos = i;
+		if (play.table[i] != NULL) {
+			if ((play.table[i]->x == piece.x) && (play.table[i]->y == piece.y)) {
+				pos = i;
+			}
 		}
 	}
 	return pos;

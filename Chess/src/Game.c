@@ -47,6 +47,9 @@ void game() {
 					// Unselect the square
 					board->selectedX = -1;
 					board->selectedY = -1;
+					Player* tempo = p1;
+					p1 = p2;
+					p2 = tempo;
 				}
 			}
 
