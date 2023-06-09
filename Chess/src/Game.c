@@ -9,10 +9,8 @@ void game() {
 	Board* board = createBoard(8);
 
 	Piece* piece;
-	piece = initPiece(BISHOP, WHITE, 0, 0, window);
+	piece = initPiece(PAWN, WHITE, 0, 0, window);
 	board->table[0][0] = piece;
-
-	
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
@@ -53,13 +51,6 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 void drawBoard(Window* window, Board* board, int squareSize) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (board->selectedX == j && board->selectedY == i)
-				setDrawColor(window, 255, 0, 0, 255);
-			else if ((i + j) % 2 == 0)
-				setDrawColor(window, 200, 200, 200, 255);
-			else
-				setDrawColor(window, 64, 64, 64, 255);
-
 			Rect rect;
 			rect.x = j * squareSize;
 			rect.y = i * squareSize;
@@ -67,7 +58,17 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 			rect.height = squareSize;
 			rect.angle = 0.0f;
 
+			if ((i + j) % 2 == 0)
+				setDrawColor(window, 200, 200, 200, 255);
+			else
+				setDrawColor(window, 64, 64, 64, 255);
+
 			drawRect(window, &rect);
+
+			if (board->selectedX == j && board->selectedY == i) {
+				setDrawColor(window, 128, 128, 128, 128);
+				drawCircle(window, rect.x + rect.width / 2, rect.y + rect.height / 2, rect.width / 2 - rect.width / 10);
+			}
 
 			if (board->table[j][i])
 				drawTexture(window, &rect, board->table[j][i]->texture);

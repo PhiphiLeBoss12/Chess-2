@@ -26,6 +26,7 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+	SDL_SetRenderDrawBlendMode(window->renderer, SDL_BLENDMODE_BLEND);
 
 	window->width = width;
 	window->height = height;
@@ -67,7 +68,7 @@ void handleEvents(Window* window) {
 
 		case SDL_MOUSEMOTION:
 			window->mousePosX = event.motion.x;
-			window->mousePosY = event.motion.y;
+			window->mousePosY = window->height - event.motion.y;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -112,6 +113,20 @@ void drawRect(Window* window, Rect* rect) {
 	SDL_Rect sdlRect = { rect->x,  window->height - rect->y - rect->height, rect->width, rect->height };
 	if (SDL_RenderFillRect(window->renderer, &sdlRect) < 0)
 		printf("Failed to fill rect! SDL error: %s\n", SDL_GetError());
+}
+
+void drawCircle(Window* window, int x, int y, int radius) {
+	// Shamelessly stolen from https://stackoverflow.com/questions/65723827/sdl2-function-to-draw-a-filled-circle
+	for (int w = 0; w < radius * 2; w++) {
+		for (int h = 0; h < radius * 2; h++) {
+			int dx = radius - w; // horizontal offset
+			int dy = radius - h; // vertical offset
+			if ((dx * dx + dy * dy) <= (radius * radius))
+			{
+				SDL_RenderDrawPoint(window->renderer, x + dx, window->height - y - dy);
+			}
+		}
+	}
 }
 
 SDL_Texture* createTexture(Window* window, const char* path) {
