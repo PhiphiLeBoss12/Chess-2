@@ -18,3 +18,6 @@ void drawBoard(Window* window, Board* board, int squareSize);
 
 // Draws all move possibilities of the selected piece if a piece is selected
 void drawPossibilities(Window* window, Board* board, Case* possibilities, int numPossibilities, int squareSize);
+
+// Big ahh function to react when the mouse is clicked
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Case* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays);

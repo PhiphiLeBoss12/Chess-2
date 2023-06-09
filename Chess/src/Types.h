@@ -35,9 +35,9 @@ typedef struct StructPlayer {
 	Piece * *eaten; //tableau pièce adverse mangé
 } Player;
 
-typedef struct StructCase {
+typedef struct StructCell {
 	int x;
 	int y;
-} Case;
+} Cell;
 
 
