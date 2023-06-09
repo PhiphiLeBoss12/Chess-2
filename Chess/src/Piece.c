@@ -180,6 +180,15 @@ Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibiliti
 	case KNIGHT:
 		return movePossibilitiesKnight(piece, board, sizeTabPossibilities);
 		break;
+	case ROOK:
+		return movePossibilitiesRook(piece, board, sizeTabPossibilities);
+		break;
+	case QUEEN:
+		return movePossibilitiesQueen(piece, board, sizeTabPossibilities);
+		break;
+	case KING:
+		return movePossibilitiesKing(piece, board, sizeTabPossibilities);
+		break;
 	default:
 		*sizeTabPossibilities = 0;
 		return NULL;
@@ -320,60 +329,155 @@ Case* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilit
 	return tab;
 }
 
-//Case * movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities) {
-//	Case* tab;
-//	Case casePos;
-//	tab = malloc(sizeof(Case) * 14);
-//	int index = 0;
-//	int i, mult, X, Y;
-//	//X line
-//	for (int power = 1; power < 3; power++) { //Left and Right
-//		mult = pow((-1), power);
-//		for (i = 1; i < SIZE; i++) { //1 to 7 (top line)
-//			Y = piece->y + i * mult;
-//			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-//				if (board->table[X][Y] == NULL) {
-//					casePos.x = X;
-//					casePos.y = Y;
-//					tab[index] = casePos;
-//					index++;
-//				}
-//				else {
-//					if (board->table[X][Y]->color != piece->color) {
-//						casePos.x = X;
-//						casePos.y = Y;
-//						tab[index] = casePos;
-//						index++;
-//					}
-//					break; //We're out of the loop because there will be no more accessible pieces in front
-//				}
-//			}
-//		}
-//		for (i = -1; i > -SIZE; i--) { //-1 to -7 (bottom line)
-//			X = piece->x + i * mult;
-//			Y = piece->y - i * mult;
-//			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-//				if (board->table[X][Y] == NULL) {
-//					casePos.x = X;
-//					casePos.y = Y;
-//					tab[index] = casePos;
-//					index++;
-//				}
-//				else {
-//					if (board->table[X][Y]->color != piece->color) {
-//						casePos.x = X;
-//						casePos.y = Y;
-//						tab[index] = casePos;
-//						index++;
-//					}
-//					break; //We're out of the loop because there will be no more accessible pieces in front
-//				}
-//			}
-//		}
-//	}
-//	*sizeTabPossibilities = index;
-//	return tab;
-//}
+Case * movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities) {
+	Case* tab;
+	Case casePos;
+	tab = malloc(sizeof(Case) * 14);
+	int index = 0;
+	int i, mult, X, Y;
+	//X line
+	X = piece->x;
+	for (i = 1; i < SIZE; i++) { //1 to 7 (top line)
+		Y = piece->y + i;
+		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
+			if (board->table[X][Y] == NULL) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+			}
+			else {
+				if (board->table[X][Y]->color != piece->color) {
+					casePos.x = X;
+					casePos.y = Y;
+					tab[index] = casePos;
+					index++;
+				}
+				break; //We're out of the loop because there will be no more accessible pieces in front
+			}
+		}
+	}
+	for (i = -1; i > -SIZE; i--) { //-1 to -7 (bottom line)
+		Y = piece->y + i;
+		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
+			if (board->table[X][Y] == NULL) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+			}
+			else {
+				if (board->table[X][Y]->color != piece->color) {
+					casePos.x = X;
+					casePos.y = Y;
+					tab[index] = casePos;
+					index++;
+				}
+				break; //We're out of the loop because there will be no more accessible pieces in front
+			}
+		}
+	}
+	Y = piece->y;
+	for (i = 1; i < SIZE; i++) { //1 to 7 (top line)
+		X = piece->x + i;
+		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
+			if (board->table[X][Y] == NULL) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+			}
+			else {
+				if (board->table[X][Y]->color != piece->color) {
+					casePos.x = X;
+					casePos.y = Y;
+					tab[index] = casePos;
+					index++;
+				}
+				break; //We're out of the loop because there will be no more accessible pieces in front
+			}
+		}
+	}
+	for (i = -1; i > -SIZE; i--) { //-1 to -7 (bottom line)
+		X = piece->x + i;
+		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
+			if (board->table[X][Y] == NULL) {
+				casePos.x = X;
+				casePos.y = Y;
+				tab[index] = casePos;
+				index++;
+			}
+			else {
+				if (board->table[X][Y]->color != piece->color) {
+					casePos.x = X;
+					casePos.y = Y;
+					tab[index] = casePos;
+					index++;
+				}
+				break; //We're out of the loop because there will be no more accessible pieces in front
+			}
+		}
+	}
+	*sizeTabPossibilities = index;
+	return tab;
+}
+
+Case* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibilities) {
+	Case* tab;
+	tab = malloc(sizeof(Case) * 27);
+	int index = 0;
+	int* len = malloc(sizeof(int));
+	int i;
+
+	Case* tabBishop;
+	tabBishop = movePossibilitiesBishop(piece, board, sizeTabPossibilities);
+	for (i = 0; i < *sizeTabPossibilities; i++) {
+		tab[index] = tabBishop[i];
+		index++;
+	}
+
+	Case* tabRook;
+	tabRook = movePossibilitiesRook(piece, board, len);
+	for (i = 0; i < *len; i++) {
+		tab[index] = tabRook[i];
+		index++;
+	}
+
+	*sizeTabPossibilities += *len;
+	return tab;
+}
+
+Case* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities) {
+	Case* tab;
+	tab = malloc(sizeof(Case) * 27);
+	Case casePos;
+	int index = 0;
+	int X, Y;
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			X = piece->x + i;
+			Y = piece->y + j;
+			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE && (piece->x != X || piece->y != Y)) {
+				if (board->table[X][Y] == NULL) {
+					casePos.x = X;
+					casePos.y = Y;
+					tab[index] = casePos;
+					index++;
+				}
+				else {
+					if (board->table[X][Y]->color != piece->color) {
+						casePos.x = X;
+						casePos.y = Y;
+						tab[index] = casePos;
+						index++;
+					}
+				}
+			}
+		}
+	}
+	*sizeTabPossibilities = index;
+	return tab;
+}
 
 
 
