@@ -2,11 +2,8 @@
 #include "Window.h"
 #include "Board.h"
 
-// Feel free to add more parameters in these functions
 // Main game loop
 void game();
-// Clean everything
-void cleanup(Window* window, Board* board);
 
 // Gets the input
 void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize);
