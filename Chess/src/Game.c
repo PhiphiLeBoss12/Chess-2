@@ -1,16 +1,20 @@
 #include "Game.h"
 #include "Window.h"
 #include "Piece.h"
+#include "Player.h"
 #include <stdio.h>
 
 void game() {
 	// INIT
 	Window* window = initWindow("Chess 2", 800, 800);
 	Board* board = createBoard(8);
+	// Player* p1 = initPlayers(WHITE, window);
+	// Player* p2 = initPlayers(BLACK, window);
+	// putInBoard(p1, board);
+	// putInBoard(p2, board);
 
-	Piece* piece;
-	piece = initPiece(PAWN, WHITE, 0, 0, window);
-	board->table[0][0] = piece;
+	Piece* piece = initPiece(PAWN, WHITE, 5, 5, window);
+	board->table[5][5] = piece;
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
@@ -67,11 +71,35 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 
 			if (board->selectedX == j && board->selectedY == i) {
 				setDrawColor(window, 128, 128, 128, 128);
-				drawCircle(window, rect.x + rect.width / 2, rect.y + rect.height / 2, rect.width / 2 - rect.width / 10);
+				int x = rect.x + rect.width / 2;
+				int y = rect.y + rect.height / 2;
+				int radius = rect.width / 2 - rect.width / 10;
+				drawCircle(window, x, y, radius);
 			}
 
 			if (board->table[j][i])
 				drawTexture(window, &rect, board->table[j][i]->texture);
 		}
+	}
+
+	drawPossibilities(window, board, squareSize);
+}
+
+void drawPossibilities(Window* window, Board* board, int squareSize) {
+	// No case is selected
+	if (board->selectedX < 0 || board->selectedY < 0)
+		return;
+	// No piece is in the selected case
+	if (!board->table[board->selectedX][board->selectedY])
+		return;
+
+	Piece* piece = board->table[board->selectedX][board->selectedY];
+	int numPossibilities;
+	Case* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities);
+	for (int i = 0; i < numPossibilities; i++) {
+		int x = possibilities[i].x * squareSize + squareSize / 2;
+		int y = possibilities[i].y * squareSize + squareSize / 2;
+		int radius = squareSize / 2 - squareSize / 10;
+		drawCircle(window, x, y, radius);
 	}
 }

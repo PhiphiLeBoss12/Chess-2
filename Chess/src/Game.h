@@ -15,3 +15,6 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize);
 // The board is always drawn at the top-left corner of the screen
 // Should be called before drawing pieces
 void drawBoard(Window* window, Board* board, int squareSize);
+
+// Draws all move possibilities of the selected piece if a piece is selected
+void drawPossibilities(Window* window, Board* board, int squareSize);
