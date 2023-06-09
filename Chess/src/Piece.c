@@ -76,44 +76,45 @@ void showTypePiece(TypePiece type) { //function to debug
 		break;
 	}
 }
+
 char *showCoord(int x, int y) {
-	char* coord;
+	char *coord;
 	coord = malloc(sizeof(char*) * 2);
+
+	char lettre;
 	switch (x) {
 	case 0:
-		coord = "A";
+		lettre = 'A';
 		break;
 	case 1:
-		coord = "B";
+		lettre = 'B';
 		break;
 	case 2:
-		coord = "C";
+		lettre = 'C';
 		break;
 	case 3:
-		coord = "D";
+		lettre = 'D';
 		break;
 	case 4:
-		coord = "E";
+		lettre = 'E';
 		break;
 	case 5:
-		coord = "F";
+		lettre = 'F';
 		break;
 	case 6:
-		coord = "G";
+		lettre = 'G';
 		break;
 	case 7:
-		coord = "H";
+		lettre = 'H';
 		break;
 	}
-	char* charNumber;
-	sprintf(charNumber, "%d", y + 1);
-	strcat(coord, charNumber);
+	sprintf(coord, "%c%d", lettre, y + 1);
 	return coord;
 }
 
 
-void showCoordPiece(Piece* piece) {
-	showCoord(piece->x, piece->y);
+char* showCoordPiece(Piece* piece) {
+	return showCoord(piece->x, piece->y);
 }
 
 void showPiece(Piece* piece) { 

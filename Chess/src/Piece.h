@@ -6,7 +6,7 @@ void destroyPiece(Piece* piece);
 
 void showTypePiece(TypePiece type);
 char* showCoord(int x, int y);
-void showCoordPiece(Piece* piece);
+char* showCoordPiece(Piece* piece);
 void showPiece(Piece* piece);
 
 Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities);
