@@ -1,10 +1,20 @@
 #include "Game.h"
 #include "Window.h"
+#include "Piece.h"
 #include <stdio.h>
 
-void game(Window* window) {
+void game() {
+	// INIT
+	Window* window = initWindow("Chess 2", 800, 800);
 	Board* board = createBoard(8);
 
+	Piece* piece;
+	piece = initPiece(BISHOP, WHITE, 0, 0, window);
+	board->table[0][0] = piece;
+
+	
+
+	// MAIN LOOP
 	while (!window->shouldClose) {
 		handleEvents(window);
 		setDrawColor(window, 64, 64, 64, 255);
@@ -22,9 +32,13 @@ void game(Window* window) {
 			board->selectedY = y;
 		}
 	}
+
+	// CLEANUP
+	cleanup(window, board);
 }
 
-void cleanup(Window* window) {
+void cleanup(Window* window, Board* board) {
+	destroyBoard(board);
 	destroyWindow(window);
 }
 

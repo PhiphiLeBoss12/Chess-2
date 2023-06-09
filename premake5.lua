@@ -26,6 +26,9 @@ project "Chess"
 	targetdir ("bin/" .. outputDir .. "/%{prj.name}")
 	objdir ("bin-intermediate/" .. outputDir .. "/%{prj.name}")
 
+	-- Specifies the working directory of the debugger
+	debugdir ("bin/" .. outputDir .. "/%{prj.name}")
+
 	-- Specifies the files to include in the project
 	files
 	{
