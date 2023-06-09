@@ -1,5 +1,9 @@
 #include "Types.h"
 
+Player* initPlayers(TypeColor color, Window* window);
 
-Player* initPlayer(TypeColor color);
-int isPlayerCheck(Player* player);
+void freePlayer(Player* player);
+
+void printPlayer(Player* player);
+
+void putInBoard(Player* player, Board* board);

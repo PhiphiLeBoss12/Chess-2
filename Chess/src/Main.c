@@ -4,6 +4,7 @@
 #include "Board.h"
 #include "Window.h"
 #include "Game.h"
+#include "Player.h"
 #include <math.h>
 
 /* ------------------- */
@@ -128,6 +129,7 @@ void testMainMarie() {
 
 int main(int argc, char* argv[])
 {
+    game();
 
 	//testMainMarie();
 

@@ -26,6 +26,7 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+	SDL_SetRenderDrawBlendMode(window->renderer, SDL_BLENDMODE_BLEND);
 
 	window->width = width;
 	window->height = height;
@@ -67,7 +68,7 @@ void handleEvents(Window* window) {
 
 		case SDL_MOUSEMOTION:
 			window->mousePosX = event.motion.x;
-			window->mousePosY = event.motion.y;
+			window->mousePosY = window->height - event.motion.y;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -108,8 +109,24 @@ void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned cha
 }
 
 void drawRect(Window* window, Rect* rect) {
-	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
-	SDL_RenderFillRect(window->renderer, &sdlRect);
+	// We want to set the origin of the window at the bottom-left
+	SDL_Rect sdlRect = { rect->x,  window->height - rect->y - rect->height, rect->width, rect->height };
+	if (SDL_RenderFillRect(window->renderer, &sdlRect) < 0)
+		printf("Failed to fill rect! SDL error: %s\n", SDL_GetError());
+}
+
+void drawCircle(Window* window, int x, int y, int radius) {
+	// Shamelessly stolen from https://stackoverflow.com/questions/65723827/sdl2-function-to-draw-a-filled-circle
+	for (int w = 0; w < radius * 2; w++) {
+		for (int h = 0; h < radius * 2; h++) {
+			int dx = radius - w; // horizontal offset
+			int dy = radius - h; // vertical offset
+			if ((dx * dx + dy * dy) <= (radius * radius))
+			{
+				SDL_RenderDrawPoint(window->renderer, x + dx, window->height - y - dy);
+			}
+		}
+	}
 }
 
 SDL_Texture* createTexture(Window* window, const char* path) {
@@ -127,7 +144,8 @@ SDL_Texture* createTexture(Window* window, const char* path) {
 }
 
 void drawTexture(Window* window, Rect* rect, SDL_Texture* texture) {
-	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
+	// We want to set the origin of the window at the bottom-left
+	SDL_Rect sdlRect = { rect->x, window->height - rect->y - rect->height, rect->width, rect->height };
 	if (SDL_RenderCopyEx(window->renderer, texture, NULL, &sdlRect, rect->angle, NULL, SDL_FLIP_NONE) < 0)
 		printf("Failed to copy texture! SDL error: %s\n", SDL_GetError());
 }
