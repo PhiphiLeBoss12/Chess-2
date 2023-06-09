@@ -45,7 +45,7 @@ Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) 
 	piece->y = y;
 	piece->hasMoved = 0; //False
 	piece->hasMovedOnce = 0; //False
-	piece->texture = chooseTexturePiece(piece->type, piece->color, window);
+	// piece->texture = chooseTexturePiece(piece->type, piece->color, window);
 	return piece;
 }
 
