@@ -169,6 +169,7 @@ int getPosVideEaten(Player play) {
 	}
 	return i;
 }
+
 Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities) {
 	switch (piece->type) {
 	case PAWN:
