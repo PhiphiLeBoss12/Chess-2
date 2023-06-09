@@ -13,7 +13,9 @@ Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibiliti
 Case* movePossibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities);
 Case* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities);
 Case* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilities);
-//Case* movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities);
+Case* movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities);
+Case* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibilities);
+Case* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities);
 
 
 void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
