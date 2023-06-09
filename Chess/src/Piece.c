@@ -138,6 +138,7 @@ void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Playe
 	piece->x = x;
 	piece->y = y;
 	board->table[x][y] = piece; //pi�ce d�placer
+	piece->hasMovedOnce = 1;
 }
 
 /* searchPieceInTablePlay
@@ -169,6 +170,7 @@ int getPosVideEaten(Player play) {
 	}
 	return i;
 }
+
 Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities) {
 	switch (piece->type) {
 	case PAWN:
