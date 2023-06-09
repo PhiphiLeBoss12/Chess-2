@@ -108,8 +108,10 @@ void setDrawColor(Window* window, unsigned char r, unsigned char g, unsigned cha
 }
 
 void drawRect(Window* window, Rect* rect) {
-	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
-	SDL_RenderFillRect(window->renderer, &sdlRect);
+	// We want to set the origin of the window at the bottom-left
+	SDL_Rect sdlRect = { rect->x,  window->height - rect->y - rect->height, rect->width, rect->height };
+	if (SDL_RenderFillRect(window->renderer, &sdlRect) < 0)
+		printf("Failed to fill rect! SDL error: %s\n", SDL_GetError());
 }
 
 SDL_Texture* createTexture(Window* window, const char* path) {
@@ -127,7 +129,8 @@ SDL_Texture* createTexture(Window* window, const char* path) {
 }
 
 void drawTexture(Window* window, Rect* rect, SDL_Texture* texture) {
-	SDL_Rect sdlRect = { rect->x, rect->y, rect->width, rect->height };
+	// We want to set the origin of the window at the bottom-left
+	SDL_Rect sdlRect = { rect->x, window->height - rect->y - rect->height, rect->width, rect->height };
 	if (SDL_RenderCopyEx(window->renderer, texture, NULL, &sdlRect, rect->angle, NULL, SDL_FLIP_NONE) < 0)
 		printf("Failed to copy texture! SDL error: %s\n", SDL_GetError());
 }
