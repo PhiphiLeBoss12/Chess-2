@@ -4,4 +4,4 @@
 Board* createBoard(int size);
 void destroyBoard(Board* board);
 
-Board* displayBoardConsole(Board* board);
+void displayBoardConsole(Board* board);
