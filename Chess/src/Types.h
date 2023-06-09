@@ -19,7 +19,7 @@ typedef struct StructPiece {
 	int y;
 	int hasMoved; //if the piece has moved in this turn
 	int hasMovedOnce; //if the piece has moved one time
-	SDL_Texture* texture; 
+	SDL_Texture* texture; // Unused
 } Piece;
 
 typedef struct StructBoard {
