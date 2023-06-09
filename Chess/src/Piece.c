@@ -170,6 +170,7 @@ int getPosVideEaten(Player play) {
 	}
 	return i;
 }
+
 Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities) {
 	Case* tab;
 	switch (piece->type) {
