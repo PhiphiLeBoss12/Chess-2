@@ -13,6 +13,8 @@ void game() {
 	putInBoard(p1, board);
 	putInBoard(p2, board);
 
+	Piece* selectedPiece = NULL;
+	int squareSize = 0;
 	int leftButtonHeld = 0;
 
 	// MAIN LOOP
@@ -21,16 +23,35 @@ void game() {
 		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
 
-		int squareSize = min(window->width, window->height) / 8;
+		squareSize = min(window->width, window->height) / 8;
+
+		int numPossibilities = 0;
+		Case* possibilities = NULL;
+		if (board->selectedX != -1 && board->selectedY != -1) {
+			if (board->table[board->selectedX][board->selectedY]) {
+				possibilities = movePossibilitiesPiece(selectedPiece, board, &numPossibilities);
+			}
+		}
+
 		drawBoard(window, board, squareSize);
+		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
 
 		presentWindow(window);
 
-		int x, y;
 		if (window->mouseLeftButton && !leftButtonHeld) {
+			int x, y;
 			getInputOnBoard(window, &x, &y, squareSize);
 			board->selectedX = x;
 			board->selectedY = y;
+			
+			for (int i = 0; i < numPossibilities; i++) {
+				if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y)
+					movePiece(selectedPiece, board->selectedX, board->selectedY, board, p1, p2);
+			}
+
+			if (board->table[board->selectedX][board->selectedY])
+				selectedPiece = board->table[board->selectedX][board->selectedY];
+
 			leftButtonHeld = 1;
 		}
 		if (!window->mouseLeftButton)
@@ -83,21 +104,12 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 				drawTexture(window, &rect, board->table[j][i]->texture);
 		}
 	}
-
-	drawPossibilities(window, board, squareSize);
 }
 
-void drawPossibilities(Window* window, Board* board, int squareSize) {
-	// No case is selected
-	if (board->selectedX < 0 || board->selectedY < 0)
-		return;
-	// No piece is in the selected case
-	if (!board->table[board->selectedX][board->selectedY])
-		return;
+void drawPossibilities(Window* window, Board* board, Case* possibilities, int numPossibilities, int squareSize) {
+	if (!possibilities)
+		return NULL;
 
-	Piece* piece = board->table[board->selectedX][board->selectedY];
-	int numPossibilities;
-	Case* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities);
 	for (int i = 0; i < numPossibilities; i++) {
 		int x = possibilities[i].x * squareSize + squareSize / 2;
 		int y = possibilities[i].y * squareSize + squareSize / 2;

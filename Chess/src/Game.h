@@ -17,4 +17,4 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize);
 void drawBoard(Window* window, Board* board, int squareSize);
 
 // Draws all move possibilities of the selected piece if a piece is selected
-void drawPossibilities(Window* window, Board* board, int squareSize);
+void drawPossibilities(Window* window, Board* board, Case* possibilities, int numPossibilities, int squareSize);
