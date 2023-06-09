@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
     Case* tabCase;
     int* lenTab = malloc(sizeof(int));
-    tabCase = movePosibilitiesPawn(piece, board, lenTab);
+    tabCase = movePossibilitiesPawn(piece, board, lenTab);
     for (int i = 0; i < *lenTab; i++) {
         showCoord(tabCase[i].x, tabCase[i].y);
         printf("\n");
