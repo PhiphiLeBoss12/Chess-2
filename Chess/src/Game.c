@@ -16,6 +16,7 @@ void game() {
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
 	int leftButtonHeld = 0;
+	TypeColor whoPlays = WHITE;
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
@@ -26,12 +27,7 @@ void game() {
 		squareSize = min(window->width, window->height) / 8;
 
 		int numPossibilities = 0;
-		Case* possibilities = NULL;
-		if (board->selectedX != -1 && board->selectedY != -1) {
-			if (board->table[board->selectedX][board->selectedY]) {
-				possibilities = movePossibilitiesPiece(selectedPiece, board, &numPossibilities);
-			}
-		}
+		Case* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
 
 		drawBoard(window, board, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
@@ -45,11 +41,16 @@ void game() {
 			board->selectedY = y;
 			
 			for (int i = 0; i < numPossibilities; i++) {
-				if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y)
+				if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && whoPlays == selectedPiece->color) {
 					movePiece(selectedPiece, board->selectedX, board->selectedY, board, p1, p2);
+					whoPlays = whoPlays == WHITE ? BLACK : WHITE; // Change the color
+					// Unselect the square
+					board->selectedX = -1;
+					board->selectedY = -1;
+				}
 			}
 
-			if (board->table[board->selectedX][board->selectedY])
+			if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
 				selectedPiece = board->table[board->selectedX][board->selectedY];
 
 			leftButtonHeld = 1;
@@ -73,6 +74,15 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 
 	*boardX = x / squareSize;
 	*boardY = y / squareSize;
+}
+
+Case* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
+	if (board->selectedX != -1 && board->selectedY != -1 && whoPlays == selectedPiece->color) {
+		if (board->table[board->selectedX][board->selectedY]) {
+			return movePossibilitiesPiece(selectedPiece, board, numPossibilities);
+		}
+	}
+	return NULL;
 }
 
 void drawBoard(Window* window, Board* board, int squareSize) {
