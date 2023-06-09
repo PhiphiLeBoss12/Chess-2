@@ -8,7 +8,11 @@ void game() {
 	Window* window = initWindow("Chess 2", 800, 800);
 	Board* board = createBoard(8);
 
-	board->table[0][0] = initPiece(PAWN, WHITE, 0, 0);
+	Piece* piece;
+	piece = initPiece(BISHOP, WHITE, 0, 0, window);
+	board->table[0][0] = piece;
+
+	
 
 	// MAIN LOOP
 	while (!window->shouldClose) {
