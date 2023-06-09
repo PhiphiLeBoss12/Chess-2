@@ -202,20 +202,23 @@ Case *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 	int index = 0; //index in the table
 	tab = malloc(sizeof(Case) * 4);
 	Case casePos;
+	int mult = 1;
+	if (piece->color == BLACK)
+		mult = -1;
 	//To move 1 case
-	if (piece->y + 1 < SIZE) {
-		if (board->table[piece->x][piece->y + 1] == NULL) {
+	if (piece->y + 1*mult < SIZE) {
+		if (board->table[piece->x][piece->y + 1*mult] == NULL) {
 			casePos.x = piece->x;
-			casePos.y = piece->y + 1;
+			casePos.y = piece->y + 1*mult;
 			tab[index] = casePos;
 			index++;
 		}
 	}
 	//To move 2 cases
-	if (piece->y + 2 < SIZE) {
-		if (board->table[piece->x][piece->y + 1] == NULL && board->table[piece->x][piece->y + 2] == NULL && piece->hasMovedOnce == 0) {
+	if (piece->y + 2*mult < SIZE) {
+		if (board->table[piece->x][piece->y + 1*mult] == NULL && board->table[piece->x][piece->y + 2*mult] == NULL && piece->hasMovedOnce == 0) {
 			casePos.x = piece->x;
-			casePos.y = piece->y + 2;
+			casePos.y = piece->y + 2*mult;
 			tab[index] = casePos;
 			index++;
 		}
@@ -223,11 +226,11 @@ Case *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 	int add;
 	for (int power = 1; power < 3; power++) { //Left and Right
 		add = pow((-1), power);
-		if (piece->x + add >= 0 && piece->x + add < SIZE && piece->y + 1 < SIZE) { //Verify border
-			if (board->table[piece->x + add][piece->y + 1] != NULL ) {
-				if (board->table[piece->x + add][piece->y + 1]->color != piece->color) {
-					casePos.x = piece->x + add;
-					casePos.y = piece->y + 1;
+		if (piece->x + add*mult >= 0 && piece->x + add*mult < SIZE && piece->y + 1*mult < SIZE) { //Verify border
+			if (board->table[piece->x + add*mult][piece->y + 1*mult] != NULL ) {
+				if (board->table[piece->x + add * mult][piece->y + 1 * mult]->color != piece->color) {
+					casePos.x = piece->x + add * mult;
+					casePos.y = piece->y + 1 * mult;
 					tab[index] = casePos;
 					index++;
 				}
