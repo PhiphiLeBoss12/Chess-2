@@ -9,9 +9,10 @@ void showCoord(int x, int y);
 void showCoordPiece(Piece* piece);
 void showPiece(Piece* piece);
 
-Case* movePosibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities);
-//Case* movePosibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities);
-//Case* movePosibilitiesKnight(Piece* piece, Board* board);
+Case *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities);
+Case* movePossibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities);
+Case* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities);
+//Case* movePossibilitiesKnight(Piece* piece, Board* board);
 
 void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
 int searchPieceInTablePlay(Player play, Piece piece);
