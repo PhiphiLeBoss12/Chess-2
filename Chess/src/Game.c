@@ -57,6 +57,10 @@ void game() {
 		}
 		if (!window->mouseLeftButton)
 			leftButtonHeld = 0;
+
+		// Free the possibilities
+		if (possibilities)
+			free(possibilities);
 	}
 
 	// CLEANUP
