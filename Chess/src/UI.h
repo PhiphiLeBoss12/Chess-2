@@ -1,6 +1,10 @@
 #pragma once
+#include "Types.h"
 #include "Window.h"
 
-void drawSidePanel(Window* window) {
+typedef struct SidePanel {
+	int offsetX;
+	TypeColor whoPlays;
+} SidePanel;
 
-}
+void drawSidePanel(Window* window, SidePanel* panel);

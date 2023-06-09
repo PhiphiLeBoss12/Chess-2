@@ -2,11 +2,12 @@
 #include "Window.h"
 #include "Piece.h"
 #include "Player.h"
+#include "UI.h"
 #include <stdio.h>
 
 void game() {
 	// INIT
-	Window* window = initWindow("Chess 2", 800, 800);
+	Window* window = initWindow("Chess 2", 1024, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
 	players[0] = initPlayers(WHITE, window);
@@ -21,6 +22,10 @@ void game() {
 
 	SDL_Texture** textures = createTextureArray(window);
 
+	SidePanel panel;
+	panel.offsetX = 800;
+	panel.whoPlays = whoPlays;
+
 	// MAIN LOOP
 	while (!window->shouldClose) {
 		squareSize = min(window->width, window->height) / 8;
@@ -34,10 +39,12 @@ void game() {
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
+		drawSidePanel(window, &panel);
 
 		presentWindow(window);
 
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		panel.whoPlays = whoPlays;
 	}
 
 	free(textures);
@@ -95,20 +102,15 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 			rect.height = squareSize;
 			rect.angle = 0.0f;
 
-			if ((i + j) % 2 == 0)
+			if ((i + j) % 2 == 1)
 				setDrawColor(window, 200, 200, 200, 255);
 			else
 				setDrawColor(window, 64, 64, 64, 255);
 
-			drawRect(window, &rect);
-
-			if (board->selectedX == j && board->selectedY == i) {
+			if (board->selectedX == j && board->selectedY == i)
 				setDrawColor(window, 128, 128, 128, 128);
-				int x = rect.x + rect.width / 2;
-				int y = rect.y + rect.height / 2;
-				int radius = rect.width / 2 - rect.width / 10;
-				drawCircle(window, x, y, radius);
-			}
+
+			drawRect(window, &rect);
 
 			if (board->table[j][i]) {
 				TypeColor color = board->table[j][i]->color;
