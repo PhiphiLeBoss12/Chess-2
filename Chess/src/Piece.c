@@ -31,7 +31,7 @@ SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window)
 	return createTexture(window, path);
 }
 
-Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window *window) {
+Piece *initPiece(TypePiece type, TypeColor color, int x, int y) {
 	if (!(0 <= x && x < SIZE && 0 <= y && y < SIZE)) { //check if coord is in the table
 		printf("Failed : This piece isn't in the table.");
 		__debugbreak();
@@ -45,7 +45,6 @@ Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window *window) 
 	piece->y = y;
 	piece->hasMoved = 0; //False
 	piece->hasMovedOnce = 0; //False
-	piece->texture = chooseTexturePiece(type, color, window);
 	//board->table[x][y] = piece; //put the piece in the board
 	return piece;
 }

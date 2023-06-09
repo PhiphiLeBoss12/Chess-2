@@ -31,13 +31,13 @@ void destroyBoard(Board* board) {
 }
 
 void displayBoardConsole(Board* board) {
-	for (int x = 0; x < board->size; x++) {
-		for (int y = 0; y < board->size; y++) {
+	for (int y = 0; y < board->size; y++) {
+		for (int x = 0; x < board->size; x++) {
 			if (board->table[x][y] != NULL) {
 				printf("%c ", PiecesNames[(board->table[x][y])->type]);
 			}
 			else {
-				printf("X");
+				printf("X ");
 			}
 		}
 		printf("\n");
