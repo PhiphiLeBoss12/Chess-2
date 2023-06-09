@@ -22,8 +22,7 @@ Board* createBoard(int size) {
 	return board;
 }
 
-
-Board* displayBoardConsole(Board* board) {
+void displayBoardConsole(Board* board) {
 	for (int x = 0; x < board->size; x++) {
 		for (int y = 0; y < board->size; y++) {
 			if (board->table[x][y] != NULL) {

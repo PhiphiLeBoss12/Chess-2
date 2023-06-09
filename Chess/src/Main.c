@@ -8,6 +8,20 @@
 
 int main(int argc, char* argv[])
 {
+
+    Board* b = createBoard(8);
+
+    Player* p1 = initPlayers(WHITE);
+    Player* p2 = initPlayers(BLACK);
+
+    printPlayer(p1);
+
+    putInBoard(p1, b);
+    putInBoard(p2, b);
+
+    displayBoardConsole(b);
+
+    /*
     Board* board;
     board = malloc(sizeof(Board));
     Piece* tab[8][8];
@@ -34,5 +48,7 @@ int main(int argc, char* argv[])
         showCoord(tabCase[i].x, tabCase[i].y);
         printf("\n");
     }
+
+    */
     return 0;
 }
