@@ -137,6 +137,11 @@ void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Playe
 	}
 	piece->x = x;
 	piece->y = y;
+	
+	if (piece->type == PAWN && (piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0))
+	{
+		piece->type = QUEEN;
+	}
 	board->table[x][y] = piece; //pi�ce d�placer
 	piece->hasMovedOnce = 1;
 }
