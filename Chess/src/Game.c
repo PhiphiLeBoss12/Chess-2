@@ -13,6 +13,8 @@ void game() {
 	putInBoard(p1, board);
 	putInBoard(p2, board);
 
+	showCoordPiece(p1->table[0]);
+
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
 	int leftButtonHeld = 0;
@@ -27,7 +29,7 @@ void game() {
 		squareSize = min(window->width, window->height) / 8;
 
 		int numPossibilities = 0;
-		Case* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
+		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
 
 		drawBoard(window, board, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
@@ -80,7 +82,7 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 	*boardY = y / squareSize;
 }
 
-Case* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
+Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
 	if (board->selectedX != -1 && board->selectedY != -1 && whoPlays == selectedPiece->color) {
 		if (board->table[board->selectedX][board->selectedY]) {
 			return movePossibilitiesPiece(selectedPiece, board, numPossibilities);
@@ -120,7 +122,7 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 	}
 }
 
-void drawPossibilities(Window* window, Board* board, Case* possibilities, int numPossibilities, int squareSize) {
+void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize) {
 	if (!possibilities)
 		return NULL;
 
