@@ -154,7 +154,25 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			}
 
 			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
-				movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+				//Verify castling 
+				if (board->table[board->selectedX][board->selectedY] != NULL) {
+					if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
+						Piece* rook;
+						rook = board->table[board->selectedX][board->selectedY];
+						//Castling right
+						if (board->selectedX > 4) {
+							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1]);
+							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1]);
+						}
+						else { //Castling left
+							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1]);
+							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
+						}
+					}
+				}
+				else {
+					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square
 				board->selectedX = -1;

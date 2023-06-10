@@ -373,6 +373,8 @@ Cell* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilit
 						}
 						break; //We're out of the loop because there will be no more accessible pieces in front
 					}
+				} else {
+					break; //There's no point in checking any further
 				}
 			}
 		}
@@ -465,6 +467,8 @@ Cell *movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilitie
 						}
 						break; //We're out of the loop because there will be no more accessible pieces in front
 					}
+				} else {
+					break; //There's no point in checking any further
 				}
 			}
 		}
@@ -529,6 +533,29 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 					}
 				}
 			}
+		}
+	}
+	//Castling
+	if (!piece->hasMovedOnce) { //Verify if king hasn't moved
+		
+		//The height didn't change
+		if (piece->color == WHITE) {
+			cell.y = 0;
+		} else {
+			cell.y = 7;
+		}
+		//Verify if there is no piece between king & if rook hasn't moved
+		//Right
+		if (board->table[5][cell.y] == NULL && board->table[6][cell.y] == NULL && board->table[7][cell.y]->type == ROOK && !board->table[7][cell.y]->hasMovedOnce) {
+				cell.x = 7;
+				possibilities[index] = cell;
+				index++;
+		}
+		//Left
+		if (board->table[3][cell.y] == NULL && board->table[2][cell.y] == NULL && board->table[1][cell.y] == NULL && board->table[0][cell.y]->type == ROOK && !board->table[0][cell.y]->hasMovedOnce) {
+				cell.x = 0;
+				possibilities[index] = cell;
+				index++;
 		}
 	}
 
