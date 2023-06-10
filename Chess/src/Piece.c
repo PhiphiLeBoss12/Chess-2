@@ -286,131 +286,132 @@ Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibiliti
 	return possibilities;
 }
 
-Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities) {
+Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities) { //Moving possibilities of a pawn
+	// return all the moving possibilities of a pawn in a Cell's table without verify check
+
 	Cell* possibilities;
-	int index = 0; //index in the table
-	possibilities= malloc(sizeof(Cell) * 4);
+	int index = 0; //position in the table possibilities
+	possibilities= malloc(sizeof(Cell) * 4); //Max 4 possibilities
 	Cell cell;
-	int mult = 1;
-	if (piece->color == BLACK)
+	int mult = 1; //Initialize to white player
+
+	if (piece->color == BLACK) //Black player plays in negative move
 		mult = -1;
-	//To move 1 case
-	if (piece->y + 1*mult < SIZE) {
-		if (board->table[piece->x][piece->y + 1*mult] == NULL) {
+	
+	if (0 <= piece->y + 1 * mult && piece->y + 1*mult < SIZE) { //Verify border
+		//To move 1 case
+		if (board->table[piece->x][piece->y + 1*mult] == NULL) { //Empty cell
 			cell.x = piece->x;
 			cell.y = piece->y + 1*mult;
 			possibilities[index] = cell;
 			index++;
-		}
-	}
-	//To move 2 cells
-	if (piece->y + 2*mult < SIZE) {
-		if (board->table[piece->x][piece->y + 1*mult] == NULL && board->table[piece->x][piece->y + 2*mult] == NULL && piece->hasMovedOnce == 0) {
-			cell.x = piece->x;
-			cell.y = piece->y + 2*mult;
-			possibilities[index] = cell;
-			index++;
-		}
-	}
-	int add;
-	for (int power = 1; power < 3; power++) { //Left and Right
-		add = pow((-1), power);
-		if (piece->x + add*mult >= 0 && piece->x + add*mult < SIZE && piece->y + 1*mult < SIZE) { //Verify border
-			if (board->table[piece->x + add*mult][piece->y + 1*mult] != NULL ) {
-				if (board->table[piece->x + add * mult][piece->y + 1 * mult]->color != piece->color) {
-					cell.x = piece->x + add * mult;
-					cell.y = piece->y + 1 * mult;
+
+			//Can't move 2 times if it can't move once
+			//To move 2 cells, only when the pawn didn't play once
+			if (0 <= piece->y + 2 * mult && piece->y + 2 * mult < SIZE) { //Verify border
+				if (board->table[piece->x][piece->y + 2 * mult] == NULL && piece->hasMovedOnce == 0) { //Empty cell in 2 cells in front and never played
+					cell.x = piece->x;
+					cell.y = piece->y + 2 * mult;
 					possibilities[index] = cell;
 					index++;
 				}
 			}
 		}
-	}
-	*sizeTabPossibilities = index;
-	return possibilities;
-}
 
-Cell* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities) {
-	Cell* possibilities;
-	Cell cell;
-	possibilities = malloc(sizeof(Cell) * 13);
-	int index = 0;
-	int i, mult, X, Y;
-	for (int power = 1; power < 3; power++) { //Left and Right
-		mult = pow((-1), power);
-		for (i = 1; i < SIZE; i++) { //1 to 7 (top line)
-			X = piece->x + i * mult;
-			Y = piece->y + i * mult;
-			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-				if (board->table[X][Y] == NULL) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
-				}
-				else {
-					if (board->table[X][Y]->color != piece->color) {
-						cell.x = X;
-						cell.y = Y;
+		//Attacks move
+		int add;
+		for (int power = 1; power < 3; power++) { //Left and Right
+			add = pow((-1), power); //add = 1 or -1
+			if (piece->x + add * mult >= 0 && piece->x + add * mult < SIZE) { //Verify border
+				if (board->table[piece->x + add * mult][piece->y + 1 * mult] != NULL) { //Not empty cell
+					if (board->table[piece->x + add * mult][piece->y + 1 * mult]->color != piece->color) { //ennemy piece
+						cell.x = piece->x + add * mult;
+						cell.y = piece->y + 1 * mult;
 						possibilities[index] = cell;
 						index++;
 					}
-					break; //We're out of the loop because there will be no more accessible pieces in front
-				}
-			}
-		}
-		for (i = -1; i > -SIZE; i--) { //-1 to -7 (bottom line)
-			X = piece->x + i * mult;
-			Y = piece->y - i * mult;
-			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-				if (board->table[X][Y] == NULL) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
-				}
-				else {
-					if (board->table[X][Y]->color != piece->color) {
-						cell.x = X;
-						cell.y = Y;
-						possibilities[index] = cell;
-						index++;
-					}
-					break; //We're out of the loop because there will be no more accessible pieces in front
 				}
 			}
 		}
 	}
-	*sizeTabPossibilities = index;
+	
+	*sizeTabPossibilities = index; //length min of possibilities
 	return possibilities;
 }
 
+Cell* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a bishop
+	// return all the moving possibilities of a bishop in a Cell's table without verify check
 
-Cell* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilities) {
 	Cell* possibilities;
 	Cell cell;
-	possibilities = malloc(sizeof(cell) * 8);
-	int index = 0;
-	int add, X, Y, mult2;
-	for (int mult = 1; mult < 3; mult++) {
-		for (int power = 1; power < 3; power++) {
-			for (int power2=1; power2 < 3; power2++) {
-				add = pow((-1), power);
-				mult2 = pow((-1), power2);
-				X = piece->x + add * mult;
-				Y = piece->y + (2*mult2) / mult;
-				if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-					if (board->table[X][Y] == NULL) {
-						cell.x = X;
-						cell.y = Y;
+	possibilities = malloc(sizeof(Cell) * 13); //Max 13 possibilities
+	int index = 0; //position in the table possibilities
+	int right_left, top_bottom;
+
+	for (int power = 1; power < 3; power++) { //Left and Right
+		right_left = pow((-1), power); //right_left = -1 or 1, allow to go in left and right
+
+		for (int power2 = 1; power2 < 3; power2++) { //Top and Bottom
+			top_bottom = pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
+
+			//All cell in the line (7 cells max)
+			//Didn't find a way to optimize the number of cell to be checked
+			for (int i = 1; i < SIZE-1; i++) { 
+				//define the coords of the cell
+				cell.x = piece->x + i * top_bottom;
+				cell.y = piece->y + i * right_left;
+
+				if (0 <= cell.x && cell.x < SIZE && 0 <= cell.y && cell.y < SIZE) { //Verify border
+					if (board->table[cell.x][cell.y] == NULL) { //Empty cell
 						possibilities[index] = cell;
 						index++;
-
 					}
 					else {
-						if (board->table[X][Y]->color != piece->color) {
-							cell.x = X;
-							cell.y = Y;
+						if (board->table[cell.x][cell.y]->color != piece->color) { //Ennemy piece
+							possibilities[index] = cell;
+							index++;
+						}
+						break; //We're out of the loop because there will be no more accessible pieces in front
+					}
+				}
+			}
+		}
+	}
+	*sizeTabPossibilities = index; //length min of possibilities
+	return possibilities;
+}
+
+
+Cell* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a knight
+	// return all the moving possibilities of a knight in a Cell's table without verify check
+
+	Cell* possibilities;
+	Cell cell;
+	possibilities = malloc(sizeof(cell) * 8); //Max 8 possibilities
+	int index = 0; //position in the table possibilities
+	int left_right, top_bottom;
+
+	for (int depth = 1; depth < 3; depth++) { //multiplicate to 1 or 2 the cell 
+
+		//allow to create a variable left_right who multiplicate depth to -1 or 1 to go left or right
+		for (int power = 1; power < 3; power++) { 
+			left_right = pow((-1), power);
+
+			//allow to create a variable top_bottom who multiplicate depth to -1 or 1 to go in top or bottom uwu
+			for (int power2=1; power2 < 3; power2++) { 
+				top_bottom = pow((-1), power2);
+
+				//define the coords of the cell
+				cell.x = piece->x + left_right * depth; //x +- 1 or 2
+				cell.y = piece->y + (2* top_bottom) / depth; // y +- 2*(1 or -1) / (1 or 2)
+
+				if (0 <= cell.x && cell.x < SIZE && 0 <= cell.y && cell.y < SIZE) { //Verify border
+					if (board->table[cell.x][cell.y] == NULL) { //Empty piece
+						possibilities[index] = cell;
+						index++;
+					}
+					else {
+						if (board->table[cell.x][cell.y]->color != piece->color) { //Ennemy cell
 							possibilities[index] = cell;
 							index++;
 						}
@@ -419,110 +420,68 @@ Cell* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilit
 			}
 		}
 	}
-	*sizeTabPossibilities = index;
+	*sizeTabPossibilities = index; //length min of possibilities
 	return possibilities;
 }
 
-Cell * movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities) {
+Cell *movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a rook
+	// return all the moving possibilities of a rook in a Cell's table without verify check
 	Cell* possibilities;
 	Cell cell;
-	possibilities = malloc(sizeof(Cell) * 14);
-	int index = 0;
-	int i, mult, X, Y;
-	//Y line
-	X = piece->x;
-	for (i = 1; i < SIZE; i++) { //Top
-		Y = piece->y + i;
-		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-			if (board->table[X][Y] == NULL) {
-				cell.x = X;
-				cell.y = Y;
-				possibilities[index] = cell;
-				index++;
-			}
-			else {
-				if (board->table[X][Y]->color != piece->color) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
+	possibilities = malloc(sizeof(Cell) * 14); //Max 14 possibilities
+	int index = 0; //position in the table possibilities
+	int top_bottom_left_right;
+
+	for (int line = 1; line < 3; line++) {
+
+		if (line == 1) //X line
+			cell.y = piece->y;
+		else //Y line
+			cell.x = piece->x;
+
+		//allow to create a variable top_bottom_left_right who multiplicate cell.y or cell.x to -1 or 1 to go in top or bottom or left or right
+		for (int power = 1; power < 3; power++) { 
+			top_bottom_left_right = pow((-1), power);
+
+			//All cell in the line (7 cells max)
+			//Didn't find a way to optimize the number of cell to be checked
+			for (int i = 1; i < SIZE - 1; i++) {
+
+				//define y of the cell
+				if (line == 1) //X line
+					cell.x = piece->x + i * top_bottom_left_right;
+				else //Y line
+					cell.y = piece->y + i * top_bottom_left_right;
+
+				if (0 <= cell.x && cell.x < SIZE && 0 <= cell.y && cell.y < SIZE) { //Verify border
+					if (board->table[cell.x][cell.y] == NULL) { //Empty cell
+						possibilities[index] = cell;
+						index++;
+					}
+					else {
+						if (board->table[cell.x][cell.y]->color != piece->color) { //Ennemy piece
+							possibilities[index] = cell;
+							index++;
+						}
+						break; //We're out of the loop because there will be no more accessible pieces in front
+					}
 				}
-				break; //We're out of the loop because there will be no more accessible pieces in front
 			}
 		}
 	}
-	for (i = -1; i > -SIZE; i--) { //Bottom
-		Y = piece->y + i;
-		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-			if (board->table[X][Y] == NULL) {
-				cell.x = X;
-				cell.y = Y;
-				possibilities[index] = cell;
-				index++;
-			}
-			else {
-				if (board->table[X][Y]->color != piece->color) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
-				}
-				break; //We're out of the loop because there will be no more accessible pieces in front
-			}
-		}
-	}
-	//X Line
-	Y = piece->y;
-	for (i = 1; i < SIZE; i++) { //Right
-		X = piece->x + i;
-		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-			if (board->table[X][Y] == NULL) {
-				cell.x = X;
-				cell.y = Y;
-				possibilities[index] = cell;
-				index++;
-			}
-			else {
-				if (board->table[X][Y]->color != piece->color) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
-				}
-				break; //We're out of the loop because there will be no more accessible pieces in front
-			}
-		}
-	}
-	for (i = -1; i > -SIZE; i--) { //Left
-		X = piece->x + i;
-		if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE) {
-			if (board->table[X][Y] == NULL) {
-				cell.x = X;
-				cell.y = Y;
-				possibilities[index] = cell;
-				index++;
-			}
-			else {
-				if (board->table[X][Y]->color != piece->color) {
-					cell.x = X;
-					cell.y = Y;
-					possibilities[index] = cell;
-					index++;
-				}
-				break; //We're out of the loop because there will be no more accessible pieces in front
-			}
-		}
-	}
-	*sizeTabPossibilities = index;
+
+	*sizeTabPossibilities = index; //length min of possibilities
 	return possibilities;
 }
 
-Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibilities) {
+Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a queen
+	// return all the moving possibilities of a queen in a Cell's table without verify check
 	Cell* possibilities;
-	possibilities = malloc(sizeof(Cell) * 27);
-	int index = 0;
-	int* len = malloc(sizeof(int));
+	possibilities = malloc(sizeof(Cell) * 27); //Max 27 possibilities
+	int index = 0; //position in the table possibilities
 	int i;
+
+	//reclaim all the possibilities like it's a bishop and a rook 
 
 	Cell* possibilitiesBishop;
 	possibilitiesBishop = movePossibilitiesBishop(piece, board, sizeTabPossibilities);
@@ -531,38 +490,40 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 		index++;
 	}
 
+	//watch out for the castling
 	Cell* possibilitiesRook;
+	int* len = malloc(sizeof(int)); //sizeTabPossibilities of the rook
 	possibilitiesRook = movePossibilitiesRook(piece, board, len);
 	for (i = 0; i < *len; i++) {
 		possibilities[index] = possibilitiesRook[i];
 		index++;
 	}
 
-	*sizeTabPossibilities += *len;
+	*sizeTabPossibilities += *len; //length min of possibilities
 	return possibilities;
 }
 
-Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities) {
+Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a king
+	// return all the moving possibilities of a king in a Cell's table without verify check
 	Cell* possibilities;
-	possibilities = malloc(sizeof(Cell) * 27);
+	possibilities = malloc(sizeof(Cell) * 8); //Max 8 possibilities
 	Cell cell;
-	int index = 0;
-	int X, Y;
+	int index = 0; //position in the table possibilities
+	int isPieceCoord;
+
+	//We go through all the cells around
 	for (int i = -1; i < 2; i++) {
 		for (int j = -1; j < 2; j++) {
-			X = piece->x + i;
-			Y = piece->y + j;
-			if (0 <= X && X < SIZE && 0 <= Y && Y < SIZE && (piece->x != X || piece->y != Y)) {
-				if (board->table[X][Y] == NULL) {
-					cell.x = X;
-					cell.y = Y;
+			cell.x = piece->x + i;
+			cell.y = piece->y + j;
+			isPieceCoord = piece->x == cell.x && piece->y == cell.y; //Verify if the cell is piece coord
+			if (0 <= cell.x && cell.x < SIZE && 0 <= cell.y && cell.y < SIZE && !isPieceCoord)  { //Verify border & !isPieceCoord
+				if (board->table[cell.x][cell.y] == NULL) { //Empty cell
 					possibilities[index] = cell;
 					index++;
 				}
 				else {
-					if (board->table[X][Y]->color != piece->color) {
-						cell.x = X;
-						cell.y = Y;
+					if (board->table[cell.x][cell.y]->color != piece->color) { //Ennemy piece
 						possibilities[index] = cell;
 						index++;
 					}
@@ -570,7 +531,8 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 			}
 		}
 	}
-	*sizeTabPossibilities = index;
+
+	*sizeTabPossibilities = index; //length min of possibilities
 	return possibilities;
 }
 
