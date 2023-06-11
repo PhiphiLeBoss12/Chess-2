@@ -169,6 +169,9 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
 						}
 					}
+					else {
+						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					}
 				}
 				else {
 					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
