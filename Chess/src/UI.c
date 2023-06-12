@@ -36,6 +36,9 @@ void drawStartScreen(Window* window, SDL_Texture** textures) {
 		drawText(window, color, "development: tom", 450, 425, 0.2f);
 		drawText(window, color, "graphics design: wikipedia", 450, 400, 0.2f);
 		drawText(window, color, "original idea: Hán Xin", 450, 375, 0.2f);
+		drawText(window, color, "\"Deadly Roulette\" \"Walking Along\" Kevin MacLeod (incompetech.com)", 450, 350, 0.12f);
+		drawText(window, color, "Licensed under Creative Commons : By Attribution 4.0 License", 450, 335, 0.12f);
+		drawText(window, color, "http ://creativecommons.org/licenses/by/4.0/", 450, 320, 0.12f);
 	}
 
 	iter++;
