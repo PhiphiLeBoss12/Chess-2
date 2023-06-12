@@ -43,6 +43,11 @@ void game() {
 			for (int i = 0; i < numPossibilities; i++) {
 				if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && whoPlays == selectedPiece->color) {
 					movePiece(selectedPiece, board->selectedX, board->selectedY, board, p1, p2);
+
+
+					isCheck(board, WHITE);
+
+
 					whoPlays = whoPlays == WHITE ? BLACK : WHITE; // Change the color
 					// Unselect the square
 					board->selectedX = -1;
