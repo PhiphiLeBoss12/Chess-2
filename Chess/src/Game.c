@@ -3,6 +3,7 @@
 #include "Piece.h"
 #include "Player.h"
 #include "UI.h"
+#include "Bots.h"
 #include <stdio.h>
 
 void game() {
@@ -43,7 +44,10 @@ void game() {
 
 		presentWindow(window);
 
-		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		if (whoPlays == WHITE) {
+			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		}
+		
 		panel.whoPlays = whoPlays;
 	}
 
@@ -146,51 +150,53 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			board->selectedX = x;
 			board->selectedY = y;
 		}
+		gayme(window, board, selectedPiece, players, possibilities, numPossibilities, squareSize, whoPlays, x, y);
+		leftButtonHeld = 1;
+	}
+	if (!window->mouseLeftButton)
+		leftButtonHeld = 0;
+}
 
-		for (int i = 0; i < numPossibilities; i++) {
-			if (x == possibilities[i].x && y == possibilities[i].y) {
-				board->selectedX = x;
-				board->selectedY = y;
-			}
 
-			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
-				//Verify castling 
-				if (board->table[board->selectedX][board->selectedY] != NULL) {
-					if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
-						Piece* rook;
-						rook = board->table[board->selectedX][board->selectedY];
-						//Castling right
-						if (board->selectedX > 4) {
-							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1]);
-							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1]);
-						}
-						else { //Castling left
-							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1]);
-							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
-						}
+void gayme(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, int x, int y) {
+	for (int i = 0; i < numPossibilities; i++) {
+		if (x == possibilities[i].x && y == possibilities[i].y) {
+			board->selectedX = x;
+			board->selectedY = y;
+		}
+
+		if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
+			//Verify castling 
+			if (board->table[board->selectedX][board->selectedY] != NULL) {
+				if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
+					Piece* rook;
+					rook = board->table[board->selectedX][board->selectedY];
+					//Castling right
+					if (board->selectedX > 4) {
+						movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1]);
+						movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1]);
 					}
-					else {
-						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					else { //Castling left
+						movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1]);
+						movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
 					}
 				}
 				else {
 					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 				}
-				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
-				// Unselect the square
-				board->selectedX = -1;
-				board->selectedY = -1;
-				Player* tempo = players[0];
-				players[0] = players[1];
-				players[1] = tempo;
 			}
+			else {
+				movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+			}
+			*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
+			// Unselect the square
+			board->selectedX = -1;
+			board->selectedY = -1;
+			Player* tempo = players[0];
+			players[0] = players[1];
+			players[1] = tempo;
 		}
-
-		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
-			*selectedPiece = board->table[board->selectedX][board->selectedY];
-
-		leftButtonHeld = 1;
 	}
-	if (!window->mouseLeftButton)
-		leftButtonHeld = 0;
+	if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
+		*selectedPiece = board->table[board->selectedX][board->selectedY];
 }
