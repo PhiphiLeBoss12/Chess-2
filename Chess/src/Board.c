@@ -44,8 +44,8 @@ void displayBoardConsole(Board* board) {
 	}
 }
 
-Case getKingPosition(Board* board, TypeColor color) {
-	Case king;
+Cell getKingPosition(Board* board, TypeColor color) {
+	Cell king;
 	for (int x = 0; x < board->size; x++) {
 		for (int y = 0; y < board->size; y++) {
 			if (board->table[x][y] != NULL) {
@@ -61,7 +61,7 @@ Case getKingPosition(Board* board, TypeColor color) {
 }
 
 
-int knightIsMenacing(Board* board, TypeColor color, Case king) {
+int knightIsMenacing(Board* board, TypeColor color, Cell king) {
 	int posThreatx, posThreaty;
 	for (int x = -2 ; x <= 2 ; x++) {
 		for (int y = -2; y <= 2; y++) {
@@ -86,7 +86,7 @@ int knightIsMenacing(Board* board, TypeColor color, Case king) {
 }
 
 
-int verifyPieceLine(Piece *piece, int startingPos, int i, Case king, TypeColor color) {
+int verifyPieceLine(Piece *piece, int startingPos, int i, Cell king, TypeColor color) {
 	if (piece != NULL) {
 
 		if (i == king.y + 1 && piece->type == KING && piece->color != color)
@@ -100,7 +100,7 @@ int verifyPieceLine(Piece *piece, int startingPos, int i, Case king, TypeColor c
 	else return 0;
 }
 
-int rookOrQueenIsMenacing(Board* board, TypeColor color, Case king) {
+int rookOrQueenIsMenacing(Board* board, TypeColor color, Cell king) {
 	Piece *piece;
 
 	int i, status;
@@ -147,11 +147,11 @@ int rookOrQueenIsMenacing(Board* board, TypeColor color, Case king) {
 	return 0;
 }
 
-int bishopOrQueenIsMenacing(Board* board, TypeColor color, Case king) {
+int bishopOrQueenIsMenacing(Board* board, TypeColor color, Cell king) {
 }
 
 int isCheck(Board* board, TypeColor color) {
-	Case king = getKingPosition(board, color);
+	Cell king = getKingPosition(board, color);
 
 	printf("%d", knightIsMenacing(board, color, king) || rookOrQueenIsMenacing(board, color, king));
 	

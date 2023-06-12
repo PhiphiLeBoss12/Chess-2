@@ -6,6 +6,6 @@ void destroyBoard(Board* board);
 
 void displayBoardConsole(Board* board);
 
-Case getKingPosition(Board* board, TypeColor color);
-int knightIsMenacing(Board* board, TypeColor color, Case king);
+Cell getKingPosition(Board* board, TypeColor color);
+int knightIsMenacing(Board* board, TypeColor color, Cell king);
 int isCheck(Board* board, TypeColor color);
