@@ -44,11 +44,18 @@ void game() {
 
 		presentWindow(window);
 
-		//printf(whoPlays == WHITE ? "White" : "Black");
 		if (whoPlays == WHITE) {
 			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		}
 		else {
+			
+			/*if (selectedPiece == NULL) {
+				printf("NULL\n");
+			}
+			else {
+				showPiece(selectedPiece);
+				printf("\n");
+			}*/
 			RandomBot(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		}
 		
@@ -92,8 +99,10 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 		return NULL;
 	if (board->selectedX == -1 || board->selectedY == -1)
 		return NULL;
+	printf(whoPlays != selectedPiece->color ? "True\n" : "False\n");
 	if (whoPlays != selectedPiece->color) 
 		return NULL;
+	//printf(board->table[board->selectedX][board->selectedY] == NULL ? "True\n" : "False\n");
 	if (!board->table[board->selectedX][board->selectedY])
 		return NULL;
 
