@@ -2,11 +2,12 @@
 #include "Window.h"
 #include "Piece.h"
 #include "Player.h"
+#include "UI.h"
 #include <stdio.h>
 
 void game() {
 	// INIT
-	Window* window = initWindow("Chess 2", 800, 800);
+	Window* window = initWindow("Chess 2", 800 + 400, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
 	players[0] = initPlayers(WHITE, window);
@@ -19,6 +20,13 @@ void game() {
 	int leftButtonHeld = 0;
 	TypeColor whoPlays = WHITE;
 
+	SDL_Texture** textures = createTextureArray(window);
+
+	SidePanel panel;
+	panel.width = 400;
+	panel.offsetX = 800;
+	panel.whoPlays = whoPlays;
+
 	// MAIN LOOP
 	while (!window->shouldClose) {
 		squareSize = min(window->width, window->height) / 8;
@@ -30,18 +38,38 @@ void game() {
 		int numPossibilities = 0;
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
 
-		drawBoard(window, board, squareSize);
+		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
+		drawSidePanel(window, &panel);
 
 		presentWindow(window);
 
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		panel.whoPlays = whoPlays;
 	}
 
+	free(textures);
 	freePlayer(players[0]);
 	freePlayer(players[1]);
 	destroyBoard(board);
 	destroyWindow(window);
+}
+
+SDL_Texture** createTextureArray(Window* window) {
+	SDL_Texture** textures = (SDL_Texture**)malloc(sizeof(SDL_Texture*) * 12);
+	textures[0] = createTexture(window, "White_Pawn.png");
+	textures[1] = createTexture(window, "White_Bishop.png");
+	textures[2] = createTexture(window, "White_Knight.png");
+	textures[3] = createTexture(window, "White_Rook.png");
+	textures[4] = createTexture(window, "White_Queen.png");
+	textures[5] = createTexture(window, "White_King.png");
+	textures[6] = createTexture(window, "Black_Pawn.png");
+	textures[7] = createTexture(window, "Black_Bishop.png");
+	textures[8] = createTexture(window, "Black_Knight.png");
+	textures[9] = createTexture(window, "Black_Rook.png");
+	textures[10] = createTexture(window, "Black_Queen.png");
+	textures[11] = createTexture(window, "Black_King.png");
+	return textures;
 }
 
 void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
@@ -65,7 +93,7 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 	return movePossibilitiesPiece(selectedPiece, board, numPossibilities);
 }
 
-void drawBoard(Window* window, Board* board, int squareSize) {
+void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			Rect rect;
@@ -75,23 +103,22 @@ void drawBoard(Window* window, Board* board, int squareSize) {
 			rect.height = squareSize;
 			rect.angle = 0.0f;
 
-			if ((i + j) % 2 == 0)
+			if ((i + j) % 2 == 1)
 				setDrawColor(window, 200, 200, 200, 255);
 			else
 				setDrawColor(window, 64, 64, 64, 255);
 
+			if (board->selectedX == j && board->selectedY == i)
+				setDrawColor(window, 128, 128, 128, 128);
+
 			drawRect(window, &rect);
 
-			if (board->selectedX == j && board->selectedY == i) {
-				setDrawColor(window, 128, 128, 128, 128);
-				int x = rect.x + rect.width / 2;
-				int y = rect.y + rect.height / 2;
-				int radius = rect.width / 2 - rect.width / 10;
-				drawCircle(window, x, y, radius);
+			if (board->table[j][i]) {
+				TypeColor color = board->table[j][i]->color;
+				TypePiece type = board->table[j][i]->type;
+				int index = type + 6 * color;
+				drawTexture(window, &rect, textures[index]);
 			}
-
-			if (board->table[j][i])
-				drawTexture(window, &rect, board->table[j][i]->texture);
 		}
 	}
 }
@@ -116,6 +143,9 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 		int x, y;
 		getInputOnBoard(window, &x, &y, squareSize);
 
+		if (x < 0 || y < 0 || x > 7 || y > 7)
+			return;
+
 		if (board->table[x][y]) {
 			board->selectedX = x;
 			board->selectedY = y;
@@ -128,7 +158,28 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			}
 
 			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
-				movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+				//Verify castling 
+				if (board->table[board->selectedX][board->selectedY] != NULL) {
+					if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
+						Piece* rook;
+						rook = board->table[board->selectedX][board->selectedY];
+						//Castling right
+						if (board->selectedX > 4) {
+							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1]);
+							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1]);
+						}
+						else { //Castling left
+							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1]);
+							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
+						}
+					}
+					else {
+						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					}
+				}
+				else {
+					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square
 				board->selectedX = -1;

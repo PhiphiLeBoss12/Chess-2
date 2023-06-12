@@ -19,7 +19,7 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	if (!window->window) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -135,6 +135,11 @@ void drawCircle(Window* window, int x, int y, int radius) {
 			}
 		}
 	}
+}
+
+void drawLine(Window* window, int thiccness, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < thiccness; i++)
+		SDL_RenderDrawLine(window->renderer, x1 + (i - thiccness / 2), y1, x2 + (i - thiccness / 2), y2);
 }
 
 SDL_Texture* createTexture(Window* window, const char* path) {
