@@ -201,6 +201,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
+		int pieceEaten = 0;
 		int x, y;
 		getInputOnBoard(window, &x, &y, squareSize);
 
@@ -235,11 +236,11 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						}
 					}
 					else {
-						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 					}
 				}
 				else {
-					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square
@@ -250,6 +251,8 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				players[1] = tempo;
 
 				playSound(stepSound);
+				if (pieceEaten)
+					playSound(killSound);
 			}
 		}
 
