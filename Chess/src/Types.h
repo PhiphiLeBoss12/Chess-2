@@ -19,7 +19,7 @@ typedef struct StructPiece {
 	int y;
 	int hasMoved; //if the piece has moved in this turn
 	int hasMovedOnce; //if the piece has moved one time
-	SDL_Texture* texture; 
+	SDL_Texture* texture; // Unused
 } Piece;
 
 typedef struct StructBoard {
@@ -35,9 +35,9 @@ typedef struct StructPlayer {
 	Piece * *eaten; //tableau pièce adverse mangé
 } Player;
 
-typedef struct StructCase {
+typedef struct StructCell {
 	int x;
 	int y;
-} Case;
+} Cell;
 
 

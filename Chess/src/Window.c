@@ -12,10 +12,14 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		printf("Failed to initialize SDL_image! IMG error: %s\n", IMG_GetError());
 		return NULL;
 	}
+	if (TTF_Init() < 0) {
+		printf("Failed to initialize SDL_ttf! TTF error: %s\n", TTF_GetError());
+		return NULL;
+	}
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	if (!window->window) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -27,6 +31,8 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		return NULL;
 	}
 	SDL_SetRenderDrawBlendMode(window->renderer, SDL_BLENDMODE_BLEND);
+
+	window->font = TTF_OpenFont("OpenSans-Regular.ttf", 128);
 
 	window->width = width;
 	window->height = height;
@@ -45,10 +51,12 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 }
 
 void destroyWindow(Window* window) {
+	TTF_CloseFont(window->font);
 	SDL_DestroyRenderer(window->renderer);
 	SDL_DestroyWindow(window->window);
 	free(window);
 
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -129,6 +137,11 @@ void drawCircle(Window* window, int x, int y, int radius) {
 	}
 }
 
+void drawLine(Window* window, int thiccness, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < thiccness; i++)
+		SDL_RenderDrawLine(window->renderer, x1 + (i - thiccness / 2), y1, x2 + (i - thiccness / 2), y2);
+}
+
 SDL_Texture* createTexture(Window* window, const char* path) {
 	SDL_Surface* surface = IMG_Load(path);
 	if (!surface) {
@@ -140,6 +153,7 @@ SDL_Texture* createTexture(Window* window, const char* path) {
 		printf("Failed to create texture from surface! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
+	SDL_FreeSurface(surface);
 	return texture;
 }
 
@@ -151,5 +165,26 @@ void drawTexture(Window* window, Rect* rect, SDL_Texture* texture) {
 }
 
 void destroyTexture(SDL_Texture* texture) {
+	SDL_DestroyTexture(texture);
+}
+
+void drawText(Window* window, SDL_Color color, const char* text, int x, int y, float sizeRatio) {
+	SDL_Surface* surface = TTF_RenderText_Blended(window->font, text, color);
+	if (!surface) {
+		printf("Failed to create surface! TTF error: %s\n", TTF_GetError());
+		return;
+	}
+
+	Rect rect;
+	rect.x = x;
+	rect.y = y;
+	rect.width = (float)surface->w * sizeRatio;
+	rect.height = (float)surface->h * sizeRatio;
+	rect.angle = 0.0f;
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->renderer, surface);
+	drawTexture(window, &rect, texture);
+
+	SDL_FreeSurface(surface);
 	SDL_DestroyTexture(texture);
 }
