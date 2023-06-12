@@ -567,3 +567,190 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 
 
 
+/*
+CHECK VERIFICATION
+*/
+Cell getKingPosition(Board* board, TypeColor color) {
+	Cell king;
+	for (int x = 0; x < board->size; x++) {
+		for (int y = 0; y < board->size; y++) {
+			if (board->table[x][y] != NULL) {
+				if (board->table[x][y]->type == KING && board->table[x][y]->color == color) {
+					king.x = x;
+					king.y = y;
+					return king;
+				}
+			}
+		}
+	}
+	printf("Error getKingPosition : Your king might be in another castle (he's not in the board)\n");
+}
+
+int knightIsMenacing(Board* board, TypeColor color, Cell king) {
+	int posThreatx, posThreaty;
+	for (int x = -2; x <= 2; x++) {
+		for (int y = -2; y <= 2; y++) {
+			if (x != 0 && y != 0) {
+				// Computing the position of a potential knight
+				posThreatx = king.x + x;
+				posThreaty = king.y + y;
+
+				// Checking if the position exists in the grid
+				if (posThreatx >= 0 && posThreatx < 8 && posThreaty >= 0 && posThreaty < 8) {
+
+					// checking if a knight actually is in the grid
+					Piece* piece = board->table[posThreatx][posThreaty];
+					if (piece != NULL && piece->type == KNIGHT && piece->color != color) {
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int verifyPieceLine(Piece* piece, int startingPos, int i, Cell king, TypeColor color) {
+	if (piece != NULL) {
+
+		if (i == startingPos && piece->type == KING && piece->color != color)
+			return 1;
+
+		else if ((piece->type == ROOK || piece->type == QUEEN) && piece->color != color)
+			return 1;
+
+		else return 2;
+	}
+	else return 0;
+}
+
+int rookOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
+	Piece* piece;
+
+	int i, status;
+	for (i = king.y + 1; i < 8; i++) {
+		piece = board->table[king.x][i];
+		status = verifyPieceLine(piece, king.y + 1, i, king, color);
+
+		if (status == 1)
+			return 1;
+		else if (status == 2)
+			break;
+	}
+
+	for (i = king.y - 1; i >= 0; i--) {
+		piece = board->table[king.x][i];
+		status = verifyPieceLine(piece, king.y - 1, i, king, color);
+
+		if (status == 1)
+			return 1;
+		else if (status == 2)
+			break;
+	}
+
+	for (i = king.x + 1; i < 8; i++) {
+		piece = board->table[i][king.y];
+		status = verifyPieceLine(piece, king.x + 1, i, king, color);
+
+		if (status == 1)
+			return 1;
+		else if (status == 2)
+			break;
+	}
+
+	for (i = king.x - 1; i >= 0; i--) {
+		piece = board->table[i][king.y];
+		status = verifyPieceLine(piece, king.x - 1, i, king, color);
+
+		if (status == 1)
+			return 1;
+		else if (status == 2)
+			break;
+	}
+
+	return 0;
+}
+
+int bishopOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
+	// return all the moving possibilities of a bishop in a Cell's table without verify check
+	Cell cell;
+	int right_left, top_bottom;
+
+	for (int power = 1; power < 3; power++) { //Left and Right
+		right_left = pow((-1), power); //right_left = -1 or 1, allow to go in left and right
+
+		for (int power2 = 1; power2 < 3; power2++) { //Top and Bottom
+			top_bottom = pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
+
+			//All cell in the line (7 cells max)
+			//Didn't find a way to optimize the number of cell to be checked
+			for (int i = 1; i < SIZE - 1; i++) {
+				//define the coords of the cell
+				cell.x = king.x + i * top_bottom;
+				cell.y = king.y + i * right_left;
+
+				if (0 <= cell.x && cell.x < SIZE && 0 <= cell.y && cell.y < SIZE) { //Verify border
+					Piece* piece = board->table[cell.x][cell.y];
+
+					if (piece != NULL) { // Non-empty cell
+						if ((piece->type == BISHOP || piece->type == QUEEN) && piece->color != color) //Ennemy piece
+							return 1;
+
+						else if (piece->type == KING && piece->color != color && i == 1)
+							return 1;
+
+						break;
+					}
+				}
+				else {
+					break; //There's no point in checking any further
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+int pawnMenacing(Board* board, TypeColor color, Cell king) {
+	// return all the moving possibilities of a pawn in a Cell's table without verify check
+
+	int index = 0; //position in the table possibilities
+	Cell cell;
+	int mult = 1; //Initialize to white player
+
+	if (color == BLACK) //Black player plays in negative move
+		mult = -1;
+
+	if (0 <= king.y + 1 * mult && king.y + 1 * mult < SIZE) { //Verify border
+		//Attacks move
+		int add;
+		for (int power = 1; power < 3; power++) { //Left and Right
+			add = pow((-1), power); //add = 1 or -1
+			
+			if (king.x + add * mult >= 0 && king.x + add * mult < SIZE) { //Verify border
+				Piece* piece = board->table[king.x + add * mult][king.y + 1 * mult];
+
+				if (piece != NULL) { //Not empty cell
+					if (piece->color != color) { //ennemy piece
+						return 1;
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+int isCheck(Board* board, TypeColor color) {
+	Cell king = getKingPosition(board, color);
+
+	printf("%d", knightIsMenacing(board, color, king) || 
+		rookOrQueenOrKingAreMenacing(board, color, king) ||
+		bishopOrQueenOrKingAreMenacing(board, color, king) ||
+		pawnMenacing(board, color, king));
+
+	return 0;
+}
+

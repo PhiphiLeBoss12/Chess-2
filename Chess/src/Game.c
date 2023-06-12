@@ -231,6 +231,8 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
 
 		leftButtonHeld = 1;
+
+		isCheck(board, WHITE);
 	}
 	if (!window->mouseLeftButton)
 		leftButtonHeld = 0;

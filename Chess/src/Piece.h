@@ -23,3 +23,6 @@ int searchPieceInTablePlay(Player play, Piece piece);
 int getPosVideEaten(Player play);
 void affTabPlayer(Player play);
 void affEatenPlayer(Player play);
+
+int isCheck(Board* board, TypeColor color);
+
