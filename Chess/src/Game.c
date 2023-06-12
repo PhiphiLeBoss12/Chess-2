@@ -47,6 +47,9 @@ void game() {
 		if (whoPlays == WHITE) {
 			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		}
+		else {
+			RandomBot(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		}
 		
 		panel.whoPlays = whoPlays;
 	}
