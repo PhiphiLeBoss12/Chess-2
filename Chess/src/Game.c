@@ -7,7 +7,7 @@
 
 void game() {
 	// INIT
-	Window* window = initWindow("Chess 2", 1024, 800);
+	Window* window = initWindow("Chess 2", 800 + 400, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
 	players[0] = initPlayers(WHITE, window);
@@ -23,6 +23,7 @@ void game() {
 	SDL_Texture** textures = createTextureArray(window);
 
 	SidePanel panel;
+	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
 
@@ -141,6 +142,9 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 	if (window->mouseLeftButton && !leftButtonHeld) {
 		int x, y;
 		getInputOnBoard(window, &x, &y, squareSize);
+
+		if (x < 0 || y < 0 || x > 7 || y > 7)
+			return;
 
 		if (board->table[x][y]) {
 			board->selectedX = x;

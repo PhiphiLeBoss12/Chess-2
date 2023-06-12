@@ -55,6 +55,9 @@ void drawRect(Window* window, Rect* rect);
 // Draws a circle centered at (x,y) of radius radius
 void drawCircle(Window* window, int x, int y, int radius);
 
+// Draws a line from (x1,y1) to (x2,y2)
+void drawLine(Window* window, int thiccness, int x1, int y1, int x2, int y2);
+
 // Creates a texture from the file path
 // Only JPG and PNG formats are supported!
 // You need to destroy the texture once you don't need it anymore
