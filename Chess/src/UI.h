@@ -13,7 +13,7 @@ typedef struct EndScreen {
 	TypeColor whoWon;
 } EndScreen;
 
-void drawStartScreen(Window* window);
+void drawStartScreen(Window* window, SDL_Texture** textures);
 
 void drawSidePanel(Window* window, SidePanel* panel);
 

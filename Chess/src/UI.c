@@ -1,7 +1,7 @@
 ﻿#include "UI.h"
 #include <math.h>
 
-void drawStartScreen(Window* window) {
+void drawStartScreen(Window* window, SDL_Texture** textures) {
 	static double iter = 0;
 
 	Rect rect = { 0, 0, window->width, window->height, 0.0f };
@@ -14,6 +14,17 @@ void drawStartScreen(Window* window) {
 
 	drawText(window, color, "press return to play", 30, 700, 0.3f);
 	drawText(window, color, "press escape to quit :(", 30, 650, 0.3f);
+
+	Rect texRect = { 800, 300, 256, 256, -iter / 5 };
+	drawTexture(window, &texRect, textures[4]);
+	Rect texRect1 = { 600, 600, 128, 128, iter };
+	drawTexture(window, &texRect1, textures[9]);
+	Rect texRect2 = { 100, 300, 128, 128, iter / 6 };
+	drawTexture(window, &texRect2, textures[5]);
+	Rect texRect3 = { cos(iter / 50) * 40 + 500, sin(iter / 50) * 40 + 176, 64, 64, -iter};
+	drawTexture(window, &texRect3, textures[10]);
+	Rect texRect4 = { sin(iter / 70) * 50 + 900, cos(iter / 70) * 50 + 100, 128, 128, iter};
+	drawTexture(window, &texRect4, textures[1]);
 
 	iter++;
 }
