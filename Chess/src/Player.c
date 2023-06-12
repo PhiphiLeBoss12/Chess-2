@@ -23,11 +23,11 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 	int pawn, pieces;
 	if (coloor==WHITE)
 	{
-		printf("WHITE PLAYER INIT \n");
+		// printf("WHITE PLAYER INIT \n");
 		pawn = 1; pieces = 0;
 	}
 	else {
-		printf("BLACK PLAYER INIT \n");
+		// printf("BLACK PLAYER INIT \n");
 		pawn = 6; pieces = 7;
 	}
 	// Init
@@ -43,7 +43,7 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 	player->table[13] = initPiece(BISHOP,	coloor, 5, pieces, window);
 	player->table[14] = initPiece(KNIGHT,	coloor, 6, pieces, window);
 	player->table[15] = initPiece(ROOK,		coloor, 7, pieces, window);
-	printf("Player init done\n");
+	// printf("Player init done\n");
 	return player;
 }
 
