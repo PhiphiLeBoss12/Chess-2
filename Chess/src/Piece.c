@@ -132,14 +132,16 @@ void showPiece(Piece* piece) {
 			� Board* board (plateau du jeu)
 			� Player* playNice (joueur � qui app la pi�ce)
 			� Player* playBad (joeur adverse)
-	output :	� void (rien) */
-void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad) {
+	output :	1 si une pièce s'est faite mangée, 0 sinon */
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad) {
+	int pieceEaten = 0;
 	board->table[piece->x][piece->y] = NULL; //ancienne position
 	if (board->table[x][y] != NULL) { //si ennemi
 		int pos = getPosVideEaten(*playNice); //o� il y a un emplacement vide dans eaten
 		playNice->eaten[pos] = board->table[x][y]; //ajout ennemi � la liste eaten du player
 		int pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y])); //recherche la pi�ce mang� dans la liste du joueur adverse
 		playBad->table[pos2] = NULL; //suppression de la pi�ce mang�
+		pieceEaten = 1;
 	}
 	piece->x = x;
 	piece->y = y;
@@ -150,6 +152,7 @@ void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Playe
 	}
 	board->table[x][y] = piece; //pi�ce d�placer
 	piece->hasMovedOnce = 1;
+	return pieceEaten;
 }
 
 void affTabPlayer(Player play) {
@@ -545,7 +548,7 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 			cell.y = 7;
 		}
 		//Verify if there is no piece between king & if rook hasn't moved
-		if (board->table[7-cell.y][cell.y] != NULL) {
+		if (board->table[0][cell.y] != NULL && board->table[7][cell.y] != NULL) {
 			//Right
 			if (board->table[5][cell.y] == NULL && board->table[6][cell.y] == NULL && board->table[7][cell.y]->type == ROOK && !board->table[7][cell.y]->hasMovedOnce) {
 				cell.x = 7;

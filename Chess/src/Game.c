@@ -3,7 +3,15 @@
 #include "Piece.h"
 #include "Player.h"
 #include "UI.h"
+#include "Sound.h"
 #include <stdio.h>
+
+// Global variables (very bad)
+Mix_Music* mainMenuMusic;
+Mix_Music* gameMusic;
+Mix_Chunk* stepSound;
+Mix_Chunk* winSound;
+Mix_Chunk* killSound;
 
 void game() {
 	// INIT
@@ -24,10 +32,18 @@ void game() {
 
 	SDL_Texture** textures = createTextureArray(window);
 
+	mainMenuMusic = loadMusic("Deadly Roulette.mp3");
+	gameMusic = loadMusic("Walking Along.mp3");
+	stepSound = loadSound("step.mp3");
+	winSound = loadSound("Danse Macabre.mp3");
+	killSound = loadSound("kill.mp3");
+
 	SidePanel panel;
 	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
+
+	playMusic(mainMenuMusic);
 
 	// MAIN LOOP
 	while (gameState != QUIT && !window->shouldClose) {
@@ -46,8 +62,10 @@ void game() {
 
 		if (gameState == START) {
 			drawStartScreen(window, textures);
-			if (window->keyDown == SDLK_RETURN)
+			if (window->keyDown == SDLK_RETURN) {
 				gameState = PLAYING;
+				playMusic(gameMusic);
+			}
 			if (window->keyDown == SDLK_ESCAPE)
 				gameState = QUIT;
 		}
@@ -84,6 +102,12 @@ void game() {
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		panel.whoPlays = whoPlays;
 	}
+
+	destroyMusic(gameMusic);
+	destroyMusic(mainMenuMusic);
+	destroySound(stepSound);
+	destroySound(winSound);
+	destroySound(killSound);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -146,7 +170,7 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 				setDrawColor(window, 64, 64, 64, 255);
 
 			if (board->selectedX == j && board->selectedY == i)
-				setDrawColor(window, 128, 128, 128, 128);
+				setDrawColor(window, 64, 128, 64, 200);
 
 			drawRect(window, &rect);
 
@@ -177,6 +201,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
+		int pieceEaten = 0;
 		int x, y;
 		getInputOnBoard(window, &x, &y, squareSize);
 
@@ -211,11 +236,11 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						}
 					}
 					else {
-						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 					}
 				}
 				else {
-					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square
@@ -224,6 +249,10 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				Player* tempo = players[0];
 				players[0] = players[1];
 				players[1] = tempo;
+
+				playSound(stepSound);
+				if (pieceEaten)
+					playSound(killSound);
 			}
 		}
 
