@@ -749,11 +749,9 @@ int pawnMenacing(Board* board, TypeColor color, Cell king) {
 int isCheck(Board* board, TypeColor color) {
 	Cell king = getKingPosition(board, color);
 
-	printf("%d", knightIsMenacing(board, color, king) || 
-		rookOrQueenOrKingAreMenacing(board, color, king) ||
-		bishopOrQueenOrKingAreMenacing(board, color, king) ||
-		pawnMenacing(board, color, king));
-
-	return 0;
+	return knightIsMenacing(board, color, king) || 
+		rookOrQueenOrKingAreMenacing(board, color, king) || 
+		bishopOrQueenOrKingAreMenacing(board, color, king) || 
+		pawnMenacing(board, color, king);
 }
 
