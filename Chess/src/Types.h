@@ -17,7 +17,6 @@ typedef struct StructPiece {
 	TypeColor color;
 	int x;
 	int y;
-	int hasMoved; //if the piece has moved in this turn
 	int hasMovedOnce; //if the piece has moved one time
 	SDL_Texture* texture; // Unused
 } Piece;
@@ -39,5 +38,3 @@ typedef struct StructCell {
 	int x;
 	int y;
 } Cell;
-
-
