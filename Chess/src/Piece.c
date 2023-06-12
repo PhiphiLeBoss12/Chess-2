@@ -545,7 +545,7 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 			cell.y = 7;
 		}
 		//Verify if there is no piece between king & if rook hasn't moved
-		if (board->table[7-cell.y][cell.y] != NULL) {
+		if (board->table[0][cell.y] != NULL && board->table[7][cell.y] != NULL) {
 			//Right
 			if (board->table[5][cell.y] == NULL && board->table[6][cell.y] == NULL && board->table[7][cell.y]->type == ROOK && !board->table[7][cell.y]->hasMovedOnce) {
 				cell.x = 7;
