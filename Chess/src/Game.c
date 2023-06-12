@@ -45,7 +45,7 @@ void game() {
 		drawSidePanel(window, &panel);
 
 		if (gameState == START) {
-			drawStartScreen(window);
+			drawStartScreen(window, textures);
 			if (window->keyDown == SDLK_RETURN)
 				gameState = PLAYING;
 			if (window->keyDown == SDLK_ESCAPE)
