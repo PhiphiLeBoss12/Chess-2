@@ -7,6 +7,8 @@
 
 void game() {
 	// INIT
+	GameState gameState = START;
+
 	Window* window = initWindow("Chess 2", 800 + 400, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
@@ -28,7 +30,7 @@ void game() {
 	panel.whoPlays = whoPlays;
 
 	// MAIN LOOP
-	while (!window->shouldClose) {
+	while (gameState != QUIT && !window->shouldClose) {
 		squareSize = min(window->width, window->height) / 8;
 
 		handleEvents(window);
@@ -41,6 +43,41 @@ void game() {
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
 		drawSidePanel(window, &panel);
+
+		if (gameState == START) {
+			drawStartScreen(window);
+			if (window->keyDown == SDLK_RETURN)
+				gameState = PLAYING;
+			if (window->keyDown == SDLK_ESCAPE)
+				gameState = QUIT;
+		}
+
+		if (gameState == END) {
+			EndScreen es;
+			es.width = 800;
+			es.height = 600;
+			es.whoWon = WHITE;
+			drawEndScreen(window, &es);
+
+			if (window->keyDown == SDLK_RETURN) {
+				freePlayer(players[0]);
+				freePlayer(players[1]);
+				destroyBoard(board);
+
+				players[0] = initPlayers(WHITE, window);
+				players[1] = initPlayers(BLACK, window);
+				board = createBoard(8);
+				putInBoard(players[0], board);
+				putInBoard(players[1], board);
+
+				TypeColor whoPlays = WHITE;
+				
+				gameState = PLAYING;
+			}
+
+			if (window->keyDown == SDLK_ESCAPE)
+				gameState = QUIT;
+		}
 
 		presentWindow(window);
 
