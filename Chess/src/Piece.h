@@ -18,7 +18,7 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities);
 
 
-void movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
 int searchPieceInTablePlay(Player play, Piece piece);
 int getPosVideEaten(Player play);
 void affTabPlayer(Player play);
