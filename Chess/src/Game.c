@@ -44,6 +44,7 @@ void game() {
 
 		presentWindow(window);
 
+		//printf(whoPlays == WHITE ? "White" : "Black");
 		if (whoPlays == WHITE) {
 			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		}
@@ -168,6 +169,7 @@ void gayme(Window* window, Board* board, Piece** selectedPiece, Player** players
 			board->selectedY = y;
 		}
 
+		//printf(board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color ? "True\n" : "False\n");
 		if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
 			//Verify castling 
 			if (board->table[board->selectedX][board->selectedY] != NULL) {

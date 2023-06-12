@@ -24,3 +24,5 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 
 // Big ahh function to react when the mouse is clicked
 void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays);
+
+void gayme(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, int x, int y);

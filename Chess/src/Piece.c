@@ -120,7 +120,7 @@ char* showCoordPiece(Piece* piece) {
 void showPiece(Piece* piece) { 
 	showTypePiece(piece->type);
 	printf(": ");
-	showCoordPiece(piece);
+	printf("%s", showCoordPiece(piece));
 	printf("\n");
 }
 
@@ -545,17 +545,19 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 			cell.y = 7;
 		}
 		//Verify if there is no piece between king & if rook hasn't moved
-		//Right
-		if (board->table[5][cell.y] == NULL && board->table[6][cell.y] == NULL && board->table[7][cell.y]->type == ROOK && !board->table[7][cell.y]->hasMovedOnce) {
+		if (board->table[7-cell.y][cell.y] != NULL) {
+			//Right
+			if (board->table[5][cell.y] == NULL && board->table[6][cell.y] == NULL && board->table[7][cell.y]->type == ROOK && !board->table[7][cell.y]->hasMovedOnce) {
 				cell.x = 7;
 				possibilities[index] = cell;
 				index++;
-		}
-		//Left
-		if (board->table[3][cell.y] == NULL && board->table[2][cell.y] == NULL && board->table[1][cell.y] == NULL && board->table[0][cell.y]->type == ROOK && !board->table[0][cell.y]->hasMovedOnce) {
+			}
+			//Left
+			if (board->table[3][cell.y] == NULL && board->table[2][cell.y] == NULL && board->table[1][cell.y] == NULL && board->table[0][cell.y]->type == ROOK && !board->table[0][cell.y]->hasMovedOnce) {
 				cell.x = 0;
 				possibilities[index] = cell;
 				index++;
+			}
 		}
 	}
 
