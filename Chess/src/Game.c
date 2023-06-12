@@ -3,7 +3,11 @@
 #include "Piece.h"
 #include "Player.h"
 #include "UI.h"
+#include "Sound.h"
 #include <stdio.h>
+
+// Global variables (very bad)
+Mix_Chunk* stepSound;
 
 void game() {
 	// INIT
@@ -23,6 +27,7 @@ void game() {
 	TypeColor whoPlays = WHITE;
 
 	SDL_Texture** textures = createTextureArray(window);
+	stepSound = loadSound("step.mp3");
 
 	SidePanel panel;
 	panel.width = 400;
@@ -84,6 +89,8 @@ void game() {
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		panel.whoPlays = whoPlays;
 	}
+
+	destroySound(stepSound);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -224,6 +231,8 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				Player* tempo = players[0];
 				players[0] = players[1];
 				players[1] = tempo;
+
+				playSound(stepSound);
 			}
 		}
 
