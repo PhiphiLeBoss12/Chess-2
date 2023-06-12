@@ -3,10 +3,20 @@
 #include "Piece.h"
 #include "Player.h"
 #include "UI.h"
+#include "Sound.h"
 #include <stdio.h>
+
+// Global variables (very bad)
+Mix_Music* mainMenuMusic;
+Mix_Music* gameMusic;
+Mix_Chunk* stepSound;
+Mix_Chunk* winSound;
+Mix_Chunk* killSound;
 
 void game() {
 	// INIT
+	GameState gameState = START;
+
 	Window* window = initWindow("Chess 2", 800 + 400, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
@@ -22,13 +32,21 @@ void game() {
 
 	SDL_Texture** textures = createTextureArray(window);
 
+	mainMenuMusic = loadMusic("Deadly Roulette.mp3");
+	gameMusic = loadMusic("Walking Along.mp3");
+	stepSound = loadSound("step.mp3");
+	winSound = loadSound("Danse Macabre.mp3");
+	killSound = loadSound("kill.mp3");
+
 	SidePanel panel;
 	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
 
+	playMusic(mainMenuMusic);
+
 	// MAIN LOOP
-	while (!window->shouldClose) {
+	while (gameState != QUIT && !window->shouldClose) {
 		squareSize = min(window->width, window->height) / 8;
 
 		handleEvents(window);
@@ -42,11 +60,54 @@ void game() {
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
 		drawSidePanel(window, &panel);
 
+		if (gameState == START) {
+			drawStartScreen(window, textures);
+			if (window->keyDown == SDLK_RETURN) {
+				gameState = PLAYING;
+				playMusic(gameMusic);
+			}
+			if (window->keyDown == SDLK_ESCAPE)
+				gameState = QUIT;
+		}
+
+		if (gameState == END) {
+			EndScreen es;
+			es.width = 800;
+			es.height = 600;
+			es.whoWon = WHITE;
+			drawEndScreen(window, &es);
+
+			if (window->keyDown == SDLK_RETURN) {
+				freePlayer(players[0]);
+				freePlayer(players[1]);
+				destroyBoard(board);
+
+				players[0] = initPlayers(WHITE, window);
+				players[1] = initPlayers(BLACK, window);
+				board = createBoard(8);
+				putInBoard(players[0], board);
+				putInBoard(players[1], board);
+
+				TypeColor whoPlays = WHITE;
+				
+				gameState = PLAYING;
+			}
+
+			if (window->keyDown == SDLK_ESCAPE)
+				gameState = QUIT;
+		}
+
 		presentWindow(window);
 
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
 		panel.whoPlays = whoPlays;
 	}
+
+	destroyMusic(gameMusic);
+	destroyMusic(mainMenuMusic);
+	destroySound(stepSound);
+	destroySound(winSound);
+	destroySound(killSound);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -109,7 +170,7 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 				setDrawColor(window, 64, 64, 64, 255);
 
 			if (board->selectedX == j && board->selectedY == i)
-				setDrawColor(window, 128, 128, 128, 128);
+				setDrawColor(window, 64, 128, 64, 200);
 
 			drawRect(window, &rect);
 
@@ -140,6 +201,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
+		int pieceEaten = 0;
 		int x, y;
 		getInputOnBoard(window, &x, &y, squareSize);
 
@@ -174,11 +236,11 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						}
 					}
 					else {
-						movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 					}
 				}
 				else {
-					movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square
@@ -187,6 +249,10 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				Player* tempo = players[0];
 				players[0] = players[1];
 				players[1] = tempo;
+
+				playSound(stepSound);
+				if (pieceEaten)
+					playSound(killSound);
 			}
 		}
 
@@ -194,6 +260,8 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
 
 		leftButtonHeld = 1;
+
+		isCheck(board, WHITE);
 	}
 	if (!window->mouseLeftButton)
 		leftButtonHeld = 0;

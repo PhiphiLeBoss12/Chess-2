@@ -3,6 +3,8 @@
 #include "Window.h"
 #include "Board.h"
 
+typedef enum GameState { START, PLAYING, END, QUIT } GameState;
+
 // Main game loop
 void game();
 

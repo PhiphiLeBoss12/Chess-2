@@ -56,7 +56,8 @@ project "Chess"
 			"SDL2",
 			"SDL2main",
 			"SDL2_image",
-			"SDL2_ttf"
+			"SDL2_ttf",
+			"SDL2_mixer"
 		}
 		postbuildcommands ("xcopy ..\\libs\\windows\\dlls\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")
 		postbuildcommands ("xcopy ..\\dev-assets\\ ..\\bin\\" .. outputDir .. "\\%{prj.name}\\ /s /e /y /i")

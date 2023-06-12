@@ -43,3 +43,4 @@ void displayBoardConsole(Board* board) {
 		printf("\n");
 	}
 }
+

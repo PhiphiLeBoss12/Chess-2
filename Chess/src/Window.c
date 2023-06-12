@@ -1,14 +1,14 @@
 #include <Window.h>
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 Window* initWindow(const char* title, unsigned int width, unsigned int height) {
-	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		printf("Failed to initialize SDL! SDL error: %s\n", SDL_GetError());
 		return NULL;
 	}
-	if (IMG_Init(flags) != flags) {
+	if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0) {
 		printf("Failed to initialize SDL_image! IMG error: %s\n", IMG_GetError());
 		return NULL;
 	}
@@ -16,6 +16,11 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		printf("Failed to initialize SDL_ttf! TTF error: %s\n", TTF_GetError());
 		return NULL;
 	}
+	if (Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MID | MIX_INIT_OPUS) < 0) {
+		printf("Failed to initialize SDL_mixer! MIX error: %s\n", Mix_GetError());
+		return NULL;
+	}
+	Mix_OpenAudio(48000, AUDIO_F32SYS, 2, 2048);
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
@@ -56,6 +61,8 @@ void destroyWindow(Window* window) {
 	SDL_DestroyWindow(window->window);
 	free(window);
 
+	Mix_CloseAudio();
+	Mix_Quit();
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
