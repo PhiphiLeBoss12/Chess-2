@@ -7,7 +7,11 @@
 #include <stdio.h>
 
 // Global variables (very bad)
+Mix_Music* mainMenuMusic;
+Mix_Music* gameMusic;
 Mix_Chunk* stepSound;
+Mix_Chunk* winSound;
+Mix_Chunk* killSound;
 
 void game() {
 	// INIT
@@ -27,12 +31,19 @@ void game() {
 	TypeColor whoPlays = WHITE;
 
 	SDL_Texture** textures = createTextureArray(window);
+
+	mainMenuMusic = loadMusic("Deadly Roulette.mp3");
+	gameMusic = loadMusic("Walking Along.mp3");
 	stepSound = loadSound("step.mp3");
+	winSound = loadSound("Danse Macabre.mp3");
+	killSound = loadSound("kill.mp3");
 
 	SidePanel panel;
 	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
+
+	playMusic(mainMenuMusic);
 
 	// MAIN LOOP
 	while (gameState != QUIT && !window->shouldClose) {
@@ -51,8 +62,10 @@ void game() {
 
 		if (gameState == START) {
 			drawStartScreen(window, textures);
-			if (window->keyDown == SDLK_RETURN)
+			if (window->keyDown == SDLK_RETURN) {
 				gameState = PLAYING;
+				playMusic(gameMusic);
+			}
 			if (window->keyDown == SDLK_ESCAPE)
 				gameState = QUIT;
 		}
@@ -90,7 +103,11 @@ void game() {
 		panel.whoPlays = whoPlays;
 	}
 
+	destroyMusic(gameMusic);
+	destroyMusic(mainMenuMusic);
 	destroySound(stepSound);
+	destroySound(winSound);
+	destroySound(killSound);
 
 	free(textures);
 	freePlayer(players[0]);
