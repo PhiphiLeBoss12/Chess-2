@@ -146,7 +146,7 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 				setDrawColor(window, 64, 64, 64, 255);
 
 			if (board->selectedX == j && board->selectedY == i)
-				setDrawColor(window, 128, 128, 128, 128);
+				setDrawColor(window, 64, 128, 64, 200);
 
 			drawRect(window, &rect);
 
