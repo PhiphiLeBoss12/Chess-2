@@ -147,7 +147,7 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 	piece->y = y;
 	
 	// Pawn Promotion : PP
-	if (piece->type == PAWN && (piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0))
+	if (piece->type == PAWN && ((piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0)))
 	{
 		piece->type = QUEEN;
 	}
