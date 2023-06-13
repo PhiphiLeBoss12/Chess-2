@@ -14,7 +14,7 @@ Mix_Chunk* winSound;
 Mix_Chunk* killSound;
 Mix_Chunk* funnySound;
 Mix_Chunk* funnySound2;
-GameState gameState = START;
+GameState gameState = PLAYING;
 
 void game() {
 	// INIT
@@ -46,6 +46,8 @@ void game() {
 	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
+	panel.playerWhite = players[0];
+	panel.playerBlack = players[1];
 
 	playMusic(mainMenuMusic);
 
@@ -62,7 +64,7 @@ void game() {
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
-		drawSidePanel(window, &panel);
+		drawSidePanel(window, &panel, textures);
 
 		if (gameState == START) {
 			drawStartScreen(window, textures);

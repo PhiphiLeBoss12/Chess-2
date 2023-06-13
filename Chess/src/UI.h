@@ -6,6 +6,8 @@ typedef struct SidePanel {
 	int width;
 	int offsetX;
 	TypeColor whoPlays;
+	Player* playerWhite;
+	Player* playerBlack;
 } SidePanel;
 
 typedef struct EndScreen {
@@ -15,6 +17,6 @@ typedef struct EndScreen {
 
 void drawStartScreen(Window* window, SDL_Texture** textures);
 
-void drawSidePanel(Window* window, SidePanel* panel);
+void drawSidePanel(Window* window, SidePanel* panel, SDL_Texture** textures);
 
 void drawEndScreen(Window* window, EndScreen* endScreen);
