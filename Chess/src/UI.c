@@ -4,9 +4,23 @@
 void drawStartScreen(Window* window, SDL_Texture** textures) {
 	static double iter = 0;
 
-	Rect rect = { 0, 0, window->width, window->height, 0.0f };
-	setDrawColor(window, 64, 64, 64, 255);
-	drawRect(window, &rect);
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 15; j++) {
+			Rect rect;
+			rect.x = j * 100;
+			rect.y = i * 100;
+			rect.width = 100;
+			rect.height = 100;
+			rect.angle = 0.0f;
+
+			if ((i + j) % 2 == 1)
+				setDrawColor(window, 80, 80, 80, 255);
+			else
+				setDrawColor(window, 15, 15, 15, 255);
+
+			drawRect(window, &rect);
+		}
+	}
 
 	Rect texRect = { 800, 300, 256, 256, -iter / 5 };
 	drawTexture(window, &texRect, textures[4]);
@@ -24,7 +38,7 @@ void drawStartScreen(Window* window, SDL_Texture** textures) {
 	drawText(window, color, "the long awaited sequel", 200, sin(iter / 100) * 10 + 55, 0.2f);
 
 	drawText(window, color, "press return to play", 30, 700, 0.3f);
-	drawText(window, color, "press escape to quit :(", 30, 650, 0.3f);
+	drawText(window, color, "press escape to quit", 30, 650, 0.3f);
 	drawText(window, color, "press c to see the credits", 30, 600, 0.3f);
 
 	if (window->keyDown == SDLK_c) {
@@ -86,9 +100,9 @@ void drawEndScreen(Window* window, EndScreen* endScreen) {
 	setDrawColor(window, 25, 25, 25, 255);
 	drawRect(window, &rect);
 
-	const char* whoWonText = endScreen->whoWon == WHITE ? "white won w(°o°)w" : "black won w(°o°)w";
+	const char* whoWonText = endScreen->whoWon == WHITE ? "white won (yipee)" : "black won (yipee)";
 	SDL_Color color = { 220, 220, 220, 255 };
 	drawText(window, color, whoWonText, endScreenOriginX + endScreen->width / 2 - 175, endScreenOriginY + endScreen->height - 100, 0.3f);
-	drawText(window, color, "press return to play again (good ending) (uwu)", endScreenOriginX + 20, endScreenOriginY + endScreen->height - 200, 0.2f);
-	drawText(window, color, "press escape to quit (nooooo dont kill me) ~(> <)~", endScreenOriginX + 20, endScreenOriginY + endScreen->height - 300, 0.2f);
+	drawText(window, color, "press return to play again", endScreenOriginX + 20, endScreenOriginY + endScreen->height - 200, 0.2f);
+	drawText(window, color, "press escape to quit", endScreenOriginX + 20, endScreenOriginY + endScreen->height - 250, 0.2f);
 }

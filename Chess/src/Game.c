@@ -97,7 +97,7 @@ void game() {
 		if (gameState == END) {
 			EndScreen es;
 			es.width = 800;
-			es.height = 600;
+			es.height = 300;
 			es.whoWon = whoPlays;
 			drawEndScreen(window, &es);
 
