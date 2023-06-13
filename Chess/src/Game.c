@@ -218,6 +218,9 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 		return;
 
 	for (int i = 0; i < numPossibilities; i++) {
+		if (possibilities[i].x == -1 && possibilities[i].y == -1)
+			continue;
+
 		int x = possibilities[i].x * squareSize + squareSize / 2;
 		int y = possibilities[i].y * squareSize + squareSize / 2;
 		int radius = squareSize / 2 - squareSize / 8;
