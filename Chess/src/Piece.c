@@ -146,7 +146,8 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 	piece->x = x;
 	piece->y = y;
 	
-	if (piece->type == PAWN && (piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0))
+	// Pawn Promotion : PP
+	if (piece->type == PAWN && ((piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0)))
 	{
 		piece->type = QUEEN;
 	}
@@ -687,7 +688,7 @@ int bishopOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
-			for (int i = 1; i < SIZE - 1; i++) {
+			for (int i = 1; i < SIZE; i++) {
 				//define the coords of the cell
 				cell.x = king.x + i * top_bottom;
 				cell.y = king.y + i * right_left;
