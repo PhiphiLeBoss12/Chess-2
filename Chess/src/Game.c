@@ -219,8 +219,10 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	for (int i = 0; i < numPossibilities; i++) {
 		int x = possibilities[i].x * squareSize + squareSize / 2;
 		int y = possibilities[i].y * squareSize + squareSize / 2;
-		int radius = squareSize / 2 - squareSize / 10;
+		int radius = squareSize / 2 - squareSize / 8;
 		setDrawColor(window, 128, 128, 128, 128);
+		if (board->table[possibilities[i].x][possibilities[i].y])
+			setDrawColor(window, 255, 128, 128, 128);
 		drawCircle(window, x, y, radius);
 	}
 }
