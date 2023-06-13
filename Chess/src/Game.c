@@ -255,7 +255,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 					playSound(killSound);
 				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays))) {
 					playSound(funnySound);
-					if (isCheckmate(board, *whoPlays, players[0], players[1])) {
+					if (isCheckmate(board, *whoPlays, players[0], players[1], last)) {
 						gameState = END;
 						playSound(funnySound2);
 					}

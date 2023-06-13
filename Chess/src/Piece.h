@@ -27,4 +27,4 @@ LastMove* initLastMove();
 void affLastCoup(LastMove last);
 
 int isCheck(Board* board, TypeColor color);
-int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad);
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last);

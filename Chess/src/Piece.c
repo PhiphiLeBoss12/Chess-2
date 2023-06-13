@@ -813,7 +813,7 @@ int isCheck(Board* board, TypeColor color) {
 		pawnMenacing(board, color, king);
 }
 
-int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad) {
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last) {
 	Cell king = getKingPosition(board, color);
 
 	// Loop through every piece
@@ -832,7 +832,7 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 			for (int i = 0; i < numPossibilities; i++) {
 				Board* boardCopy = createBoardCopy(board);
 				Piece* prout = boardCopy->table[x][y];
-				movePiece(piece, possibilities[i].x, possibilities[i].y, boardCopy, playNice, playBad);
+				movePiece(piece, possibilities[i].x, possibilities[i].y, boardCopy, playNice, playBad, last);
 				if (!isCheck(boardCopy, color)) {
 					destroyBoard(boardCopy);
 					return 0;
