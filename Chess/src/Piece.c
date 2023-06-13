@@ -1,5 +1,6 @@
 #include "Piece.h"
 #include "Board.h"
+#include "Player.h"
 #include <string.h>
 
 SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
@@ -774,12 +775,17 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 			// Loop through every possibility for this piece
 			for (int i = 0; i < numPossibilities; i++) {
 				Board* boardCopy = createBoardCopy(board);
-				Piece* prout = boardCopy->table[x][y];
-				movePiece(piece, possibilities[i].x, possibilities[i].y, boardCopy, playNice, playBad);
+				Player* playNiceCopy = createPlayerCopy(playNice);
+				Player* playBadCopy = createPlayerCopy(playBad);
+				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy);
 				if (!isCheck(boardCopy, color)) {
+					freePlayer(playNiceCopy);
+					freePlayer(playBadCopy);
 					destroyBoard(boardCopy);
 					return 0;
 				}
+				freePlayer(playNiceCopy);
+				freePlayer(playBadCopy);
 				destroyBoard(boardCopy);
 			}
 		}

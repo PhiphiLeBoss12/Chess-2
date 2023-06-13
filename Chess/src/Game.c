@@ -77,7 +77,7 @@ void game() {
 			EndScreen es;
 			es.width = 800;
 			es.height = 600;
-			es.whoWon = WHITE;
+			es.whoWon = whoPlays;
 			drawEndScreen(window, &es);
 
 			if (window->keyDown == SDLK_RETURN) {
@@ -257,6 +257,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 					if (isCheckmate(board, *whoPlays, players[0], players[1])) {
 						gameState = END;
 						playSound(funnySound2);
+						*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color again
 					}
 				}
 

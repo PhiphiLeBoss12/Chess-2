@@ -8,6 +8,7 @@ typedef struct StructPlayer {
 
 #include "Player.h"
 #include "Piece.h"
+#include <string.h>
 
 Player* initPlayers(TypeColor coloor, Window* window) {
 	Player* player;
@@ -48,7 +49,15 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 }
 
 void freePlayer(Player* player) {
+	for (int i = 0; i < 16; i++) {
+		if (player->table[i])
+			free(player->table[i]);
+	}
 	free(player->table);
+	for (int i = 0; i < 16; i++) {
+		if (player->eaten[i])
+			free(player->eaten[i]);
+	}
 	free(player->eaten);
 	free(player);
 }
@@ -74,4 +83,36 @@ void putInBoard(Player* player, Board* board) {
 		y = t[i]->y;
 		board->table[x][y] = t[i];
 	}
+}
+
+Player* createPlayerCopy(Player* player) {
+	Player* newPlayer = malloc(sizeof(Player));
+
+	newPlayer->table = (Piece**)malloc(16 * sizeof(Piece*));
+	for (int i = 0; i < 16; i++) {
+		newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
+		if (player->table[i]) {
+			newPlayer->table[i]->color = player->table[i]->color;
+			newPlayer->table[i]->x = player->table[i]->x;
+			newPlayer->table[i]->y = player->table[i]->y;
+			newPlayer->table[i]->hasMovedOnce = player->table[i]->hasMovedOnce;
+			newPlayer->table[i]->type = player->table[i]->type;
+		}
+		else
+			newPlayer->table[i] = NULL;
+	}
+
+	newPlayer->eaten = (Piece**)malloc(16 * sizeof(Piece*));
+	for (int i = 0; i < 16; i++) {
+		newPlayer->eaten[i] = (Piece*)malloc(sizeof(Piece));
+		if (player->eaten[i])
+			memcpy(newPlayer->eaten[i], player->eaten[i], sizeof(Player));
+		else
+			newPlayer->eaten[i] = NULL;
+	}
+
+	newPlayer->color = player->color;
+	newPlayer->check = player->check;
+
+	return newPlayer;
 }
