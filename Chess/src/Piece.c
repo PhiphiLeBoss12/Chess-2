@@ -126,13 +126,18 @@ void showPiece(Piece* piece) {
 /* movePiece
 	utilit� :	� d�placer une pi�ce sur l'�chiquier
 				� manger un ennemi
+				¤ promotion
 	input :	� Piece* piece (pi�ce � d�placer)
 			� int x, int y (nouvelle position)
 			� Board* board (plateau du jeu)
 			� Player* playNice (joueur � qui app la pi�ce)
 			� Player* playBad (joeur adverse)
-	output :	1 si une pièce s'est faite mangée, 0 sinon */
-int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad) {
+	output :	¤ 1 si une pièce s'est faite mangée, 0 sinon */
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last) {
+
+	last->prevX = piece->x;
+	last->prevY = piece->y;
+
 	int pieceEaten = 0;
 	board->table[piece->x][piece->y] = NULL; //ancienne position
 	if (board->table[x][y] != NULL) { //si ennemi
@@ -142,42 +147,66 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 		playBad->table[pos2] = NULL; //suppression de la pi�ce mang�
 		pieceEaten = 1;
 	}
+	else {
+		if (piece->type == PAWN && (x == piece->x + 1 || x == piece->x - 1)) {
+			int pos = getPosVideEaten(*playNice);
+			int pos2;
+			if (piece->color == WHITE) {
+				playNice->eaten[pos] = board->table[x][y - 1];
+				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y - 1]));
+				board->table[x][y - 1] = NULL;
+			}
+			else {
+				playNice->eaten[pos] = board->table[x][y + 1];
+				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y + 1]));
+				board->table[x][y + 1] = NULL;
+			}
+			playBad->table[pos2] = NULL;
+			pieceEaten = 1;
+		}
+	}
+
 	piece->x = x;
 	piece->y = y;
+
+	last->piece = piece;
 	
 	// Pawn Promotion : PP
 	if (piece->type == PAWN && ((piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0)))
 	{
 		piece->type = QUEEN;
 	}
+
 	board->table[x][y] = piece; //pi�ce d�placer
 	piece->hasMovedOnce = 1;
 	return pieceEaten;
 }
 
+/* affLastCoup
+	utilité :	¤ afficher le dernier coup pour vérif
+	input :	¤ LastMove last (dernier coup)
+	output : void (rien) */
+void affLastCoup(LastMove last) {
+	if (last.piece != NULL) {
+		printf("\nname : %c", PiecesNames[last.piece->type]);
+		printf("\nprevX : %d", last.prevX);
+		printf("\nprevY : %d", last.prevY);
+		printf("\nx : %d", last.piece->x);
+		printf("\ny : %d\n", last.piece->y);
+	}
+	else {
+		printf("\npas de dernier coup\n");
+	}
+}
+
+/* affTabPlayer
+	utilité :	¤ afficher le tableau des pièces d'un joueur
+	input :	¤ Player play (le joueur)
+	output :	¤ void (rien) */
 void affTabPlayer(Player play) {
 	for (int i = 0; i < 16; i++) {
 		if (play.table[i] != NULL) {
-			switch (play.table[i]->type) {
-				case 0:
-					printf("P ");
-					break;
-				case 1:
-					printf("F ");
-					break;
-				case 2:
-					printf("C ");
-					break;
-				case 3:
-					printf("T ");
-					break;
-				case 4:
-					printf("Q ");
-					break;
-				case 5:
-					printf("R ");
-					break;
-			}
+			printf("%c ", PiecesNames[play.table[i]->type]);
 		}
 		else {
 			printf("_ ");
@@ -185,29 +214,14 @@ void affTabPlayer(Player play) {
 	}
 }
 
+/* affEatenPlayer
+	utilité :	¤ afficher le tableau des pièces mangées d'un joueur
+	input :	¤ Player play (le joueur)
+	output :	¤ void (rien) */
 void affEatenPlayer(Player play) {
 	for (int i = 0; i < 16; i++) {
 		if (play.eaten[i] != NULL) {
-			switch (play.eaten[i]->type) {
-			case 0:
-				printf("P ");
-				break;
-			case 1:
-				printf("F ");
-				break;
-			case 2:
-				printf("C ");
-				break;
-			case 3:
-				printf("T ");
-				break;
-			case 4:
-				printf("Q ");
-				break;
-			case 5:
-				printf("R ");
-				break;
-			}
+			printf("%c ", PiecesNames[play.eaten[i]->type]);
 		}
 		else {
 			printf("_ ");
@@ -247,12 +261,24 @@ int getPosVideEaten(Player play) {
 	return i;
 }
 
-Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities, Player* playNice, Player* playBad) {
+/* initLastMove
+	utilité :	¤ initialiser le dernier coup
+	input :	¤ void (rien)
+	output :	¤  LastMove* last (variable du dernier coup) */
+LastMove* initLastMove() {
+	LastMove* last = (LastMove*)malloc(sizeof(LastMove));
+	last->prevX = -1;
+	last->prevY = -1;
+	last->piece = NULL;
+	return last;
+}
+
+Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities, LastMove* last) {
 	Cell* possibilities;
 	//Calculate all the possibilities from choosen piece
 	switch (piece->type) {
 	case PAWN:
-		possibilities = movePossibilitiesPawn(piece, board, sizeTabPossibilities);
+		possibilities = movePossibilitiesPawn(piece, board, sizeTabPossibilities, last);
 		break;
 	case BISHOP:
 		possibilities = movePossibilitiesBishop(piece, board, sizeTabPossibilities);
@@ -289,7 +315,7 @@ Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibiliti
 	return possibilities;
 }
 
-Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities) { //Moving possibilities of a pawn
+Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilities, LastMove *last) { //Moving possibilities of a pawn
 	// return all the moving possibilities of a pawn in a Cell's table without verify check
 
 	Cell* possibilities;
@@ -332,6 +358,37 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 						cell.y = piece->y + 1 * mult;
 						possibilities[index] = cell;
 						index++;
+					}
+				}
+			}
+		}
+
+		//En passant
+
+		if (piece->x - 1 >= 0) { //bord
+			if (board->table[piece->x - 1][piece->y] != NULL) {
+				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
+					if (last->piece->x == piece->x - 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
+						if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
+							cell.x = piece->x - 1;
+							cell.y = piece->y + 1 * mult;
+							possibilities[index] = cell;
+							index++;
+						}
+					}
+				}
+			}
+		}
+		if (piece->x + 1 <= 7) { //bord
+			if (board->table[piece->x + 1][piece->y] != NULL) {
+				if (board->table[piece->x + 1][piece->y]->type == PAWN && board->table[piece->x + 1][piece->y]->color != piece->color) { //pion adverse sur la droite
+					if (last->piece->x == piece->x + 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
+						if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
+							cell.x = piece->x + 1;
+							cell.y = piece->y + 1 * mult;
+							possibilities[index] = cell;
+							index++;
+						}
 					}
 				}
 			}

@@ -25,6 +25,7 @@ void game() {
 	players[1] = initPlayers(BLACK, window);
 	putInBoard(players[0], board);
 	putInBoard(players[1], board);
+	LastMove* last = initLastMove();
 
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
@@ -56,7 +57,7 @@ void game() {
 		clear(window);
 
 		int numPossibilities = 0;
-		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities);
+		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
@@ -101,7 +102,7 @@ void game() {
 
 		presentWindow(window);
 
-		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays);
+		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last);
 		panel.whoPlays = whoPlays;
 	}
 
@@ -144,7 +145,7 @@ void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
 	*boardY = y / squareSize;
 }
 
-Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities) {
+Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities, LastMove* last) {
 	if (!selectedPiece)
 		return NULL;
 	if (board->selectedX == -1 || board->selectedY == -1)
@@ -154,7 +155,7 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 	if (!board->table[board->selectedX][board->selectedY])
 		return NULL;
 
-	return movePossibilitiesPiece(selectedPiece, board, numPossibilities);
+	return movePossibilitiesPiece(selectedPiece, board, numPossibilities, last);
 }
 
 void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize) {
@@ -200,7 +201,7 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	}
 }
 
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays) {
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last) {
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
@@ -230,20 +231,20 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						rook = board->table[board->selectedX][board->selectedY];
 						//Castling right
 						if (board->selectedX > 4) {
-							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1]);
-							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1]);
+							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last);
+							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last);
 						}
 						else { //Castling left
-							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1]);
-							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1]);
+							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last);
+							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1], last);
 						}
 					}
 					else {
-						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last);
 					}
 				}
 				else {
-					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
+					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last);
 				}
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
 				// Unselect the square

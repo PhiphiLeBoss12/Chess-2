@@ -38,3 +38,9 @@ typedef struct StructCell {
 	int x;
 	int y;
 } Cell;
+
+typedef struct StructLastMove {
+	int prevX;
+	int prevY;
+	Piece* piece;
+} LastMove;
