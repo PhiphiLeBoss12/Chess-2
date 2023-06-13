@@ -146,7 +146,8 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 		int pos = getPosVideEaten(*playNice); //o� il y a un emplacement vide dans eaten
 		playNice->eaten[pos] = board->table[x][y]; //ajout ennemi � la liste eaten du player
 		int pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y])); //recherche la pi�ce mang� dans la liste du joueur adverse
-		playBad->table[pos2] = NULL; //suppression de la pi�ce mang�
+		if (pos2 != -1)
+			playBad->table[pos2] = NULL; //suppression de la pi�ce mang�
 		pieceEaten = 1;
 	}
 	else {
@@ -156,14 +157,17 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 			if (piece->color == WHITE) {
 				playNice->eaten[pos] = board->table[x][y - 1];
 				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y - 1]));
-				board->table[x][y - 1] = NULL;
+				if (pos2 != -1)
+					board->table[x][y - 1] = NULL;
 			}
 			else {
 				playNice->eaten[pos] = board->table[x][y + 1];
-				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y + 1]));
+				if (pos2 != -1)
+					pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y + 1]));
 				board->table[x][y + 1] = NULL;
 			}
-			playBad->table[pos2] = NULL;
+			if (pos2 != -1)
+				playBad->table[pos2] = NULL;
 			pieceEaten = 1;
 		}
 	}
