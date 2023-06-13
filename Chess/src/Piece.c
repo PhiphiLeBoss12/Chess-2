@@ -157,8 +157,7 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 			if (piece->color == WHITE) {
 				playNice->eaten[pos] = board->table[x][y - 1];
 				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y - 1]));
-				if (pos2 != -1)
-					board->table[x][y - 1] = NULL;
+				board->table[x][y - 1] = NULL;
 			}
 			else {
 				playNice->eaten[pos] = board->table[x][y + 1];
@@ -166,8 +165,7 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 				if (pos2 != -1)
 					board->table[x][y + 1] = NULL;
 			}
-			if (pos2 != -1)
-				playBad->table[pos2] = NULL;
+			playBad->table[pos2] = NULL;
 			pieceEaten = 1;
 		}
 	}
@@ -374,12 +372,14 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 		if (piece->x - 1 >= 0) { //bord
 			if (board->table[piece->x - 1][piece->y] != NULL) {
 				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
-					if (last->piece->x == piece->x - 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
-						if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
-							cell.x = piece->x - 1;
-							cell.y = piece->y + 1 * mult;
-							possibilities[index] = cell;
-							index++;
+					if (last->piece != NULL) {
+						if (last->piece->x == piece->x - 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
+							if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
+								cell.x = piece->x - 1;
+								cell.y = piece->y + 1 * mult;
+								possibilities[index] = cell;
+								index++;
+							}
 						}
 					}
 				}
@@ -388,12 +388,14 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 		if (piece->x + 1 <= 7) { //bord
 			if (board->table[piece->x + 1][piece->y] != NULL) {
 				if (board->table[piece->x + 1][piece->y]->type == PAWN && board->table[piece->x + 1][piece->y]->color != piece->color) { //pion adverse sur la droite
-					if (last->piece->x == piece->x + 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
-						if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
-							cell.x = piece->x + 1;
-							cell.y = piece->y + 1 * mult;
-							possibilities[index] = cell;
-							index++;
+					if (last->piece != NULL) {
+						if (last->piece->x == piece->x + 1 && last->piece->y == piece->y) { //dernier coup de l'adversaire
+							if (last->prevX == last->piece->x && (last->prevY == last->piece->y - 2 || last->prevY == last->piece->y + 2)) { //pion a sauté de deux
+								cell.x = piece->x + 1;
+								cell.y = piece->y + 1 * mult;
+								possibilities[index] = cell;
+								index++;
+							}
 						}
 					}
 				}
@@ -656,7 +658,7 @@ int knightIsMenacing(Board* board, TypeColor color, Cell king) {
 	int posThreatx, posThreaty;
 	for (int x = -2; x <= 2; x++) {
 		for (int y = -2; y <= 2; y++) {
-			if (x != 0 && y != 0) {
+			if (x != 0 && y != 0 && x != y && x != y*(-1)) {
 				// Computing the position of a potential knight
 				posThreatx = king.x + x;
 				posThreaty = king.y + y;
@@ -798,7 +800,7 @@ int pawnMenacing(Board* board, TypeColor color, Cell king) {
 				Piece* piece = board->table[king.x + add * mult][king.y + 1 * mult];
 
 				if (piece != NULL) { //Not empty cell
-					if (piece->color != color) { //ennemy piece
+					if (piece->color != color && piece->type == PAWN) { //ennemy piece
 						return 1;
 					}
 				}

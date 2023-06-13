@@ -64,7 +64,7 @@ void game() {
 		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
 
 		drawBoard(window, board, textures, squareSize);
-		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
+		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
 		drawSidePanel(window, &panel, textures);
 
 		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
@@ -213,7 +213,7 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 	}
 }
 
-void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize) {
+void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece) {
 	if (!possibilities)
 		return;
 
@@ -222,9 +222,18 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 		int y = possibilities[i].y * squareSize + squareSize / 2;
 		int radius = squareSize / 2 - squareSize / 8;
 		setDrawColor(window, 128, 128, 128, 128);
-		if (possibilities[i].x != -1 && possibilities[i].y != -1)
-			if (board->table[possibilities[i].x][possibilities[i].y])
-				setDrawColor(window, 255, 128, 128, 128);
+		if (board->table[possibilities[i].x][possibilities[i].y] && selectedPiece->color != board->table[possibilities[i].x][possibilities[i].y]->color)
+			setDrawColor(window, 255, 128, 128, 128);
+		if (selectedPiece->type == PAWN && (possibilities[i].x == selectedPiece->x - 1 || possibilities[i].x == selectedPiece->x + 1) && board->table[possibilities[i].x][possibilities[i].y] == NULL) {
+			if (selectedPiece->color == WHITE) {
+				y = (possibilities[i].y - 1) * squareSize + squareSize / 2;
+			}
+			else {
+				y = (possibilities[i].y + 1) * squareSize + squareSize / 2;
+			}
+			setDrawColor(window, 255, 128, 128, 128);
+			drawCircle(window, x, y, radius);
+		}
 		drawCircle(window, x, y, radius);
 	}
 }
