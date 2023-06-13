@@ -12,6 +12,7 @@ Mix_Music* gameMusic;
 Mix_Chunk* stepSound;
 Mix_Chunk* winSound;
 Mix_Chunk* killSound;
+Mix_Chunk* funnySound;
 
 void game() {
 	// INIT
@@ -37,6 +38,7 @@ void game() {
 	stepSound = loadSound("step.mp3");
 	winSound = loadSound("Danse Macabre.mp3");
 	killSound = loadSound("kill.mp3");
+	funnySound = loadSound("funny.mp3");
 
 	SidePanel panel;
 	panel.width = 400;
@@ -108,6 +110,7 @@ void game() {
 	destroySound(stepSound);
 	destroySound(winSound);
 	destroySound(killSound);
+	destroySound(funnySound);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -253,6 +256,8 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				playSound(stepSound);
 				if (pieceEaten)
 					playSound(killSound);
+				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays)))
+					playSound(funnySound);
 			}
 		}
 
@@ -260,8 +265,6 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
 
 		leftButtonHeld = 1;
-
-		isCheck(board, WHITE);
 	}
 	if (!window->mouseLeftButton)
 		leftButtonHeld = 0;

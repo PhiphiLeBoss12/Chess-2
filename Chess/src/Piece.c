@@ -43,7 +43,6 @@ Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) 
 	piece->color = color;
 	piece->x = x;
 	piece->y = y;
-	piece->hasMoved = 0; //False
 	piece->hasMovedOnce = 0; //False
 	// piece->texture = chooseTexturePiece(piece->type, piece->color, window);
 	return piece;
@@ -146,7 +145,8 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 	piece->x = x;
 	piece->y = y;
 	
-	if (piece->type == PAWN && (piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0))
+	// Pawn Promotion : PP
+	if (piece->type == PAWN && ((piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0)))
 	{
 		piece->type = QUEEN;
 	}
