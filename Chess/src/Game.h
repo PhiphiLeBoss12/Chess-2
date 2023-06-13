@@ -22,7 +22,7 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize);
 
 // Draws all move possibilities of the selected piece if a piece is selected
-void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize);
+void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece);
 
 // Big ahh function to react when the mouse is clicked
 void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last);
