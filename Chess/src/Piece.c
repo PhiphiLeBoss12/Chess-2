@@ -1,4 +1,5 @@
 #include "Piece.h"
+#include "Board.h"
 #include <string.h>
 
 SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
@@ -744,7 +745,7 @@ int bishopOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
-			for (int i = 1; i < SIZE - 1; i++) {
+			for (int i = 1; i < SIZE; i++) {
 				//define the coords of the cell
 				cell.x = king.x + i * top_bottom;
 				cell.y = king.y + i * right_left;
@@ -812,3 +813,34 @@ int isCheck(Board* board, TypeColor color) {
 		pawnMenacing(board, color, king);
 }
 
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad) {
+	Cell king = getKingPosition(board, color);
+
+	// Loop through every piece
+	for (int y = 0; y < 8; y++) {
+		for (int x = 0; x < 8; x++) {
+			if (!board->table[x][y])
+				continue;
+			if (board->table[x][y]->color != color)
+				continue;
+
+			Piece* piece = board->table[x][y];
+			int numPossibilities;
+			Cell* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities, playNice, playBad);
+
+			// Loop through every possibility for this piece
+			for (int i = 0; i < numPossibilities; i++) {
+				Board* boardCopy = createBoardCopy(board);
+				Piece* prout = boardCopy->table[x][y];
+				movePiece(piece, possibilities[i].x, possibilities[i].y, boardCopy, playNice, playBad);
+				if (!isCheck(boardCopy, color)) {
+					destroyBoard(boardCopy);
+					return 0;
+				}
+				destroyBoard(boardCopy);
+			}
+		}
+	}
+
+	return 1;
+}

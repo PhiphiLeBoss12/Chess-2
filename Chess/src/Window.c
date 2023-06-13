@@ -176,7 +176,7 @@ void destroyTexture(SDL_Texture* texture) {
 }
 
 void drawText(Window* window, SDL_Color color, const char* text, int x, int y, float sizeRatio) {
-	SDL_Surface* surface = TTF_RenderText_Blended(window->font, text, color);
+	SDL_Surface* surface = TTF_RenderText_Solid(window->font, text, color);
 	if (!surface) {
 		printf("Failed to create surface! TTF error: %s\n", TTF_GetError());
 		return;
@@ -191,7 +191,7 @@ void drawText(Window* window, SDL_Color color, const char* text, int x, int y, f
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->renderer, surface);
 	drawTexture(window, &rect, texture);
-
+	
 	SDL_FreeSurface(surface);
 	SDL_DestroyTexture(texture);
 }
