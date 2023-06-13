@@ -53,7 +53,7 @@ void freePlayer(Player* player) {
 		if (player->table[i])
 			free(player->table[i]);
 	}
-	// free(player->table);
+	free(player->table);
 	for (int i = 0; i < 16; i++) {
 		if (player->eaten[i])
 			free(player->eaten[i]);

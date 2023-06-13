@@ -514,7 +514,7 @@ Cell *movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilitie
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
-			for (int i = 1; i < SIZE - 1; i++) {
+			for (int i = 1; i < SIZE; i++) {
 
 				//define y of the cell
 				if (line == 1) //X line

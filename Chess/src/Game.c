@@ -46,6 +46,8 @@ void game() {
 	panel.width = 400;
 	panel.offsetX = 800;
 	panel.whoPlays = whoPlays;
+	panel.playerWhite = players[0];
+	panel.playerBlack = players[1];
 
 	playMusic(mainMenuMusic);
 
@@ -62,7 +64,24 @@ void game() {
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
-		drawSidePanel(window, &panel);
+		drawSidePanel(window, &panel, textures);
+
+		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
+			freePlayer(players[0]);
+			freePlayer(players[1]);
+			destroyBoard(board);
+
+			players[0] = initPlayers(WHITE, window);
+			players[1] = initPlayers(BLACK, window);
+			board = createBoard(8);
+			putInBoard(players[0], board);
+			putInBoard(players[1], board);
+
+			whoPlays = WHITE;
+
+			panel.playerWhite = players[0];
+			panel.playerBlack = players[1];
+		}
 
 		if (gameState == START) {
 			drawStartScreen(window, textures);
@@ -92,9 +111,12 @@ void game() {
 				putInBoard(players[0], board);
 				putInBoard(players[1], board);
 
-				TypeColor whoPlays = WHITE;
+				whoPlays = WHITE;
 				
 				gameState = PLAYING;
+
+				panel.playerWhite = players[0];
+				panel.playerBlack = players[1];
 			}
 
 			if (window->keyDown == SDLK_ESCAPE)
@@ -197,8 +219,10 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	for (int i = 0; i < numPossibilities; i++) {
 		int x = possibilities[i].x * squareSize + squareSize / 2;
 		int y = possibilities[i].y * squareSize + squareSize / 2;
-		int radius = squareSize / 2 - squareSize / 10;
+		int radius = squareSize / 2 - squareSize / 8;
 		setDrawColor(window, 128, 128, 128, 128);
+		if (board->table[possibilities[i].x][possibilities[i].y])
+			setDrawColor(window, 255, 128, 128, 128);
 		drawCircle(window, x, y, radius);
 	}
 }

@@ -44,8 +44,8 @@ void drawStartScreen(Window* window, SDL_Texture** textures) {
 	iter++;
 }
 
-void drawSidePanel(Window* window, SidePanel* panel) {
-	setDrawColor(window, 20, 20, 20, 255);
+void drawSidePanel(Window* window, SidePanel* panel, SDL_Texture** textures) {
+	setDrawColor(window, 50, 50, 50, 255);
 	Rect rect = { panel->offsetX, 0, panel->width, window->height, 0.0f };
 	drawRect(window, &rect);
 
@@ -55,7 +55,27 @@ void drawSidePanel(Window* window, SidePanel* panel) {
 	SDL_Color color = { 220, 220, 220, 255 };
 	char* text = panel->whoPlays == WHITE ? "white plays" : "black plays";
 	int textOffset = panel->offsetX + 16; // TODO: better offset calculation
-	drawText(window, color, text, textOffset, window->height - 60, 0.3f);
+	drawText(window, color, text, textOffset, window->height / 2, 0.3f);
+
+	for (int i = 0; i < 16; i++) {
+		if (!panel->playerWhite->eaten[i])
+			continue;
+		TypeColor color = panel->playerWhite->eaten[i]->color;
+		TypePiece type = panel->playerWhite->eaten[i]->type;
+		int index = type + 6 * color;
+		Rect rect = { panel->offsetX + (64 * (i % 6)), window->height - 100 - (64 * (i / 6)), 64, 64, 0.0f};
+		drawTexture(window, &rect, textures[type + 6 * color]);
+	}
+
+	for (int i = 0; i < 16; i++) {
+		if (!panel->playerBlack->eaten[i])
+			continue;
+		TypeColor color = panel->playerBlack->eaten[i]->color;
+		TypePiece type = panel->playerBlack->eaten[i]->type;
+		int index = type + 6 * color;
+		Rect rect = { panel->offsetX + (64 * (i % 6)), 50 + (64 * (i / 6)), 64, 64, 0.0f };
+		drawTexture(window, &rect, textures[type + 6 * color]);
+	}
 }
 
 void drawEndScreen(Window* window, EndScreen* endScreen) {
