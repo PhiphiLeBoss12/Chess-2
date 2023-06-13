@@ -13,11 +13,11 @@ Mix_Chunk* stepSound;
 Mix_Chunk* winSound;
 Mix_Chunk* killSound;
 Mix_Chunk* funnySound;
+Mix_Chunk* funnySound2;
+GameState gameState = START;
 
 void game() {
 	// INIT
-	GameState gameState = START;
-
 	Window* window = initWindow("Chess 2", 800 + 400, 800);
 	Board* board = createBoard(8);
 	Player* players[2];
@@ -39,6 +39,7 @@ void game() {
 	winSound = loadSound("Danse Macabre.mp3");
 	killSound = loadSound("kill.mp3");
 	funnySound = loadSound("funny.mp3");
+	funnySound2 = loadSound("funny2.mp3");
 
 	SidePanel panel;
 	panel.width = 400;
@@ -111,6 +112,7 @@ void game() {
 	destroySound(winSound);
 	destroySound(killSound);
 	destroySound(funnySound);
+	destroySound(funnySound2);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -245,19 +247,25 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				else {
 					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1]);
 				}
+
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
+				playSound(stepSound);
+				if (pieceEaten)
+					playSound(killSound);
+				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays))) {
+					playSound(funnySound);
+					if (isCheckmate(board, *whoPlays, players[0], players[1])) {
+						gameState = END;
+						playSound(funnySound2);
+					}
+				}
+
 				// Unselect the square
 				board->selectedX = -1;
 				board->selectedY = -1;
 				Player* tempo = players[0];
 				players[0] = players[1];
 				players[1] = tempo;
-
-				playSound(stepSound);
-				if (pieceEaten)
-					playSound(killSound);
-				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays)))
-					playSound(funnySound);
 			}
 		}
 
