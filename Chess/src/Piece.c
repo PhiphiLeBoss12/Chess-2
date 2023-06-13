@@ -834,7 +834,7 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 				Board* boardCopy = createBoardCopy(board);
 				Player* playNiceCopy = createPlayerCopy(playNice);
 				Player* playBadCopy = createPlayerCopy(playBad);
-				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy);
+				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
 				if (!isCheck(boardCopy, color)) {
 					freePlayer(playNiceCopy);
 					freePlayer(playBadCopy);
