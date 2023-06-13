@@ -1,4 +1,5 @@
 #include "Board.h"
+#include <stdlib.h>
 
 /*
 * Returns a board form its size. The board will be a square.
@@ -44,3 +45,22 @@ void displayBoardConsole(Board* board) {
 	}
 }
 
+Board* createBoardCopy(Board* board) {
+	Board* newBoard = (Board*)malloc(sizeof(Board));
+
+	newBoard->table = (Piece***)malloc(board->size * sizeof(Piece**));
+	memcpy(newBoard->table, board->table, 8);
+	for (int x = 0; x < board->size; x++) {
+		newBoard->table[x] = (Piece**)malloc(board->size * sizeof(Piece*));
+		memcpy(newBoard->table[x], board->table[x], 8);
+		for (int y = 0; y < board->size; y++) {
+			newBoard->table[x][y] = board->table[x][y];
+		}
+	}
+
+	newBoard->selectedX = board->selectedX;
+	newBoard->selectedY = board->selectedY;
+	newBoard->size = board->size;
+
+	return newBoard;
+}

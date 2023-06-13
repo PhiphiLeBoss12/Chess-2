@@ -25,4 +25,4 @@ void affTabPlayer(Player play);
 void affEatenPlayer(Player play);
 
 int isCheck(Board* board, TypeColor color);
-
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad);
