@@ -162,9 +162,9 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 			}
 			else {
 				playNice->eaten[pos] = board->table[x][y + 1];
+				pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y + 1]));
 				if (pos2 != -1)
-					pos2 = searchPieceInTablePlay(*playBad, *(board->table[x][y + 1]));
-				board->table[x][y + 1] = NULL;
+					board->table[x][y + 1] = NULL;
 			}
 			if (pos2 != -1)
 				playBad->table[pos2] = NULL;
@@ -818,6 +818,7 @@ int isCheck(Board* board, TypeColor color) {
 		pawnMenacing(board, color, king);
 }
 
+// wtf
 int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last) {
 	Cell king = getKingPosition(board, color);
 
@@ -853,4 +854,26 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 	}
 
 	return 1;
+}
+
+// wtf
+void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities) {
+	for (int i = 0; i < numPossibilities; i++) {
+		Board* boardCopy = createBoardCopy(board);
+		Player* playNiceCopy = createPlayerCopy(playNice);
+		Player* playBadCopy = createPlayerCopy(playBad);
+		Piece pieceCopy = *piece;
+		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
+		if (isCheck(boardCopy, color)) {
+			freePlayer(playNiceCopy);
+			freePlayer(playBadCopy);
+			destroyBoard(boardCopy);
+			possibilities[i].x = -1;
+			possibilities[i].y = -1;
+			continue;
+		}
+		freePlayer(playNiceCopy);
+		freePlayer(playBadCopy);
+		destroyBoard(boardCopy);
+	}
 }

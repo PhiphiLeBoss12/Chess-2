@@ -61,6 +61,7 @@ void game() {
 
 		int numPossibilities = 0;
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
+		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
@@ -221,8 +222,9 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 		int y = possibilities[i].y * squareSize + squareSize / 2;
 		int radius = squareSize / 2 - squareSize / 8;
 		setDrawColor(window, 128, 128, 128, 128);
-		if (board->table[possibilities[i].x][possibilities[i].y])
-			setDrawColor(window, 255, 128, 128, 128);
+		if (possibilities[i].x != -1 && possibilities[i].y != -1)
+			if (board->table[possibilities[i].x][possibilities[i].y])
+				setDrawColor(window, 255, 128, 128, 128);
 		drawCircle(window, x, y, radius);
 	}
 }
