@@ -14,7 +14,7 @@ Mix_Chunk* winSound;
 Mix_Chunk* killSound;
 Mix_Chunk* funnySound;
 Mix_Chunk* funnySound2;
-GameState gameState = PLAYING;
+GameState gameState = START;
 
 void game() {
 	// INIT
@@ -66,6 +66,23 @@ void game() {
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize);
 		drawSidePanel(window, &panel, textures);
 
+		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
+			freePlayer(players[0]);
+			freePlayer(players[1]);
+			destroyBoard(board);
+
+			players[0] = initPlayers(WHITE, window);
+			players[1] = initPlayers(BLACK, window);
+			board = createBoard(8);
+			putInBoard(players[0], board);
+			putInBoard(players[1], board);
+
+			whoPlays = WHITE;
+
+			panel.playerWhite = players[0];
+			panel.playerBlack = players[1];
+		}
+
 		if (gameState == START) {
 			drawStartScreen(window, textures);
 			if (window->keyDown == SDLK_RETURN) {
@@ -94,9 +111,12 @@ void game() {
 				putInBoard(players[0], board);
 				putInBoard(players[1], board);
 
-				TypeColor whoPlays = WHITE;
+				whoPlays = WHITE;
 				
 				gameState = PLAYING;
+
+				panel.playerWhite = players[0];
+				panel.playerBlack = players[1];
 			}
 
 			if (window->keyDown == SDLK_ESCAPE)
