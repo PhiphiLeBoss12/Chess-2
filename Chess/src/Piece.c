@@ -687,7 +687,7 @@ int bishopOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
-			for (int i = 1; i < SIZE - 1; i++) {
+			for (int i = 1; i < SIZE; i++) {
 				//define the coords of the cell
 				cell.x = king.x + i * top_bottom;
 				cell.y = king.y + i * right_left;
