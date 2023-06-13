@@ -9,8 +9,8 @@ char* showCoord(int x, int y);
 char* showCoordPiece(Piece* piece);
 void showPiece(Piece* piece);
 
-Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities);
-Cell* movePossibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities);
+Cell* movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibilities, LastMove* last);
+Cell* movePossibilitiesPawn(Piece* piece, Board* board, int* sizeTabPossibilities, LastMove* last);
 Cell* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilities);
 Cell* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilities);
 Cell* movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilities);
@@ -18,11 +18,13 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities);
 
 
-int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad);
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last);
 int searchPieceInTablePlay(Player play, Piece piece);
 int getPosVideEaten(Player play);
 void affTabPlayer(Player play);
 void affEatenPlayer(Player play);
+LastMove* initLastMove();
+void affLastCoup(LastMove last);
 
 int isCheck(Board* board, TypeColor color);
-int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad);
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last);

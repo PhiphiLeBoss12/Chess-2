@@ -14,7 +14,7 @@ SDL_Texture** createTextureArray(Window* window);
 void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize);
 
 // Simple helper function
-Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities);
+Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities, LastMove* last);
 
 // Draws the play board on screen
 // The board is always drawn at the top-left corner of the screen
@@ -25,4 +25,4 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize);
 
 // Big ahh function to react when the mouse is clicked
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays);
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last);
