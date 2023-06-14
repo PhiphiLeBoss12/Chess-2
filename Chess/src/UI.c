@@ -40,19 +40,20 @@ void drawStartScreen(Window* window, SDL_Texture** textures) {
 	drawText(window, color, "press return to play", 30, 700, 0.3f);
 	drawText(window, color, "press escape to quit", 30, 650, 0.3f);
 	drawText(window, color, "press c to see the credits", 30, 600, 0.3f);
+	drawText(window, color, "press m to toggle music", 30, 550, 0.3f);
 
 	if (window->keyDown == SDLK_c) {
-		drawText(window, color, "supervisor: éric andrès", 450, 550, 0.2f);
-		drawText(window, color, "development: julien", 450, 525, 0.2f);
-		drawText(window, color, "development: lilian", 450, 500, 0.2f);
-		drawText(window, color, "development: marie", 450, 475, 0.2f);
-		drawText(window, color, "development: philéas", 450, 450, 0.2f);
-		drawText(window, color, "development: tom", 450, 425, 0.2f);
-		drawText(window, color, "graphics design: wikipedia", 450, 400, 0.2f);
-		drawText(window, color, "original idea: Hán Xin", 450, 375, 0.2f);
-		drawText(window, color, "\"Deadly Roulette\" \"Walking Along\" Kevin MacLeod (incompetech.com)", 450, 350, 0.12f);
-		drawText(window, color, "Licensed under Creative Commons : By Attribution 4.0 License", 450, 335, 0.12f);
-		drawText(window, color, "http ://creativecommons.org/licenses/by/4.0/", 450, 320, 0.12f);
+		drawText(window, color, "supervisor: éric andrès", 450, 550 - 20, 0.2f);
+		drawText(window, color, "development: julien", 450, 525 - 20, 0.2f);
+		drawText(window, color, "development: lilian", 450, 500 - 20, 0.2f);
+		drawText(window, color, "development: marie", 450, 475 - 20, 0.2f);
+		drawText(window, color, "development: philéas", 450, 450 - 20, 0.2f);
+		drawText(window, color, "development: tom", 450, 425 - 20, 0.2f);
+		drawText(window, color, "graphics design: wikipedia", 450, 400 - 20, 0.2f);
+		drawText(window, color, "original idea: Hán Xin", 450, 375 - 20, 0.2f);
+		drawText(window, color, "\"Deadly Roulette\" \"Walking Along\" Kevin MacLeod (incompetech.com)", 450, 350 - 20, 0.12f);
+		drawText(window, color, "Licensed under Creative Commons : By Attribution 4.0 License", 450, 335 - 20, 0.12f);
+		drawText(window, color, "http ://creativecommons.org/licenses/by/4.0/", 450, 320 - 20, 0.12f);
 	}
 
 	iter++;

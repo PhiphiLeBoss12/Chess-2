@@ -43,6 +43,7 @@ void game() {
 	stalemateSound = loadSound("impasta.mp3");
 	funnySound = loadSound("funny.mp3");
 	funnySound2 = loadSound("funny2.mp3");
+	int enableMusic = 1;
 
 	SidePanel panel;
 	panel.width = 400;
@@ -51,7 +52,8 @@ void game() {
 	panel.playerWhite = players[0];
 	panel.playerBlack = players[1];
 
-	playMusic(mainMenuMusic);
+	if (enableMusic)
+		playMusic(mainMenuMusic);
 
 	// MAIN LOOP
 	while (gameState != QUIT && !window->shouldClose) {
@@ -90,7 +92,8 @@ void game() {
 			drawStartScreen(window, textures);
 			if (window->keyDown == SDLK_RETURN) {
 				gameState = PLAYING;
-				playMusic(gameMusic);
+				if (enableMusic)
+					playMusic(gameMusic);
 			}
 			if (window->keyDown == SDLK_ESCAPE)
 				gameState = QUIT;
@@ -134,6 +137,9 @@ void game() {
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last);
 		panel.whoPlays = whoPlays;
 		free(possibilities);
+		
+		// Toggle Music
+		toggleMusic(window, &enableMusic);
 	}
 
 	destroyMusic(gameMusic);
@@ -150,6 +156,20 @@ void game() {
 	freePlayer(players[1]);
 	destroyBoard(board);
 	destroyWindow(window);
+}
+
+void toggleMusic(Window* window, int* enableMusic) {
+	static int keyHeld = 0;
+	if (window->keyDown == SDLK_m && !keyHeld) {
+		*enableMusic = !*enableMusic;
+		if (!*enableMusic)
+			stopMusic();
+		else
+			resumeMusic();
+		keyHeld = 1;
+	}
+	if (window->keyDown == SDLK_UNKNOWN)
+		keyHeld = 0;
 }
 
 SDL_Texture** createTextureArray(Window* window) {

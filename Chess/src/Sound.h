@@ -8,4 +8,5 @@ void playSound(Mix_Chunk* sound);
 Mix_Music* loadMusic(const char* path);
 Mix_Music* destroyMusic(Mix_Music* music);
 void playMusic(Mix_Music* music);
-void stopMusic(Mix_Music* music);
+void stopMusic();
+void resumeMusic();
