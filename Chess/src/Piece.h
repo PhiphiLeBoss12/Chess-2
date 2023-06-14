@@ -29,3 +29,5 @@ void affLastCoup(LastMove last);
 int isCheck(Board* board, TypeColor color);
 int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last);
 void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities);
+
+int isStalemate(Board* board, Player** players, LastMove* last);

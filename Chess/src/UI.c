@@ -100,7 +100,13 @@ void drawEndScreen(Window* window, EndScreen* endScreen) {
 	setDrawColor(window, 25, 25, 25, 255);
 	drawRect(window, &rect);
 
-	const char* whoWonText = endScreen->whoWon == WHITE ? "white won (yipee)" : "black won (yipee)";
+	char* whoWonText;
+	if (endScreen->whoWon == WHITE)
+		whoWonText = "white won";
+	if (endScreen->whoWon == BLACK)
+		whoWonText = "black won";
+	if (endScreen->whoWon == -1)
+		whoWonText = "stalemate";
 	SDL_Color color = { 220, 220, 220, 255 };
 	drawText(window, color, whoWonText, endScreenOriginX + endScreen->width / 2 - 175, endScreenOriginY + endScreen->height - 100, 0.3f);
 	drawText(window, color, "press return to play again", endScreenOriginX + 20, endScreenOriginY + endScreen->height - 200, 0.2f);

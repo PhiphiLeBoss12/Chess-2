@@ -40,7 +40,7 @@ typedef struct StructCell {
 } Cell;
 
 typedef struct StructLastMove {
+	Piece* piece;
 	int prevX;
 	int prevY;
-	Piece* piece;
 } LastMove;

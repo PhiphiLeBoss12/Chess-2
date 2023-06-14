@@ -12,6 +12,7 @@ Mix_Music* gameMusic;
 Mix_Chunk* stepSound;
 Mix_Chunk* winSound;
 Mix_Chunk* killSound;
+Mix_Chunk* stalemateSound;
 Mix_Chunk* funnySound;
 Mix_Chunk* funnySound2;
 GameState gameState = START;
@@ -39,6 +40,7 @@ void game() {
 	stepSound = loadSound("step.mp3");
 	winSound = loadSound("Danse Macabre.mp3");
 	killSound = loadSound("kill.mp3");
+	stalemateSound = loadSound("impasta.mp3");
 	funnySound = loadSound("funny.mp3");
 	funnySound2 = loadSound("funny2.mp3");
 
@@ -94,11 +96,14 @@ void game() {
 				gameState = QUIT;
 		}
 
-		if (gameState == END) {
+		if (gameState == END || gameState == STALEMATE) {
 			EndScreen es;
 			es.width = 800;
 			es.height = 300;
-			es.whoWon = whoPlays;
+			if (gameState == END)
+				es.whoWon = whoPlays;
+			else
+				es.whoWon = -1;
 			drawEndScreen(window, &es);
 
 			if (window->keyDown == SDLK_RETURN) {
@@ -128,6 +133,7 @@ void game() {
 
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last);
 		panel.whoPlays = whoPlays;
+		free(possibilities);
 	}
 
 	destroyMusic(gameMusic);
@@ -137,6 +143,7 @@ void game() {
 	destroySound(killSound);
 	destroySound(funnySound);
 	destroySound(funnySound2);
+	destroySound(stalemateSound);
 
 	free(textures);
 	freePlayer(players[0]);
@@ -311,6 +318,11 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 
 		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
+
+		if (isStalemate(board, players, last)) {
+			gameState = STALEMATE;
+			playSound(stalemateSound);
+		}
 
 		leftButtonHeld = 1;
 	}

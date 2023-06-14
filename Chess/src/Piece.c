@@ -369,6 +369,12 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 
 		//En passant
 
+		// Temporary
+		if (!last->piece) {
+			*sizeTabPossibilities = index; //length min of possibilities
+			return possibilities;
+		}
+
 		if (piece->x - 1 >= 0) { //bord
 			if (board->table[piece->x - 1][piece->y] != NULL) {
 				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
@@ -852,6 +858,8 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 				freePlayer(playBadCopy);
 				destroyBoard(boardCopy);
 			}
+
+			free(possibilities);
 		}
 	}
 
@@ -864,8 +872,9 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		Board* boardCopy = createBoardCopy(board);
 		Player* playNiceCopy = createPlayerCopy(playNice);
 		Player* playBadCopy = createPlayerCopy(playBad);
-		Piece pieceCopy = *piece;
-		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
+		Piece* pieceCopy = malloc(sizeof(Piece));
+		*pieceCopy = *piece;
+		movePiece(pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
 		if (isCheck(boardCopy, color)) {
 			freePlayer(playNiceCopy);
 			freePlayer(playBadCopy);
@@ -878,4 +887,10 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		freePlayer(playBadCopy);
 		destroyBoard(boardCopy);
 	}
+
+}
+
+int isStalemate(Board* board, Player** players, LastMove* last) {
+	return (isCheckmate(board, players[0]->color, players[0], players[1], last) || isCheckmate(board, players[1]->color, players[1], players[0], last)) &&
+		   (!isCheck(board, players[0]->color) && !isCheck(board, players[1]->color));
 }
