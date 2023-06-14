@@ -338,6 +338,7 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 
 		//En passant
 
+		affLastCoup(*last);
 		if (piece->x - 1 >= 0) { //bord
 			if (board->table[piece->x - 1][piece->y] != NULL) {
 				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
@@ -835,11 +836,13 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		Board* boardCopy = createBoardCopy(board);
 		Player* playNiceCopy = createPlayerCopy(playNice);
 		Player* playBadCopy = createPlayerCopy(playBad);
-		Piece pieceCopy = *piece;
+		Piece* pieceCopy = malloc(sizeof(Piece));
+		pieceCopy = piece;
 		LastMove* lastCopy = initLastMove();
-		*lastCopy = *last;
+		lastCopy->prevX = last->prevX;
+		lastCopy->prevY = last->prevY;
 		lastCopy->piece = last->piece;
-		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
+		movePiece(pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
 		if (isCheck(boardCopy, color)) {
 			freePlayer(playNiceCopy);
 			freePlayer(playBadCopy);
