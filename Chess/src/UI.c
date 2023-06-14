@@ -77,7 +77,7 @@ void drawSidePanel(Window* window, SidePanel* panel, SDL_Texture** textures) {
 		TypeColor color = panel->playerWhite->eaten[i]->color;
 		TypePiece type = panel->playerWhite->eaten[i]->type;
 		int index = type + 6 * color;
-		Rect rect = { panel->offsetX + (64 * (i % 6)), window->height - 100 - (64 * (i / 6)), 64, 64, 0.0f};
+		Rect rect = { panel->offsetX + (64 * (i % 6)), 50 + (64 * (i / 6)), 64, 64, 0.0f};
 		drawTexture(window, &rect, textures[type + 6 * color]);
 	}
 
@@ -87,7 +87,7 @@ void drawSidePanel(Window* window, SidePanel* panel, SDL_Texture** textures) {
 		TypeColor color = panel->playerBlack->eaten[i]->color;
 		TypePiece type = panel->playerBlack->eaten[i]->type;
 		int index = type + 6 * color;
-		Rect rect = { panel->offsetX + (64 * (i % 6)), 50 + (64 * (i / 6)), 64, 64, 0.0f };
+		Rect rect = { panel->offsetX + (64 * (i % 6)), window->height - 100 - (64 * (i / 6)), 64, 64, 0.0f };
 		drawTexture(window, &rect, textures[type + 6 * color]);
 	}
 }
