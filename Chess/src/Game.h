@@ -3,10 +3,12 @@
 #include "Window.h"
 #include "Board.h"
 
-typedef enum GameState { START, PLAYING, END, QUIT } GameState;
+typedef enum GameState { START, PLAYING, END, STALEMATE, QUIT } GameState;
 
 // Main game loop
 void game();
+
+void toggleMusic(Window* window, int* enableMusic);
 
 SDL_Texture** createTextureArray(Window* window);
 

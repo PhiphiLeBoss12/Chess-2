@@ -12,6 +12,7 @@ Mix_Music* gameMusic;
 Mix_Chunk* stepSound;
 Mix_Chunk* winSound;
 Mix_Chunk* killSound;
+Mix_Chunk* stalemateSound;
 Mix_Chunk* funnySound;
 Mix_Chunk* funnySound2;
 GameState gameState = START;
@@ -39,8 +40,10 @@ void game() {
 	stepSound = loadSound("step.mp3");
 	winSound = loadSound("Danse Macabre.mp3");
 	killSound = loadSound("kill.mp3");
+	stalemateSound = loadSound("impasta.mp3");
 	funnySound = loadSound("funny.mp3");
 	funnySound2 = loadSound("funny2.mp3");
+	int enableMusic = 1;
 
 	SidePanel panel;
 	panel.width = 400;
@@ -49,7 +52,8 @@ void game() {
 	panel.playerWhite = players[0];
 	panel.playerBlack = players[1];
 
-	playMusic(mainMenuMusic);
+	if (enableMusic)
+		playMusic(mainMenuMusic);
 
 	// MAIN LOOP
 	while (gameState != QUIT && !window->shouldClose) {
@@ -88,17 +92,21 @@ void game() {
 			drawStartScreen(window, textures);
 			if (window->keyDown == SDLK_RETURN) {
 				gameState = PLAYING;
-				playMusic(gameMusic);
+				if (enableMusic)
+					playMusic(gameMusic);
 			}
 			if (window->keyDown == SDLK_ESCAPE)
 				gameState = QUIT;
 		}
 
-		if (gameState == END) {
+		if (gameState == END || gameState == STALEMATE) {
 			EndScreen es;
 			es.width = 800;
-			es.height = 600;
-			es.whoWon = whoPlays;
+			es.height = 300;
+			if (gameState == END)
+				es.whoWon = whoPlays;
+			else
+				es.whoWon = -1;
 			drawEndScreen(window, &es);
 
 			if (window->keyDown == SDLK_RETURN) {
@@ -128,6 +136,10 @@ void game() {
 
 		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last);
 		panel.whoPlays = whoPlays;
+		free(possibilities);
+		
+		// Toggle Music
+		toggleMusic(window, &enableMusic);
 	}
 
 	destroyMusic(gameMusic);
@@ -137,12 +149,27 @@ void game() {
 	destroySound(killSound);
 	destroySound(funnySound);
 	destroySound(funnySound2);
+	destroySound(stalemateSound);
 
 	free(textures);
 	freePlayer(players[0]);
 	freePlayer(players[1]);
 	destroyBoard(board);
 	destroyWindow(window);
+}
+
+void toggleMusic(Window* window, int* enableMusic) {
+	static int keyHeld = 0;
+	if (window->keyDown == SDLK_m && !keyHeld) {
+		*enableMusic = !*enableMusic;
+		if (!*enableMusic)
+			stopMusic();
+		else
+			resumeMusic();
+		keyHeld = 1;
+	}
+	if (window->keyDown == SDLK_UNKNOWN)
+		keyHeld = 0;
 }
 
 SDL_Texture** createTextureArray(Window* window) {
@@ -311,6 +338,11 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 
 		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
+
+		if (isStalemate(board, players, last)) {
+			gameState = STALEMATE;
+			playSound(stalemateSound);
+		}
 
 		leftButtonHeld = 1;
 	}

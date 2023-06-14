@@ -21,6 +21,9 @@ Mix_Music* destroyMusic(Mix_Music* music) {
 void playMusic(Mix_Music* music) {
 	Mix_PlayMusic(music, -1);
 }
-void stopMusic(Mix_Music* music) {
+void stopMusic() {
 	Mix_PauseMusic();
+}
+void resumeMusic() {
+	Mix_ResumeMusic();
 }

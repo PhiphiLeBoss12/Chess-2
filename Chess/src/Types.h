@@ -18,7 +18,6 @@ typedef struct StructPiece {
 	int x;
 	int y;
 	int hasMovedOnce; //if the piece has moved one time
-	SDL_Texture* texture; // Unused
 } Piece;
 
 typedef struct StructBoard {
@@ -40,7 +39,7 @@ typedef struct StructCell {
 } Cell;
 
 typedef struct StructLastMove {
+	Piece* piece;
 	int prevX;
 	int prevY;
-	Piece* piece;
 } LastMove;

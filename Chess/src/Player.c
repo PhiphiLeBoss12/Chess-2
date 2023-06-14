@@ -49,15 +49,7 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 }
 
 void freePlayer(Player* player) {
-	for (int i = 0; i < 16; i++) {
-		if (player->table[i])
-			free(player->table[i]);
-	}
 	free(player->table);
-	for (int i = 0; i < 16; i++) {
-		if (player->eaten[i])
-			free(player->eaten[i]);
-	}
 	free(player->eaten);
 	free(player);
 }
