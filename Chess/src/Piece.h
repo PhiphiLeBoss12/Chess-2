@@ -1,6 +1,5 @@
 #include "Types.h"
 
-SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window* window);
 Piece* initPiece(TypePiece type, TypeColor color, int x, int y, Window* window);
 void destroyPiece(Piece* piece);
 

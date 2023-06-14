@@ -3,35 +3,6 @@
 #include "Player.h"
 #include <string.h>
 
-SDL_Texture* chooseTexturePiece(TypePiece type, TypeColor color, Window *window) {
-	char path[100];
-	if (color == WHITE)
-		strcpy(path, "White_");
-	else
-		strcpy(path, "Black_");
-
-	switch (type) {
-	case PAWN:
-		strcat(path, "Pawn.png");
-		break;
-	case BISHOP:
-		strcat(path, "Bishop.png");
-		break;
-	case KNIGHT:
-		strcat(path, "Knight.png");
-		break;
-	case ROOK:
-		strcat(path, "Rook.png");
-		break;
-	case QUEEN:
-		strcat(path, "Queen.png");
-		break;
-	case KING:
-		strcat(path, "King.png");
-		break;
-	}
-	return createTexture(window, path);
-}
 
 Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) {
 	if (!(0 <= x && x < SIZE && 0 <= y && y < SIZE)) { //check if coord is in the table
@@ -46,12 +17,10 @@ Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) 
 	piece->x = x;
 	piece->y = y;
 	piece->hasMovedOnce = 0; //False
-	// piece->texture = chooseTexturePiece(piece->type, piece->color, window);
 	return piece;
 }
 
 void destroyPiece(Piece* piece) {
-	destroyTexture(piece->texture);
 	free(piece);
 }
 
