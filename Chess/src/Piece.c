@@ -369,12 +369,6 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 
 		//En passant
 
-		// Temporary
-		if (!last->piece) {
-			*sizeTabPossibilities = index; //length min of possibilities
-			return possibilities;
-		}
-
 		if (piece->x - 1 >= 0) { //bord
 			if (board->table[piece->x - 1][piece->y] != NULL) {
 				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
