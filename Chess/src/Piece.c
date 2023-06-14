@@ -303,19 +303,6 @@ Cell *movePossibilitiesPiece(Piece* piece, Board* board, int* sizeTabPossibiliti
 		*sizeTabPossibilities = 0;
 		return NULL;
 	}
-	//Verify check
-	/*
-	Case* newTab;
-	int index = 0;
-	Board tempBoard = *board;
-	for (int i = 0; i < *sizeTabPossibilities; i++) {
-		movePiece(piece, tab[i].x, tab[i].y, &tempBoard, playNice, playBad);
-		if (!isCheck(tempBoard, piece->color)) {
-			newTab[index] = tab[i];
-			index++;
-		}
-	}
-	return newTab;*/
 	return possibilities;
 }
 
@@ -578,7 +565,7 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities) { //Moving possibilities of a king
 	// return all the moving possibilities of a king in a Cell's table without verify check
 	Cell* possibilities;
-	possibilities = malloc(sizeof(Cell) * 8); //Max 8 possibilities
+	possibilities = malloc(sizeof(Cell) * 10); //Max 10 possibilities
 	Cell cell;
 	int index = 0; //position in the table possibilities
 	int isPieceCoord;
@@ -878,4 +865,47 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		freePlayer(playBadCopy);
 		destroyBoard(boardCopy);
 	}
+}
+
+Cell* getAllPossibilities(Player *player, Board* board, int* sizeTabPossibilities, LastMove* last) {
+	Piece* piece;
+
+	Cell* possibilitiesPlayer;
+	possibilitiesPlayer = malloc(sizeof(Cell)*78);
+
+	Cell* possibilitiesPiece;
+
+	int lenPossibilitiesPiece;
+	int index = 0;
+	*sizeTabPossibilities = 0;
+
+	for (int i = 0; i < 16; i++) { //Each piece
+		piece = player->table[i];
+
+		if (piece != NULL) {
+			possibilitiesPiece = movePossibilitiesPiece(piece, board, &lenPossibilitiesPiece, last);
+			*sizeTabPossibilities += lenPossibilitiesPiece;
+			for (int k = 0; k < lenPossibilitiesPiece; k++) { //Each move
+				possibilitiesPlayer[index] = possibilitiesPiece[k];
+				index++;
+			}
+		}
+	}
+	return possibilitiesPlayer;
+}
+
+Cell *getBestMove(Player **players, TypeColor *whoPlays, Board* board,  LastMove* last) {
+	int sizeTabPossibilities;
+	Cell* allPossibilities = getAllPossibilities(players[*whoPlays], board, &sizeTabPossibilities, last);
+	
+	Cell *bestMove = &allPossibilities[0];
+	for (int i = 0; i < 16; i++) { //All piece ennemy
+		for (int k = 0; k < sizeTabPossibilities; k++) { //All possibilities
+			if (players[*whoPlays]->table[i]->x == allPossibilities[k].x && players[!*whoPlays]->table[i]->y == allPossibilities[k].y) {
+				*bestMove = allPossibilities[k];
+			}
+		}
+	}
+	
+	return bestMove;
 }

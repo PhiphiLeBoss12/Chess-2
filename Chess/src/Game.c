@@ -61,10 +61,11 @@ void game() {
 
 		int numPossibilities = 0;
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
+		Cell* bestMove = getBestMove(players, &whoPlays, board, last);
 		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
 
 		drawBoard(window, board, textures, squareSize);
-		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
+		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece, bestMove);
 		drawSidePanel(window, &panel, textures);
 
 		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
@@ -213,7 +214,7 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 	}
 }
 
-void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece) {
+void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece, Cell* bestMove) {
 	if (!possibilities)
 		return;
 
@@ -238,6 +239,9 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 			drawCircle(window, x, y, radius);
 		}
 		drawCircle(window, x, y, radius);
+
+		setDrawColor(window, 0, 128, 0, 128);
+		drawCircle(window, bestMove->x * 100 + 100 / 2, bestMove->y * 100 + 100 / 2, 100 / 2 - 100 / 8);
 	}
 }
 
