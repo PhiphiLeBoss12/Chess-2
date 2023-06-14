@@ -610,7 +610,7 @@ Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilitie
 		}
 	}
 	//Castling
-	if (!piece->hasMovedOnce) { //Verify if king hasn't moved
+	if (!piece->hasMovedOnce && !isCheck(board, piece->color)) { //Verify if king hasn't moved and if there's no check
 		
 		//The height didn't change
 		if (piece->color == WHITE) {
