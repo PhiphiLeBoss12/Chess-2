@@ -49,7 +49,23 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 }
 
 void freePlayer(Player* player) {
+	for (int i = 0; i < 16; i++) {
+		if (player->table[i]) {
+			LOG_FN("freed player->table[%d] at %#010x\n", i, player->table[i]);
+			free(player->table[i]);
+		}
+	}
+	for (int i = 0; i < 16; i++) {
+		if (player->eaten[i]) {
+			LOG_FN("freed player->eaten[%d] at %#010x\n", i, player->eaten[i]);
+			free(player->eaten[i]);
+		}
+	}
+
+
+	LOG_FN("freed player->table at %#010x\n", player->table);
 	free(player->table);
+	LOG_FN("freed player->eaten at %#010x\n", player->eaten);
 	free(player->eaten);
 	free(player);
 }
@@ -71,6 +87,9 @@ void putInBoard(Player* player, Board* board) {
 	int x, y;
 	for (int i = 0; i < 16; i++)
 	{
+		if (!t[i])
+			continue;
+
 		x = t[i]->x;
 		y = t[i]->y;
 		board->table[x][y] = t[i];
@@ -81,21 +100,36 @@ Player* createPlayerCopy(Player* player) {
 	Player* newPlayer = malloc(sizeof(Player));
 
 	newPlayer->table = (Piece**)malloc(16 * sizeof(Piece*));
+	LOG_FN("created newPlayer->table at %#010x\n", newPlayer->table);
 	for (int i = 0; i < 16; i++) {
-		// newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
-		if (player->table[i])
+
+
+		if (player->table[i]) {
+			newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
+			LOG_FN("created newPlayer->table[%d] at %#010x\n", i, newPlayer->table[i]);
 			memcpy(newPlayer->table[i], player->table[i], sizeof(Player));
+		}
 		else
 			newPlayer->table[i] = NULL;
 	}
 
 	newPlayer->eaten = (Piece**)malloc(16 * sizeof(Piece*));
+	LOG_FN("created newPlayer->eaten at %#010x\n", newPlayer->eaten);
 	for (int i = 0; i < 16; i++) {
-		newPlayer->eaten[i] = (Piece*)malloc(sizeof(Piece));
-		if (player->eaten[i])
+		if (player->eaten[i]) {
+			newPlayer->eaten[i] = (Piece*)malloc(sizeof(Piece));
+			LOG_FN("created newPlayer->eaten[%d] at %#010x\n", i, newPlayer->eaten[i]);
 			memcpy(newPlayer->eaten[i], player->eaten[i], sizeof(Player));
+		}
 		else
 			newPlayer->eaten[i] = NULL;
+	}
+
+	for (int i = 0; i < 16; i++) {
+		LOG_FN("newPlayer->table[%d] at %#010x\n", i, newPlayer->table[i]);
+	}
+	for (int i = 0; i < 16; i++) {
+		LOG_FN("newPlayer->eaten[%d] at %#010x\n", i, newPlayer->eaten[i]);
 	}
 
 	newPlayer->color = player->color;

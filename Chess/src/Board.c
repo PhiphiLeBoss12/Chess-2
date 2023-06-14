@@ -25,12 +25,16 @@ Board* createBoard(int size) {
 
 void destroyBoard(Board* board) {
 	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			if (board->table[i][j])
-				free(board->table[i][j]);
-		}
+		// for (int j = 0; j < 8; j++) {
+		// 	if (board->table[i][j]) {
+		// 		LOG_FN("freed board->table[%d][%d] at %#010x\n", i, j, board->table[i][j]);
+		// 		free(board->table[i][j]);
+		// 	}
+		// }
+		LOG_FN("freed board->table[%d] at %#010x\n", i, board->table[i]);
 		free(board->table[i]);
 	}
+	LOG_FN("freed board->table at %#010x\n", board->table);
 	free(board->table);
 	free(board);
 }
@@ -53,18 +57,27 @@ Board* createBoardCopy(Board* board) {
 	Board* newBoard = (Board*)malloc(sizeof(Board));
 
 	newBoard->table = (Piece***)malloc(board->size * sizeof(Piece**));
+	LOG_FN("created newBoard->table at %#010x\n", newBoard->table);
 
 	memcpy(newBoard->table, board->table, 8);
 	for (int x = 0; x < board->size; x++) {
 		newBoard->table[x] = (Piece**)malloc(board->size * sizeof(Piece*));
+		LOG_FN("created newBoard->table[%d] at %#010x\n", x, newBoard->table[x]);
 		memcpy(newBoard->table[x], board->table[x], 8);
-		for (int y = 0; y < board->size; y++) {
-			newBoard->table[x][y] = (Piece*)malloc(sizeof(Piece));
-			if (board->table[x][y])
-				*newBoard->table[x][y] = *(board->table[x][y]);
-			else
-				newBoard->table[x][y] = NULL;
+
+
+		for (int i = 0; i < 8; i++) {
+			newBoard->table[x][i] = NULL;
 		}
+
+		// for (int y = 0; y < board->size; y++) {
+		// 	newBoard->table[x][y] = (Piece*)malloc(sizeof(Piece));
+		// 	LOG_FN("created newBoard->table[%d][%d] at %#010x\n", x, y, newBoard->table[x][y]);
+		// 	if (board->table[x][y])
+		// 		*newBoard->table[x][y] = *(board->table[x][y]);
+		// 	else
+		// 		newBoard->table[x][y] = NULL;
+		// }
 	}
 
 	newBoard->selectedX = board->selectedX;

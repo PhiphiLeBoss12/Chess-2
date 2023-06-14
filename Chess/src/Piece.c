@@ -664,7 +664,7 @@ int verifyPieceLine(Piece* piece, int startingPos, int i, Cell king, TypeColor c
 	else return 0;
 }
 
-int rookOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
+int rookOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {	
 	Piece* piece;
 
 	int i, status;
@@ -784,6 +784,8 @@ int pawnMenacing(Board* board, TypeColor color, Cell king) {
 
 int isCheck(Board* board, TypeColor color) {
 	Cell king = getKingPosition(board, color);
+	if (king.x == -1 || king.y == -1)
+		return 0;
 
 	return knightIsMenacing(board, color, king) || 
 		rookOrQueenOrKingAreMenacing(board, color, king) || 
@@ -795,6 +797,9 @@ Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNi
 	Board* boardCopy = createBoardCopy(board);
 	Player* playNiceCopy = createPlayerCopy(playNice);
 	Player* playBadCopy = createPlayerCopy(playBad);
+
+	putInBoard(playNiceCopy, boardCopy);
+	putInBoard(playBadCopy, boardCopy);
 
 	Piece* pieceCopy = malloc(sizeof(Piece));
 	*pieceCopy = *piece;
