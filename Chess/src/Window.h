@@ -28,6 +28,9 @@ typedef struct Rect {
 	float angle;
 } Rect;
 
+void initSDL();
+void quitSDL();
+
 // Initializes SDL and a creates a window object.
 // Returns NULL if something goes wrong
 Window* initWindow(const char* title, unsigned int width, unsigned int height);
