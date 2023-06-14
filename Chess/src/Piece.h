@@ -31,3 +31,5 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities);
 Cell* getAllPossibilities(Player* player, Board* board, int* sizeTabPossibilities, LastMove* last);
 Cell *getBestMove(Player** players, TypeColor* whoPlays, Board* board, LastMove* last);
+int getValuePiece(Piece* piece);
+int evaluateBoard(Board* board, LastMove* last);

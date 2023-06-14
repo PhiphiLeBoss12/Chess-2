@@ -120,9 +120,7 @@ char* showCoordPiece(Piece* piece) {
 
 void showPiece(Piece* piece) { 
 	showTypePiece(piece->type);
-	printf(": ");
-	showCoordPiece(piece);
-	printf("\n");
+	printf(": %s\n", showCoordPiece(piece));
 }
 
 /* movePiece
@@ -894,18 +892,87 @@ Cell* getAllPossibilities(Player *player, Board* board, int* sizeTabPossibilitie
 	return possibilitiesPlayer;
 }
 
-Cell *getBestMove(Player **players, TypeColor *whoPlays, Board* board,  LastMove* last) {
+Cell *getBestMove(Player **players, TypeColor *whoPlays, Board* board,   LastMove* last) {
 	int sizeTabPossibilities;
-	Cell* allPossibilities = getAllPossibilities(players[*whoPlays], board, &sizeTabPossibilities, last);
+	Cell* allPossibilities = getAllPossibilities(players[0], board, &sizeTabPossibilities, last);
 	
-	Cell *bestMove = &allPossibilities[0];
+	Cell* bestMove = &allPossibilities[0];
+	Piece* ennemyPiece;
+	int hasFindBestMove = 0; //False
 	for (int i = 0; i < 16; i++) { //All piece ennemy
-		for (int k = 0; k < sizeTabPossibilities; k++) { //All possibilities
-			if (players[*whoPlays]->table[i]->x == allPossibilities[k].x && players[!*whoPlays]->table[i]->y == allPossibilities[k].y) {
-				*bestMove = allPossibilities[k];
+		ennemyPiece = players[1]->table[i];
+		if (ennemyPiece != NULL) {
+			for (int k = 0; k < sizeTabPossibilities; k++) { //All possibilities
+				if (ennemyPiece->x == allPossibilities[k].x && ennemyPiece->y == allPossibilities[k].y) {
+					*bestMove = allPossibilities[k];
+					hasFindBestMove = 1;
+				}
 			}
 		}
 	}
-	
 	return bestMove;
+}
+
+int getValuePiece(Piece* piece) {
+
+	switch (piece->type) {
+	case PAWN:
+		return 1;
+	case BISHOP:
+		return 3;
+	case KNIGHT:
+		return 3;
+	case ROOK:
+		return 5;
+	case QUEEN:
+		return 8;
+	case KING:
+		return 100;
+	default:
+		return 0;
+	}
+}
+
+int evaluateBoard(Board* board, LastMove* last) {
+	int value = 0;
+	Piece* piece;
+	int sizePossibilities;
+	int mult;
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			piece = board->table[i][j];
+			if (piece != NULL) {
+				mult = 1;
+				if (piece->color != WHITE)
+					mult = -1;
+				movePossibilitiesPiece(piece, board, &sizePossibilities, last);
+				value += (getValuePiece(piece) * 1 + sizePossibilities)* mult;
+			}
+		}
+	}
+	return value;
+}
+
+int chooseBestPossibility(Piece* piece, Board* board, Player* playNice, Player* playBad, LastMove* last) {
+	int numPossibilities;
+	Cell* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities, last);
+	for (int i = 0; i < numPossibilities; i++) {
+		Board* boardCopy = createBoardCopy(board);
+		Player* playNiceCopy = createPlayerCopy(playNice);
+		Player* playBadCopy = createPlayerCopy(playBad);
+		Piece pieceCopy = *piece;
+		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
+		evaluateBoard(boardCopy, last);
+		if (isCheck(boardCopy, piece->color)) {
+			freePlayer(playNiceCopy);
+			freePlayer(playBadCopy);
+			destroyBoard(boardCopy);
+			possibilities[i].x = -1;
+			possibilities[i].y = -1;
+			continue;
+		}
+		freePlayer(playNiceCopy);
+		freePlayer(playBadCopy);
+		destroyBoard(boardCopy);
+	}
 }

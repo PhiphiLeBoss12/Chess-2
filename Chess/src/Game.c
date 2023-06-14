@@ -68,6 +68,7 @@ void game() {
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece, bestMove);
 		drawSidePanel(window, &panel, textures);
 
+		printf("Evaluation : %d\n", evaluateBoard(board, last));
 		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
 			freePlayer(players[0]);
 			freePlayer(players[1]);
