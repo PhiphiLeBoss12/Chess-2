@@ -67,7 +67,7 @@ void game() {
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
 		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
 
-		drawBoard(window, board, textures, squareSize);
+		drawBoard(window, board, textures, squareSize, *last);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
 		drawSidePanel(window, &panel, textures);
 
@@ -210,7 +210,8 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 	return movePossibilitiesPiece(selectedPiece, board, numPossibilities, last);
 }
 
-void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize) {
+void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize, LastMove last) {
+		
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			Rect rect;
@@ -236,6 +237,28 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 				int index = type + 6 * color;
 				drawTexture(window, &rect, textures[index]);
 			}
+		}
+	}
+
+	if (last.piece != NULL) {
+		setDrawColor(window, 245, 176, 65, 150);
+		Rect rect;
+		rect.x = last.piece->x * squareSize;
+		rect.y = last.piece->y * squareSize;
+		rect.width = squareSize;
+		rect.height = squareSize;
+		rect.angle = 0.0f;
+		drawRect(window, &rect);
+		rect.x = last.prevX * squareSize;
+		rect.y = last.prevY * squareSize;
+		drawRect(window, &rect);
+		if (board->table[last.piece->x][last.piece->y] != NULL) {
+			TypeColor color = last.piece->color;
+			TypePiece type = last.piece->type;
+			int index = type + 6 * color;
+			rect.x = last.piece->x * squareSize;
+			rect.y = last.piece->y * squareSize;
+			drawTexture(window, &rect, textures[index]);
 		}
 	}
 }

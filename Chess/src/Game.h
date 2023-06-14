@@ -21,7 +21,7 @@ Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, i
 // Draws the play board on screen
 // The board is always drawn at the top-left corner of the screen
 // Should be called before drawing pieces
-void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize);
+void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize, LastMove last);
 
 // Draws all move possibilities of the selected piece if a piece is selected
 void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece);
