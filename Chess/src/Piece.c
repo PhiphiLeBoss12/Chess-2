@@ -338,7 +338,7 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 
 		//En passant
 
-		affLastCoup(*last);
+		// affLastCoup(*last);
 		if (piece->x - 1 >= 0) { //bord
 			if (board->table[piece->x - 1][piece->y] != NULL) {
 				if (board->table[piece->x - 1][piece->y]->type == PAWN && board->table[piece->x - 1][piece->y]->color != piece->color) { //pion adverse sur la gauche
@@ -811,7 +811,19 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 				Board* boardCopy = createBoardCopy(board);
 				Player* playNiceCopy = createPlayerCopy(playNice);
 				Player* playBadCopy = createPlayerCopy(playBad);
-				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
+				Piece* pieceCopy = malloc(sizeof(Piece));
+				pieceCopy = piece;
+
+				LastMove* lastCopy = initLastMove();
+				lastCopy->prevX = last->prevX;
+				lastCopy->prevY = last->prevY;
+				lastCopy->piece = malloc(sizeof(Piece));
+				if (last->piece)
+					*lastCopy->piece = *last->piece;
+				else
+					lastCopy->piece = NULL;
+
+				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
 				if (!isCheck(boardCopy, color)) {
 					freePlayer(playNiceCopy);
 					freePlayer(playBadCopy);
@@ -821,6 +833,7 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 				freePlayer(playNiceCopy);
 				freePlayer(playBadCopy);
 				destroyBoard(boardCopy);
+				free(lastCopy);
 			}
 
 			free(possibilities);
@@ -836,12 +849,18 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		Board* boardCopy = createBoardCopy(board);
 		Player* playNiceCopy = createPlayerCopy(playNice);
 		Player* playBadCopy = createPlayerCopy(playBad);
+
 		Piece* pieceCopy = malloc(sizeof(Piece));
-		pieceCopy = piece;
+		*pieceCopy = *piece;
 		LastMove* lastCopy = initLastMove();
 		lastCopy->prevX = last->prevX;
 		lastCopy->prevY = last->prevY;
-		lastCopy->piece = last->piece;
+		lastCopy->piece = malloc(sizeof(Piece));
+		if (last->piece)
+			*lastCopy->piece = *last->piece;
+		else
+			lastCopy->piece = NULL;
+
 		movePiece(pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
 		if (isCheck(boardCopy, color)) {
 			freePlayer(playNiceCopy);

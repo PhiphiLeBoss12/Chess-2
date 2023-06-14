@@ -326,6 +326,10 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color again
 					}
 				}
+				if (isStalemate(board, players, last)) {
+					gameState = STALEMATE;
+					playSound(stalemateSound);
+				}
 
 				// Unselect the square
 				board->selectedX = -1;
@@ -338,11 +342,6 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 
 		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
 			*selectedPiece = board->table[board->selectedX][board->selectedY];
-
-		if (isStalemate(board, players, last)) {
-			gameState = STALEMATE;
-			playSound(stalemateSound);
-		}
 
 		leftButtonHeld = 1;
 	}
