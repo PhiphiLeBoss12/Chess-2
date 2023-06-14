@@ -192,9 +192,9 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 	output : void (rien) */
 void affLastCoup(LastMove last) {
 	if (last.piece != NULL) {
-		printf("\nname : %c", PiecesNames[last.piece->type]);
 		printf("\nprevX : %d", last.prevX);
 		printf("\nprevY : %d", last.prevY);
+		printf("\nname : %c", PiecesNames[last.piece->type]);
 		printf("\nx : %d", last.piece->x);
 		printf("\ny : %d\n", last.piece->y);
 	}
@@ -865,7 +865,10 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		Player* playNiceCopy = createPlayerCopy(playNice);
 		Player* playBadCopy = createPlayerCopy(playBad);
 		Piece pieceCopy = *piece;
-		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
+		LastMove* lastCopy = initLastMove();
+		*lastCopy = *last;
+		lastCopy->piece = last->piece;
+		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
 		if (isCheck(boardCopy, color)) {
 			freePlayer(playNiceCopy);
 			freePlayer(playBadCopy);
@@ -876,6 +879,7 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 		}
 		freePlayer(playNiceCopy);
 		freePlayer(playBadCopy);
+		free(lastCopy);
 		destroyBoard(boardCopy);
 	}
 }
