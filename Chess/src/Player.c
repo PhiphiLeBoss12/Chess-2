@@ -82,14 +82,9 @@ Player* createPlayerCopy(Player* player) {
 
 	newPlayer->table = (Piece**)malloc(16 * sizeof(Piece*));
 	for (int i = 0; i < 16; i++) {
-		newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
-		if (player->table[i]) {
-			newPlayer->table[i]->color = player->table[i]->color;
-			newPlayer->table[i]->x = player->table[i]->x;
-			newPlayer->table[i]->y = player->table[i]->y;
-			newPlayer->table[i]->hasMovedOnce = player->table[i]->hasMovedOnce;
-			newPlayer->table[i]->type = player->table[i]->type;
-		}
+		// newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
+		if (player->table[i])
+			memcpy(newPlayer->table[i], player->table[i], sizeof(Player));
 		else
 			newPlayer->table[i] = NULL;
 	}

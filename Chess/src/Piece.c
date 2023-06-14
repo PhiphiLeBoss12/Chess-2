@@ -3,7 +3,6 @@
 #include "Player.h"
 #include <string.h>
 
-
 Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) {
 	if (!(0 <= x && x < SIZE && 0 <= y && y < SIZE)) { //check if coord is in the table
 		printf("Failed : This piece isn't in the table.");
@@ -534,14 +533,14 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 
 	//watch out for the castling
 	Cell* possibilitiesRook;
-	int* len = malloc(sizeof(int)); //sizeTabPossibilities of the rook
-	possibilitiesRook = movePossibilitiesRook(piece, board, len);
-	for (i = 0; i < *len; i++) {
+	int len; //sizeTabPossibilities of the rook
+	possibilitiesRook = movePossibilitiesRook(piece, board, &len);
+	for (i = 0; i < len; i++) {
 		possibilities[index] = possibilitiesRook[i];
 		index++;
 	}
 
-	*sizeTabPossibilities += *len; //length min of possibilities
+	*sizeTabPossibilities += len; //length min of possibilities
 	return possibilities;
 }
 
@@ -799,6 +798,7 @@ Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNi
 
 	Piece* pieceCopy = malloc(sizeof(Piece));
 	*pieceCopy = *piece;
+
 	LastMove* lastCopy = initLastMove();
 	lastCopy->prevX = last->prevX;
 	lastCopy->prevY = last->prevY;
@@ -806,14 +806,16 @@ Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNi
 
 	if (last->piece)
 		*lastCopy->piece = *last->piece;
-	else
-		lastCopy->piece = NULL;
+	
+	Piece* lastCopyPiece = lastCopy->piece;
 
 	movePiece(pieceCopy, possibility.x, possibility.y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
 
 	freePlayer(playNiceCopy);
 	freePlayer(playBadCopy);
 	free(lastCopy);
+	if (lastCopyPiece)
+		free(lastCopyPiece);
 
 	return boardCopy;
 }
