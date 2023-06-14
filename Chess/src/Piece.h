@@ -32,4 +32,6 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 Cell* getAllPossibilities(Player* player, Board* board, int* sizeTabPossibilities, LastMove* last);
 Cell *getBestMove(Player** players, TypeColor* whoPlays, Board* board, LastMove* last);
 int getValuePiece(Piece* piece);
-int evaluateBoard(Board* board, LastMove* last);
+int evaluateBoard(Board* board, Player** players, LastMove* last);
+int chooseBestPossibility(Piece* piece, Board* board, Player** players, LastMove* last, Cell* bestPossibility);
+Cell* getBestMove2(Board* board, Player** players, LastMove* last);

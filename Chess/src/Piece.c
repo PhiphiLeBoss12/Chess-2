@@ -933,7 +933,7 @@ int getValuePiece(Piece* piece) {
 	}
 }
 
-int evaluateBoard(Board* board, LastMove* last) {
+int evaluateBoard(Board* board, Player **players, LastMove* last) {
 	int value = 0;
 	Piece* piece;
 	int sizePossibilities;
@@ -943,36 +943,73 @@ int evaluateBoard(Board* board, LastMove* last) {
 			piece = board->table[i][j];
 			if (piece != NULL) {
 				mult = 1;
-				if (piece->color != WHITE)
+				if (piece->color != players[0]->color) {
 					mult = -1;
+				}
 				movePossibilitiesPiece(piece, board, &sizePossibilities, last);
-				value += (getValuePiece(piece) * 1 + sizePossibilities)* mult;
+				value += (getValuePiece(piece) * 10 + sizePossibilities)* mult;
 			}
 		}
 	}
 	return value;
 }
 
-int chooseBestPossibility(Piece* piece, Board* board, Player* playNice, Player* playBad, LastMove* last) {
+int chooseBestPossibility(Piece* piece, Board* board, Player** players, LastMove* last, Cell *bestPossibility) {
 	int numPossibilities;
+	int maxMove = 0;
+	int evaluate;
 	Cell* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities, last);
+	testPossibilitiesCheck(board, players[0]->color, players[0], players[1], last, piece, possibilities, numPossibilities);
 	for (int i = 0; i < numPossibilities; i++) {
 		Board* boardCopy = createBoardCopy(board);
-		Player* playNiceCopy = createPlayerCopy(playNice);
-		Player* playBadCopy = createPlayerCopy(playBad);
+		Player* playNiceCopy = createPlayerCopy(players[0]);
+		Player* playBadCopy = createPlayerCopy(players[1]);
 		Piece pieceCopy = *piece;
-		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, last);
-		evaluateBoard(boardCopy, last);
+		LastMove* lastCopy = initLastMove();
+		lastCopy->prevX = last->prevX;
+		lastCopy->prevY = last->prevY;
+		lastCopy->piece = malloc(sizeof(Piece));
+		if (last->piece)
+			*lastCopy->piece = *last->piece;
+
+		movePiece(&pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
+		evaluate = evaluateBoard(boardCopy, players, lastCopy);
+		if (evaluate > maxMove) {
+			maxMove = evaluate;
+			*bestPossibility = possibilities[i];
+		}
+			
 		if (isCheck(boardCopy, piece->color)) {
 			freePlayer(playNiceCopy);
 			freePlayer(playBadCopy);
+			free(lastCopy);
 			destroyBoard(boardCopy);
 			possibilities[i].x = -1;
 			possibilities[i].y = -1;
 			continue;
 		}
+
 		freePlayer(playNiceCopy);
 		freePlayer(playBadCopy);
+		free(lastCopy);
 		destroyBoard(boardCopy);
 	}
+	return maxMove;
 }
+
+Cell* getBestMove2(Board* board, Player** players, LastMove* last) {
+	int sizeTabPossibilities;
+	Cell* allPossibilities = getAllPossibilities(players[0], board, &sizeTabPossibilities, last);
+
+	Cell* bestMove = &allPossibilities[0];
+	Piece* piece;
+
+	for (int i = 0; i < 16; i++) { //All piece
+		piece = players[0]->table[i];
+		if (piece != NULL) {
+			chooseBestPossibility(piece, board, players, last, bestMove);
+		}
+	}
+	return bestMove;
+}
+

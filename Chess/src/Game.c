@@ -61,14 +61,14 @@ void game() {
 
 		int numPossibilities = 0;
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
-		Cell* bestMove = getBestMove(players, &whoPlays, board, last);
+		Cell* bestMove = getBestMove2(board, players, last);
 		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
 
 		drawBoard(window, board, textures, squareSize);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece, bestMove);
 		drawSidePanel(window, &panel, textures);
 
-		printf("Evaluation : %d\n", evaluateBoard(board, last));
+		printf("Evaluation : %d\n", evaluateBoard(board, players, last));
 		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
 			freePlayer(players[0]);
 			freePlayer(players[1]);
