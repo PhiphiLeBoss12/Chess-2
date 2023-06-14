@@ -78,7 +78,7 @@ char *showCoord(int x, int y) {
 		letter = 'H';
 		break;
 	}
-	sprintf(coord, "%c%d", letter, y + 1); //concat letter and int and put in string coord
+	sprintf_s(coord, 2, "%c%d", letter, y + 1); //concat letter and int and put in string coord
 	return coord;
 }
 
@@ -323,7 +323,7 @@ Cell *movePossibilitiesPawn(Piece* piece, Board *board, int *sizeTabPossibilitie
 		//Attacks move
 		int add;
 		for (int power = 1; power < 3; power++) { //Left and Right
-			add = pow((-1), power); //add = 1 or -1
+			add = (int)pow((-1), power); //add = 1 or -1
 			if (piece->x + add * mult >= 0 && piece->x + add * mult < SIZE) { //Verify border
 				if (board->table[piece->x + add * mult][piece->y + 1 * mult] != NULL) { //Not empty cell
 					if (board->table[piece->x + add * mult][piece->y + 1 * mult]->color != piece->color) { //ennemy piece
@@ -387,10 +387,10 @@ Cell* movePossibilitiesBishop(Piece* piece, Board* board, int* sizeTabPossibilit
 	int right_left, top_bottom;
 
 	for (int power = 1; power < 3; power++) { //Left and Right
-		right_left = pow((-1), power); //right_left = -1 or 1, allow to go in left and right
+		right_left = (int)pow((-1), power); //right_left = -1 or 1, allow to go in left and right
 
 		for (int power2 = 1; power2 < 3; power2++) { //Top and Bottom
-			top_bottom = pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
+			top_bottom = (int)pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
@@ -435,11 +435,11 @@ Cell* movePossibilitiesKnight(Piece* piece, Board* board, int* sizeTabPossibilit
 
 		//allow to create a variable left_right who multiplicate depth to -1 or 1 to go left or right
 		for (int power = 1; power < 3; power++) { 
-			left_right = pow((-1), power);
+			left_right = (int)pow((-1), power);
 
 			//allow to create a variable top_bottom who multiplicate depth to -1 or 1 to go in top or bottom uwu
 			for (int power2=1; power2 < 3; power2++) { 
-				top_bottom = pow((-1), power2);
+				top_bottom = (int)pow((-1), power2);
 
 				//define the coords of the cell
 				cell.x = piece->x + left_right * depth; //x +- 1 or 2
@@ -481,7 +481,7 @@ Cell *movePossibilitiesRook(Piece* piece, Board* board, int* sizeTabPossibilitie
 
 		//allow to create a variable top_bottom_left_right who multiplicate cell.y or cell.x to -1 or 1 to go in top or bottom or left or right
 		for (int power = 1; power < 3; power++) { 
-			top_bottom_left_right = pow((-1), power);
+			top_bottom_left_right = (int)pow((-1), power);
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
@@ -622,6 +622,9 @@ Cell getKingPosition(Board* board, TypeColor color) {
 		}
 	}
 	printf("Error getKingPosition : Your king might be in another castle (he's not in the board)\n");
+	king.x = -1;
+	king.y = -1;
+	return king;
 }
 
 int knightIsMenacing(Board* board, TypeColor color, Cell king) {
@@ -715,10 +718,10 @@ int bishopOrQueenOrKingAreMenacing(Board* board, TypeColor color, Cell king) {
 	int right_left, top_bottom;
 
 	for (int power = 1; power < 3; power++) { //Left and Right
-		right_left = pow((-1), power); //right_left = -1 or 1, allow to go in left and right
+		right_left = (int)pow((-1), power); //right_left = -1 or 1, allow to go in left and right
 
 		for (int power2 = 1; power2 < 3; power2++) { //Top and Bottom
-			top_bottom = pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
+			top_bottom = (int)pow((-1), power2); //top_bottom = -1 or 1, allow to go in top and bottom
 
 			//All cell in the line (7 cells max)
 			//Didn't find a way to optimize the number of cell to be checked
@@ -754,7 +757,6 @@ int pawnMenacing(Board* board, TypeColor color, Cell king) {
 	// return all the moving possibilities of a pawn in a Cell's table without verify check
 
 	int index = 0; //position in the table possibilities
-	Cell cell;
 	int mult = 1; //Initialize to white player
 
 	if (color == BLACK) //Black player plays in negative move
@@ -764,7 +766,7 @@ int pawnMenacing(Board* board, TypeColor color, Cell king) {
 		//Attacks move
 		int add;
 		for (int power = 1; power < 3; power++) { //Left and Right
-			add = pow((-1), power); //add = 1 or -1
+			add = (int)pow((-1), power); //add = 1 or -1
 			
 			if (king.x + add * mult >= 0 && king.x + add * mult < SIZE) { //Verify border
 				Piece* piece = board->table[king.x + add * mult][king.y + 1 * mult];
@@ -790,10 +792,34 @@ int isCheck(Board* board, TypeColor color) {
 		pawnMenacing(board, color, king);
 }
 
+Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last) {
+	Board* boardCopy = createBoardCopy(board);
+	Player* playNiceCopy = createPlayerCopy(playNice);
+	Player* playBadCopy = createPlayerCopy(playBad);
+
+	Piece* pieceCopy = malloc(sizeof(Piece));
+	*pieceCopy = *piece;
+	LastMove* lastCopy = initLastMove();
+	lastCopy->prevX = last->prevX;
+	lastCopy->prevY = last->prevY;
+	lastCopy->piece = malloc(sizeof(Piece));
+
+	if (last->piece)
+		*lastCopy->piece = *last->piece;
+	else
+		lastCopy->piece = NULL;
+
+	movePiece(pieceCopy, possibility.x, possibility.y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
+
+	freePlayer(playNiceCopy);
+	freePlayer(playBadCopy);
+	free(lastCopy);
+
+	return boardCopy;
+}
+
 // wtf
 int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last) {
-	Cell king = getKingPosition(board, color);
-
 	// Loop through every piece
 	for (int y = 0; y < 8; y++) {
 		for (int x = 0; x < 8; x++) {
@@ -804,36 +830,18 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 
 			Piece* piece = board->table[x][y];
 			int numPossibilities;
-			Cell* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities, playNice, playBad);
+			Cell* possibilities = movePossibilitiesPiece(piece, board, &numPossibilities, last);
 
 			// Loop through every possibility for this piece
 			for (int i = 0; i < numPossibilities; i++) {
-				Board* boardCopy = createBoardCopy(board);
-				Player* playNiceCopy = createPlayerCopy(playNice);
-				Player* playBadCopy = createPlayerCopy(playBad);
-				Piece* pieceCopy = malloc(sizeof(Piece));
-				pieceCopy = piece;
+				Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last);
 
-				LastMove* lastCopy = initLastMove();
-				lastCopy->prevX = last->prevX;
-				lastCopy->prevY = last->prevY;
-				lastCopy->piece = malloc(sizeof(Piece));
-				if (last->piece)
-					*lastCopy->piece = *last->piece;
-				else
-					lastCopy->piece = NULL;
-
-				movePiece(boardCopy->table[x][y], possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
-				if (!isCheck(boardCopy, color)) {
-					freePlayer(playNiceCopy);
-					freePlayer(playBadCopy);
-					destroyBoard(boardCopy);
+				if (!isCheck(newBoard, color)) {
+					destroyBoard(newBoard);
 					return 0;
 				}
-				freePlayer(playNiceCopy);
-				freePlayer(playBadCopy);
-				destroyBoard(boardCopy);
-				free(lastCopy);
+
+				destroyBoard(newBoard);
 			}
 
 			free(possibilities);
@@ -846,36 +854,15 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 // wtf
 void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities) {
 	for (int i = 0; i < numPossibilities; i++) {
-		Board* boardCopy = createBoardCopy(board);
-		Player* playNiceCopy = createPlayerCopy(playNice);
-		Player* playBadCopy = createPlayerCopy(playBad);
+		Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last);
 
-		Piece* pieceCopy = malloc(sizeof(Piece));
-		*pieceCopy = *piece;
-		LastMove* lastCopy = initLastMove();
-		lastCopy->prevX = last->prevX;
-		lastCopy->prevY = last->prevY;
-		lastCopy->piece = malloc(sizeof(Piece));
-		if (last->piece)
-			*lastCopy->piece = *last->piece;
-		else
-			lastCopy->piece = NULL;
-
-		movePiece(pieceCopy, possibilities[i].x, possibilities[i].y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
-		if (isCheck(boardCopy, color)) {
-			freePlayer(playNiceCopy);
-			freePlayer(playBadCopy);
-			destroyBoard(boardCopy);
+		if (isCheck(newBoard, color)) {
 			possibilities[i].x = -1;
 			possibilities[i].y = -1;
-			continue;
 		}
-		freePlayer(playNiceCopy);
-		freePlayer(playBadCopy);
-		free(lastCopy);
-		destroyBoard(boardCopy);
-	}
 
+		destroyBoard(newBoard);
+	}
 }
 
 int isStalemate(Board* board, Player** players, LastMove* last) {

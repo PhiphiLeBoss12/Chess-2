@@ -26,6 +26,7 @@ LastMove* initLastMove();
 void affLastCoup(LastMove last);
 
 int isCheck(Board* board, TypeColor color);
+Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last);
 int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last);
 void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities);
 
