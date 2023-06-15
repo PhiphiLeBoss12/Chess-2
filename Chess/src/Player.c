@@ -71,6 +71,9 @@ void putInBoard(Player* player, Board* board) {
 	int x, y;
 	for (int i = 0; i < 16; i++)
 	{
+		if (!t[i])
+			continue;
+
 		x = t[i]->x;
 		y = t[i]->y;
 		board->table[x][y] = t[i];
@@ -82,22 +85,23 @@ Player* createPlayerCopy(Player* player) {
 
 	newPlayer->table = (Piece**)malloc(16 * sizeof(Piece*));
 	for (int i = 0; i < 16; i++) {
-		newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
-		if (player->table[i])
+		if (player->table[i]) {
+			newPlayer->table[i] = (Piece*)malloc(sizeof(Piece));
 			memcpy(newPlayer->table[i], player->table[i], sizeof(Player));
+		}
 		else
 			newPlayer->table[i] = NULL;
 	}
 
 	newPlayer->eaten = (Piece**)malloc(16 * sizeof(Piece*));
 	for (int i = 0; i < 16; i++) {
-		newPlayer->eaten[i] = (Piece*)malloc(sizeof(Piece));
-		if (player->eaten[i])
+		if (player->eaten[i]) {
+			newPlayer->eaten[i] = (Piece*)malloc(sizeof(Piece));
 			memcpy(newPlayer->eaten[i], player->eaten[i], sizeof(Player));
+		}
 		else
 			newPlayer->eaten[i] = NULL;
 	}
-
 	newPlayer->color = player->color;
 	newPlayer->check = player->check;
 

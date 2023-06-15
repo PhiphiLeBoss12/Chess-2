@@ -58,12 +58,10 @@ Board* createBoardCopy(Board* board) {
 	for (int x = 0; x < board->size; x++) {
 		newBoard->table[x] = (Piece**)malloc(board->size * sizeof(Piece*));
 		memcpy(newBoard->table[x], board->table[x], 8);
-		for (int y = 0; y < board->size; y++) {
-			newBoard->table[x][y] = (Piece*)malloc(sizeof(Piece));
-			if (board->table[x][y])
-				*newBoard->table[x][y] = *(board->table[x][y]);
-			else
-				newBoard->table[x][y] = NULL;
+
+
+		for (int i = 0; i < 8; i++) {
+			newBoard->table[x][i] = NULL;
 		}
 	}
 
