@@ -1,6 +1,6 @@
 #include "Types.h"
 
-Piece* initPiece(TypePiece type, TypeColor color, int x, int y, Window* window);
+Piece* initPiece(TypePiece type, TypeColor color, int x, int y);
 void destroyPiece(Piece* piece);
 
 void showTypePiece(TypePiece type);

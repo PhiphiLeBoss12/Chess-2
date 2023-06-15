@@ -5,227 +5,202 @@
 #include "UI.h"
 #include "Sound.h"
 #include "Network.h"
+#include "Board.h"
 #include <stdio.h>
 
-// Global variables (very bad)
-Mix_Music* mainMenuMusic;
-Mix_Music* gameMusic;
-Mix_Chunk* stepSound;
-Mix_Chunk* killSound;
-Mix_Chunk* stalemateSound;
-Mix_Chunk* funnySound;
-Mix_Chunk* funnySound2;
-GameState gameState = START;
-
-IPaddress ipServer, ipClient;
-TCPsocket tcpServer, tcpClient;
-int multiplayerServer = 0;
-int multiplayerClient = 0;
-
-void game() {
+void gameLoop() {
 	// INIT
 	Window* window = initWindow("Chess 2", 800 + 400, 800, 1);
-	Board* board = createBoard(8);
-	Player* players[2];
-	players[0] = initPlayers(WHITE, window);
-	players[1] = initPlayers(BLACK, window);
-	putInBoard(players[0], board);
-	putInBoard(players[1], board);
-	LastMove* last = initLastMove();
+	Game* game = initGame(window);
 	int promo = 0;
-
-	Piece* selectedPiece = NULL;
-	int squareSize = 0;
-	int leftButtonHeld = 0;
-	TypeColor whoPlays = WHITE;
-
-	SDL_Texture** textures = createTextureArray(window);
-
-	mainMenuMusic = loadMusic("Deadly Roulette.mp3");
-	gameMusic = loadMusic("Walking Along.mp3");
-	stepSound = loadSound("step.mp3");
-	killSound = loadSound("kill.mp3");
-	stalemateSound = loadSound("impasta.mp3");
-	funnySound = loadSound("funny.mp3");
-	funnySound2 = loadSound("funny2.mp3");
-	int enableMusic = 1;
 
 	SidePanel panel;
 	panel.width = 400;
 	panel.offsetX = 800;
-	panel.whoPlays = whoPlays;
-	panel.playerWhite = players[0];
-	panel.playerBlack = players[1];
+	panel.whoPlays = game->whoPlays;
+	panel.playerWhite = game->players[0];
+	panel.playerBlack = game->players[1];
 
-	if (enableMusic)
-		playMusic(mainMenuMusic);
+	playMusic(game->musics[MUSIC_MENU]);
 
 	// MAIN LOOP
-	while (gameState != QUIT && !window->shouldClose) {
-		squareSize = min(window->width, window->height) / 8;
-
+	while (game->gameState != QUIT && !window->shouldClose) {
 		handleEvents(window);
 		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
 
-		if (gameState == PLAYING) {
+		if (game->gameState == PLAYING) {
 			int numPossibilities = 0;
-			Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
-			testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities, &promo);
+			Cell* possibilities = getPossibilities(game, &numPossibilities);
+			testPossibilitiesCheck(game->board, game->whoPlays, game->players[0], game->players[1], game->last, game->selectedPiece, possibilities, numPossibilities, &promo);
 
-			drawBoard(window, board, textures, squareSize, *last);
-			drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
-			drawSidePanel(window, &panel, textures);
+			drawBoard(window, game);
+			drawPossibilities(window, game, possibilities, numPossibilities);
+			drawSidePanel(window, &panel, game->textures);
 
-			if (multiplayerServer && whoPlays == WHITE) {
-				handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
-				panel.whoPlays = whoPlays;
-				free(possibilities);
-				if (window->keyDown == SDLK_p) {
-					printf("Packet sent\n");
-					Packet packet = { 0, 1.0f, 1 };
-					SDLNet_TCP_Send(tcpClient, &packet, sizeof(Packet));
-					whoPlays = BLACK;
-				}
-			}
-			else if (multiplayerClient && whoPlays == BLACK) {
-				handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
-				panel.whoPlays = whoPlays;
-				free(possibilities);
-				if (window->keyDown == SDLK_p) {
-					printf("Packet sent\n");
-					Packet packet = { 0, 1.0f, 1 };
-					SDLNet_TCP_Send(tcpServer, &packet, sizeof(Packet));
-					whoPlays = WHITE;
-				}
-			}
-			else {
-				if (whoPlays == WHITE) {
-					printf("Waiting for packet...\n");
-					Packet packet;
-					packet.Sent = 0;
-					while (!packet.Sent)
-						recievePacket(&tcpServer, &packet, sizeof(Packet));
-					whoPlays = BLACK;
-					printf("Received packet!\n");
-				}
-				else if (whoPlays == BLACK) {
-					printf("Waiting for packet...\n");
-					Packet packet;
-					packet.Sent = 0;
-					while (!packet.Sent) {
-						recievePacket(&tcpClient, &packet, sizeof(Packet));
-					}
-					whoPlays = WHITE;
-					printf("Received packet!\n");
-				}
-			}
+			if (game->multiplayerServer || game->multiplayerClient)
+				doNetwork(window, game);
 
 			if (window->keyDown == SDLK_F5)
-				resetBoard(window, board, players, &whoPlays, &panel);
+				resetBoard(window, game);
+
+			handleMouseClicking(window, game, possibilities, numPossibilities, &promo);
 		}
 
-		if (gameState == START) {
-			drawStartScreen(window, textures);
+		if (game->gameState == START) {
+			drawStartScreen(window, game->textures);
 			if (window->keyDown == SDLK_RETURN) {
-				gameState = PLAYING;
-				if (enableMusic)
-					playMusic(gameMusic);
+				game->gameState = PLAYING;
+				if (game->enableMusic)
+					playMusic(game->musics[MUSIC_GAME]);
 			}
 			if (window->keyDown == SDLK_ESCAPE)
-				gameState = QUIT;
+				game->gameState = QUIT;
 			if (window->keyDown == SDLK_s) {
 				// Open server
-				if (!multiplayerServer)
-					initNetworkServer(&ipServer, &tcpServer, &tcpClient);
-				multiplayerServer = 1;
+				if (!game->multiplayerServer)
+					initNetworkServer(&game->ipServer, &game->tcpServer, &game->tcpClient);
+				game->multiplayerServer = 1;
 			}
 			if (window->keyDown == SDLK_z) {
 				// Open client
-				if (!multiplayerClient)
-					initNetworkClient(&ipClient, &tcpServer, "localhost");
-				multiplayerClient = 1;
+				if (!game->multiplayerClient)
+					initNetworkClient(&game->ipClient, &game->tcpServer, "localhost");
+				game->multiplayerClient = 1;
 			}
 		}
 
-		if (gameState == END || gameState == STALEMATE) {
+		if (game->gameState == END || game->gameState == STALEMATE) {
 			EndScreen es;
 			es.width = 800;
 			es.height = 300;
-			if (gameState == END)
-				es.whoWon = whoPlays;
+			if (game->gameState == END)
+				es.whoWon = game->whoPlays;
 			else
 				es.whoWon = -1;
 			drawEndScreen(window, &es);
 
-			if (window->keyDown == SDLK_RETURN) {
-				freePlayer(players[0]);
-				freePlayer(players[1]);
-				destroyBoard(board);
-
-				players[0] = initPlayers(WHITE, window);
-				players[1] = initPlayers(BLACK, window);
-				board = createBoard(8);
-				putInBoard(players[0], board);
-				putInBoard(players[1], board);
-
-				whoPlays = WHITE;
-				
-				gameState = PLAYING;
-
-				panel.playerWhite = players[0];
-				panel.playerBlack = players[1];
-			}
+			if (window->keyDown == SDLK_RETURN)
+				resetBoard(window, game);
 
 			if (window->keyDown == SDLK_ESCAPE)
-				gameState = QUIT;
+				game->gameState = QUIT;
 		}
 
 		presentWindow(window);
 		
+		panel.whoPlays = game->whoPlays;
+
 		// Toggle Music
-		toggleMusic(window, &enableMusic);
+		toggleMusic(window, game);
 	}
 
-	destroyMusic(gameMusic);
-	destroyMusic(mainMenuMusic);
-	destroySound(stepSound);
-	destroySound(killSound);
-	destroySound(funnySound);
-	destroySound(funnySound2);
-	destroySound(stalemateSound);
-
-	free(textures);
-	freePlayer(players[0]);
-	freePlayer(players[1]);
-	destroyBoard(board);
+	destroyGame(game);
 	destroyWindow(window);
 }
 
-void resetBoard(Window* window, Board** board, Player*** players, TypeColor* whoPlays, SidePanel* panel) {
-	freePlayer(*players[0]);
-	freePlayer(*players[1]);
-	destroyBoard(*board);
+Game* initGame(Window* window) {
+	Game* game = malloc(sizeof(Game));
 
-	*players[0] = initPlayers(WHITE, window);
-	*players[1] = initPlayers(BLACK, window);
-	*board = createBoard(8);
-	putInBoard(*players[0], board);
-	putInBoard(*players[1], board);
+	game->gameState = START;
 
-	whoPlays = WHITE;
+	game->board = createBoard(8);
+	game->players[0] = initPlayers(WHITE);
+	game->players[1] = initPlayers(BLACK);
+	game->last = initLastMove();
+	game->selectedPiece = NULL;
+	game->whoPlays = WHITE;
 
-	gameState = PLAYING;
+	putInBoard(game->players[0], game->board);
+	putInBoard(game->players[1], game->board);
 
-	panel->playerWhite = players[0];
-	panel->playerBlack = players[1];
+	game->textures = createTextureArray(window);
+
+	game->musics[MUSIC_MENU] = loadMusic("Deadly Roulette.mp3");
+	game->musics[MUSIC_GAME] = loadMusic("Walking Along.mp3");
+	game->sounds[SOUND_STEP] = loadSound("step.mp3");
+	game->sounds[SOUND_KILL] = loadSound("kill.mp3");
+	game->sounds[SOUND_STALEMATE] = loadSound("impasta.mp3");
+	game->sounds[SOUND_CHECK] = loadSound("funny.mp3");
+	game->sounds[SOUND_FUNNY] = loadSound("funny2.mp3");
+	game->enableMusic = 1;
+
+	game->multiplayerServer = 0;
+	game->multiplayerClient = 0;
+
+	return game;
 }
 
-void toggleMusic(Window* window, int* enableMusic) {
+void destroyGame(Game* game) {
+	destroyBoard(game->board);
+	freePlayer(game->players[0]);
+	freePlayer(game->players[1]);
+	free(game->last);
+
+	for (int i = 0; i < 12; i++)
+		destroyTexture(game->textures[i]);
+
+	for (int i = 0; i < 2; i++)
+		destroyMusic(game->musics[i]);
+	for (int i = 0; i < 5; i++)
+		destroySound(game->sounds[i]);
+
+	if (game->multiplayerServer || game->multiplayerClient) {
+		SDLNet_TCP_Close(game->tcpServer);
+		SDLNet_TCP_Close(game->tcpClient);
+	}
+}
+
+void doNetwork(Window* window, Game* game) {
+	if (game->multiplayerServer && game->whoPlays == WHITE) {
+		if (window->keyDown == SDLK_p) {
+			printf("Packet sent\n");
+			Packet packet = { 0, 1.0f, 1 };
+			SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(Packet));
+			game->whoPlays = BLACK;
+		}
+	}
+	else if (game->multiplayerClient && game->whoPlays == BLACK) {
+		if (window->keyDown == SDLK_p) {
+			printf("Packet sent\n");
+			Packet packet = { 0, 1.0f, 1 };
+			SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(Packet));
+			game->whoPlays = WHITE;
+		}
+	}
+	else {
+		if (game->whoPlays == WHITE) {
+			printf("Waiting for packet...\n");
+			Packet packet;
+			packet.Sent = 0;
+			while (!packet.Sent)
+				recievePacket(&game->tcpServer, &packet, sizeof(Packet));
+			game->whoPlays = BLACK;
+			printf("Received packet!\n");
+		}
+		else if (game->whoPlays == BLACK) {
+			printf("Waiting for packet...\n");
+			Packet packet;
+			packet.Sent = 0;
+			while (!packet.Sent) {
+				recievePacket(&game->tcpClient, &packet, sizeof(Packet));
+			}
+			game->whoPlays = WHITE;
+			printf("Received packet!\n");
+		}
+	}
+}
+
+void resetBoard(Window* window, Game* game) {
+	destroyGame(game);
+	game = initGame(window);
+}
+
+void toggleMusic(Window* window, Game* game) {
 	static int keyHeld = 0;
 	if (window->keyDown == SDLK_m && !keyHeld) {
-		*enableMusic = !*enableMusic;
-		if (!*enableMusic)
+		game->enableMusic = !game->enableMusic;
+		if (!game->enableMusic)
 			stopMusic();
 		else
 			resumeMusic();
@@ -252,36 +227,36 @@ SDL_Texture** createTextureArray(Window* window) {
 	return textures;
 }
 
-void getInputOnBoard(Window* window, int* boardX, int* boardY, int squareSize) {
+void getInputOnBoard(Window* window, int* boardX, int* boardY) {
 	int x = window->mousePosX;
 	int y = window->mousePosY;
 
-	*boardX = x / squareSize;
-	*boardY = y / squareSize;
+	*boardX = x / SQUARE_SIZE;
+	*boardY = y / SQUARE_SIZE;
 }
 
-Cell* getPossibilities(Piece* selectedPiece, TypeColor whoPlays, Board* board, int* numPossibilities, LastMove* last) {
-	if (!selectedPiece)
+Cell* getPossibilities(Game* game, int* numPossibilities) {
+	if (!game->selectedPiece)
 		return NULL;
-	if (board->selectedX == -1 || board->selectedY == -1)
+	if (game->board->selectedX == -1 || game->board->selectedY == -1)
 		return NULL;
-	if (whoPlays != selectedPiece->color) 
+	if (game->whoPlays != game->selectedPiece->color) 
 		return NULL;
-	if (!board->table[board->selectedX][board->selectedY])
+	if (!game->board->table[game->board->selectedX][game->board->selectedY])
 		return NULL;
 
-	return movePossibilitiesPiece(selectedPiece, board, numPossibilities, last);
+	return movePossibilitiesPiece(game->selectedPiece, game->board, numPossibilities, game->last);
 }
 
-void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareSize, LastMove last) {
+void drawBoard(Window* window, Game* game) {
 		
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			Rect rect;
-			rect.x = j * squareSize;
-			rect.y = i * squareSize;
-			rect.width = squareSize;
-			rect.height = squareSize;
+			rect.x = j * SQUARE_SIZE;
+			rect.y = i * SQUARE_SIZE;
+			rect.width = SQUARE_SIZE;
+			rect.height = SQUARE_SIZE;
 			rect.angle = 0.0f;
 
 			if ((i + j) % 2 == 1)
@@ -289,44 +264,44 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 			else
 				setDrawColor(window, 64, 64, 64, 255);
 
-			if (board->selectedX == j && board->selectedY == i)
+			if (game->board->selectedX == j && game->board->selectedY == i)
 				setDrawColor(window, 64, 128, 64, 200);
 
 			drawRect(window, &rect);
 
-			if (board->table[j][i]) {
-				TypeColor color = board->table[j][i]->color;
-				TypePiece type = board->table[j][i]->type;
+			if (game->board->table[j][i]) {
+				TypeColor color = game->board->table[j][i]->color;
+				TypePiece type = game->board->table[j][i]->type;
 				int index = type + 6 * color;
-				drawTexture(window, &rect, textures[index]);
+				drawTexture(window, &rect, game->textures[index]);
 			}
 		}
 	}
 
-	if (last.piece != NULL) {
+	if (game->last->piece != NULL) {
 		setDrawColor(window, 245, 176, 65, 150);
 		Rect rect;
-		rect.x = last.piece->x * squareSize;
-		rect.y = last.piece->y * squareSize;
-		rect.width = squareSize;
-		rect.height = squareSize;
+		rect.x = game->last->piece->x * SQUARE_SIZE;
+		rect.y = game->last->piece->y * SQUARE_SIZE;
+		rect.width = SQUARE_SIZE;
+		rect.height = SQUARE_SIZE;
 		rect.angle = 0.0f;
 		drawRect(window, &rect);
-		rect.x = last.prevX * squareSize;
-		rect.y = last.prevY * squareSize;
+		rect.x = game->last->prevX * SQUARE_SIZE;
+		rect.y = game->last->prevY * SQUARE_SIZE;
 		drawRect(window, &rect);
-		if (board->table[last.piece->x][last.piece->y] != NULL) {
-			TypeColor color = last.piece->color;
-			TypePiece type = last.piece->type;
+		if (game->board->table[game->last->piece->x][game->last->piece->y] != NULL) {
+			TypeColor color = game->last->piece->color;
+			TypePiece type = game->last->piece->type;
 			int index = type + 6 * color;
-			rect.x = last.piece->x * squareSize;
-			rect.y = last.piece->y * squareSize;
-			drawTexture(window, &rect, textures[index]);
+			rect.x = game->last->piece->x * SQUARE_SIZE;
+			rect.y = game->last->piece->y * SQUARE_SIZE;
+			drawTexture(window, &rect, game->textures[index]);
 		}
 	}
 }
 
-void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece) {
+void drawPossibilities(Window* window, Game* game, Cell* possibilities, int numPossibilities) {
 	if (!possibilities)
 		return;
 
@@ -334,18 +309,18 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 		if (possibilities[i].x == -1 && possibilities[i].y == -1)
 			continue;
 
-		int x = possibilities[i].x * squareSize + squareSize / 2;
-		int y = possibilities[i].y * squareSize + squareSize / 2;
-		int radius = squareSize / 2 - squareSize / 8;
+		int x = possibilities[i].x * SQUARE_SIZE + SQUARE_SIZE / 2;
+		int y = possibilities[i].y * SQUARE_SIZE + SQUARE_SIZE / 2;
+		int radius = SQUARE_SIZE / 2 - SQUARE_SIZE / 8;
 		setDrawColor(window, 128, 128, 128, 128);
-		if (board->table[possibilities[i].x][possibilities[i].y] && selectedPiece->color != board->table[possibilities[i].x][possibilities[i].y]->color)
+		if (game->board->table[possibilities[i].x][possibilities[i].y] && game->selectedPiece->color != game->board->table[possibilities[i].x][possibilities[i].y]->color)
 			setDrawColor(window, 255, 128, 128, 128);
-		if (selectedPiece->type == PAWN && (possibilities[i].x == selectedPiece->x - 1 || possibilities[i].x == selectedPiece->x + 1) && board->table[possibilities[i].x][possibilities[i].y] == NULL) {
-			if (selectedPiece->color == WHITE) {
-				y = (possibilities[i].y - 1) * squareSize + squareSize / 2;
+		if (game->selectedPiece->type == PAWN && (possibilities[i].x == game->selectedPiece->x - 1 || possibilities[i].x == game->selectedPiece->x + 1) && game->board->table[possibilities[i].x][possibilities[i].y] == NULL) {
+			if (game->selectedPiece->color == WHITE) {
+				y = (possibilities[i].y - 1) * SQUARE_SIZE + SQUARE_SIZE / 2;
 			}
 			else {
-				y = (possibilities[i].y + 1) * squareSize + squareSize / 2;
+				y = (possibilities[i].y + 1) * SQUARE_SIZE + SQUARE_SIZE / 2;
 			}
 			setDrawColor(window, 255, 128, 128, 128);
 			drawCircle(window, x, y, radius);
@@ -354,13 +329,18 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	}
 }
 
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last, int* promo) {
+void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int numPossibilities, int* promo) {
 	static int leftButtonHeld = 0;
+
+	Board* board = game->board;
+	Player* players[2] = { game->players[0], game->players[1] }; // May cause some problems
+	LastMove* last = game->last;
+	TypeColor* whoPlays = &game->whoPlays;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
 		int pieceEaten = 0;
 		int x, y;
-		getInputOnBoard(window, &x, &y, squareSize);
+		getInputOnBoard(window, &x, &y);
 
 		if (x < 0 || y < 0 || x > 7 || y > 7)
 			return;
@@ -376,7 +356,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 				board->selectedY = y;
 			}
 
-			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == (*selectedPiece)->color) {
+			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == game->selectedPiece->color) {
 				//Verify castling 
 				if (board->table[board->selectedX][board->selectedY] != NULL) {
 					if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
@@ -384,47 +364,47 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						rook = board->table[board->selectedX][board->selectedY];
 						//Castling right
 						if (board->selectedX > 4) {
-							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last, promo);
+							movePiece(game->selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last, promo);
 							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last, promo);
 						}
 						else { //Castling left
-							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last, promo);
+							movePiece(game->selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last, promo);
 							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1], last, promo);
 						}
 					}
 					else {
-						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
+						pieceEaten = movePiece(game->selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
 						if (*promo == 1) {
-							Window* wintest = winPromo("promotion", *selectedPiece, &(*selectedPiece)->type);
+							Window* wintest = winPromo("promotion", game->selectedPiece, &game->selectedPiece->type);
 							*promo = 0;
 							destroyWindow(wintest);
 						}
 					}
 				}
 				else {
-					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
+					pieceEaten = movePiece(game->selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
 					if (*promo == 1) {
-						Window* wintest = winPromo("promotion", *selectedPiece, &(*selectedPiece)->type);
+						Window* wintest = winPromo("promotion", game->selectedPiece, &game->selectedPiece->type);
 						*promo = 0;
 						destroyWindow(wintest);
 					}
 				}
 
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
-				playSound(stepSound);
+				playSound(game->sounds[SOUND_STEP]);
 				if (pieceEaten)
-					playSound(killSound);
+					playSound(game->sounds[SOUND_KILL]);
 				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays))) {
-					playSound(funnySound);
+					playSound(game->sounds[SOUND_CHECK]);
 					if (isCheckmate(board, *whoPlays, players[0], players[1], last, promo)) {
-						gameState = END;
-						playSound(funnySound2);
+						game->gameState = END;
+						playSound(game->sounds[SOUND_FUNNY]);
 						*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color again
 					}
 				}
 				if (isStalemate(board, players, last, promo)) {
-					gameState = STALEMATE;
-					playSound(stalemateSound);
+					game->gameState = STALEMATE;
+					playSound(game->sounds[SOUND_STALEMATE]);
 				}
 
 				// Unselect the square
@@ -437,7 +417,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 		}
 
 		if (board->selectedX != -1 && board->selectedY != -1 && board->table[board->selectedX][board->selectedY])
-			*selectedPiece = board->table[board->selectedX][board->selectedY];
+			game->selectedPiece = board->table[board->selectedX][board->selectedY];
 
 		leftButtonHeld = 1;
 	}
@@ -477,7 +457,7 @@ Window* winPromo(const char* title, Piece* pawn, TypePiece* newType) {
 
 		if (wintest->mouseLeftButton && !leftButtonHeld) {
 			int x, y;
-			getInputOnBoard(wintest, &x, &y, 100);
+			getInputOnBoard(wintest, &x, &y);
 			*newType = x + 1; 
 			choose = 1;
 		}

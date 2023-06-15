@@ -1,6 +1,6 @@
 #include "Types.h"
 
-Player* initPlayers(TypeColor color, Window* window);
+Player* initPlayers(TypeColor color);
 
 void freePlayer(Player* player);
 

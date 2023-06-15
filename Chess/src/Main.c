@@ -5,11 +5,6 @@
 
 int main(int argc, char* argv[])
 {
-    // if (NET_SERVER)
-    //     netExampleServer();
-    // else
-    //     netExampleClient();
-
-    game();
+    gameLoop();
     return 0;
 }

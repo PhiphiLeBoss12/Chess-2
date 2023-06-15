@@ -3,7 +3,7 @@
 #include "Player.h"
 #include <string.h>
 
-Piece *initPiece(TypePiece type, TypeColor color, int x, int y, Window* window) {
+Piece *initPiece(TypePiece type, TypeColor color, int x, int y) {
 	if (!(0 <= x && x < SIZE && 0 <= y && y < SIZE)) { //check if coord is in the table
 		printf("Failed : This piece isn't in the table.");
 		__debugbreak();
@@ -620,7 +620,7 @@ Cell getKingPosition(Board* board, TypeColor color) {
 			}
 		}
 	}
-	printf("Error getKingPosition : Your king might be in another castle (he's not in the board)\n");
+	// printf("Error getKingPosition : Your king might be in another castle (he's not in the board)\n");
 	king.x = -1;
 	king.y = -1;
 	return king;

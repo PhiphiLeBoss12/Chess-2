@@ -10,7 +10,7 @@ typedef struct StructPlayer {
 #include "Piece.h"
 #include <string.h>
 
-Player* initPlayers(TypeColor coloor, Window* window) {
+Player* initPlayers(TypeColor coloor) {
 	Player* player;
 	player = (Player*)malloc(sizeof(Player));
 	player->color = coloor;
@@ -34,16 +34,16 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 	// Init
 	for (int i = 0; i < 8; i++)
 	{
-		player->table[i] = initPiece(PAWN, coloor, i, pawn, window);
+		player->table[i] = initPiece(PAWN, coloor, i, pawn);
 	}
-	player->table[8] = initPiece(ROOK,		coloor, 0, pieces, window);
-	player->table[9] = initPiece(KNIGHT,	coloor, 1, pieces, window);
-	player->table[10] = initPiece(BISHOP,	coloor, 2, pieces, window);
-	player->table[11] = initPiece(QUEEN,	coloor, 3, pieces, window);
-	player->table[12] = initPiece(KING,		coloor, 4, pieces, window);
-	player->table[13] = initPiece(BISHOP,	coloor, 5, pieces, window);
-	player->table[14] = initPiece(KNIGHT,	coloor, 6, pieces, window);
-	player->table[15] = initPiece(ROOK,		coloor, 7, pieces, window);
+	player->table[8] = initPiece(ROOK,		coloor, 0, pieces);
+	player->table[9] = initPiece(KNIGHT,	coloor, 1, pieces);
+	player->table[10] = initPiece(BISHOP,	coloor, 2, pieces);
+	player->table[11] = initPiece(QUEEN,	coloor, 3, pieces);
+	player->table[12] = initPiece(KING,		coloor, 4, pieces);
+	player->table[13] = initPiece(BISHOP,	coloor, 5, pieces);
+	player->table[14] = initPiece(KNIGHT,	coloor, 6, pieces);
+	player->table[15] = initPiece(ROOK,		coloor, 7, pieces);
 	// printf("Player init done\n");
 	return player;
 }
