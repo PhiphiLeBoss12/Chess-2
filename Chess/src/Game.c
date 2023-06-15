@@ -28,8 +28,6 @@ void game() {
 	LastMove* last = initLastMove();
 	int promo = 0;
 
-	printf("\npromo %d\n", promo);
-
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
 	int leftButtonHeld = 0;
@@ -339,16 +337,18 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 					else {
 						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
 						if (*promo == 1) {
-							Window* wintest = winPromo("test", *selectedPiece);
+							Window* wintest = winPromo("promotion", *selectedPiece, &(*selectedPiece)->type);
 							*promo = 0;
+							destroyWindow(wintest);
 						}
 					}
 				}
 				else {
 					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
 					if (*promo == 1) {
-						Window* wintest = winPromo("test", *selectedPiece);
+						Window* wintest = winPromo("promotion", *selectedPiece, &(*selectedPiece)->type);
 						*promo = 0;
+						destroyWindow(wintest);
 					}
 				}
 
@@ -387,39 +387,42 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 		leftButtonHeld = 0;
 }
 
-Window* winPromo(const char* title, Piece* pawn) {
+Window* winPromo(const char* title, Piece* pawn, TypePiece* newType) {
 	Window* wintest = initWindow(title, 100*4, 100, 0);
 	SDL_Texture** texturePromo = createTextureArray(wintest);
-	clear(wintest);
-	for (int i = 0; i < 4; i++) {
-		Rect rect;
-		rect.x = i * 100;
-		rect.y = 0 * 100;
-		rect.width = 100;
-		rect.height = 100;
-		rect.angle = 0.0f;
-		TypeColor color = pawn->color;
-		printf("\ncolor : %d\n", pawn->color);
-		TypePiece type = i + 1;
-		int index = type + 6 * color;
-		if (i % 2 != 0) {
-			setDrawColor(wintest, 64, 64, 64, 255);
+	int choose = 0;
+	while (choose == 0) {
+		handleEvents(wintest);
+		clear(wintest);
+		for (int i = 0; i < 4; i++) {
+			Rect rect;
+			rect.x = i * 100;
+			rect.y = 0 * 100;
+			rect.width = 100;
+			rect.height = 100;
+			rect.angle = 0.0f;
+			TypeColor color = pawn->color;
+			TypePiece type = i + 1;
+			int index = type + 6 * color;
+			if (i % 2 != 0) {
+				setDrawColor(wintest, 64, 64, 64, 255);
+			}
+			else {
+				setDrawColor(wintest, 200, 200, 200, 255);
+			}
+			drawRect(wintest, &rect);
+			drawTexture(wintest, &rect, texturePromo[index]);
 		}
-		else {
-			setDrawColor(wintest, 200, 200, 200, 255);
+		presentWindow(wintest);
+
+		static int leftButtonHeld = 0;
+
+		if (wintest->mouseLeftButton && !leftButtonHeld) {
+			int x, y;
+			getInputOnBoard(wintest, &x, &y, 100);
+			*newType = x + 1; 
+			choose = 1;
 		}
-		drawRect(wintest, &rect);
-		drawTexture(wintest, &rect, texturePromo[index]);
 	}
-	presentWindow(wintest);
-
-	static int leftButtonHeld = 0;
-
-	if (wintest->mouseLeftButton && !leftButtonHeld) {
-		int x, y;
-		getInputOnBoard(wintest, &x, &y, 100);
-		printf("\nx : %d, y : %d\n", x, y);
-	}
-
 	return wintest;
 }

@@ -32,4 +32,4 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 // Big ahh function to react when the mouse is clicked
 void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last, int* promo);
 
-Window* winPromo(const char* title, Piece* pawn);
+Window* winPromo(const char* title, Piece* pawn, TypePiece* newType);
