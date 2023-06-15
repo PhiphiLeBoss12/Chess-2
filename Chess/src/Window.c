@@ -3,7 +3,10 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-Window* initWindow(const char* title, unsigned int width, unsigned int height) {
+// Global variable (very bad)
+unsigned int NumWindows = 0;
+
+void initSDL() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		printf("Failed to initialize SDL! SDL error: %s\n", SDL_GetError());
 		return NULL;
@@ -21,6 +24,19 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 		return NULL;
 	}
 	Mix_OpenAudio(48000, AUDIO_F32SYS, 2, 2048);
+}
+
+void quitSDL() {
+	Mix_CloseAudio();
+	Mix_Quit();
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
+}
+
+Window* initWindow(const char* title, unsigned int width, unsigned int height) {
+	if (NumWindows == 0)
+		initSDL();
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
@@ -52,6 +68,8 @@ Window* initWindow(const char* title, unsigned int width, unsigned int height) {
 
 	window->keyDown = SDLK_UNKNOWN;
 
+	NumWindows++;
+
 	return window;
 }
 
@@ -61,18 +79,21 @@ void destroyWindow(Window* window) {
 	SDL_DestroyWindow(window->window);
 	free(window);
 
-	Mix_CloseAudio();
-	Mix_Quit();
-	TTF_Quit();
-	IMG_Quit();
-	SDL_Quit();
+	NumWindows--;
+
+	if (NumWindows == 0)
+		quitSDL();
 }
 
 void handleEvents(Window* window) {
+	unsigned int windowId = SDL_GetWindowID(window->window);
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_WINDOWEVENT:
+			if (event.window.windowID != windowId)
+				break;
+
 			if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				window->shouldClose = 1;
 			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -82,11 +103,17 @@ void handleEvents(Window* window) {
 			break;
 
 		case SDL_MOUSEMOTION:
+			if (event.motion.windowID != windowId)
+				break;
+
 			window->mousePosX = event.motion.x;
 			window->mousePosY = window->height - event.motion.y;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.windowID != windowId)
+				break;
+
 			switch (event.button.button) {
 			case SDL_BUTTON_LEFT: window->mouseLeftButton = 1; break;
 			case SDL_BUTTON_RIGHT: window->mouseRightButton = 1; break;
@@ -94,6 +121,9 @@ void handleEvents(Window* window) {
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
+			if (event.button.windowID != windowId)
+				break;
+
 			switch (event.button.button) {
 			case SDL_BUTTON_LEFT: window->mouseLeftButton = 0; break;
 			case SDL_BUTTON_RIGHT: window->mouseRightButton = 0; break;
@@ -102,9 +132,15 @@ void handleEvents(Window* window) {
 			break;
 
 		case SDL_KEYDOWN:
+			if (event.key.windowID != windowId)
+				break;
+
 			window->keyDown = event.key.keysym.sym;
 			break;
 		case SDL_KEYUP:
+			if (event.key.windowID != windowId)
+				break;
+
 			window->keyDown = SDLK_UNKNOWN;
 			break;
 		}
