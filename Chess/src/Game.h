@@ -2,11 +2,14 @@
 #include "Types.h"
 #include "Window.h"
 #include "Board.h"
+#include "UI.h"
 
 typedef enum GameState { START, PLAYING, END, STALEMATE, QUIT } GameState;
 
 // Main game loop
 void game();
+
+void resetBoard(Window* window, Board* board, Player** players, TypeColor* whoPlays, SidePanel* panel);
 
 void toggleMusic(Window* window, int* enableMusic);
 

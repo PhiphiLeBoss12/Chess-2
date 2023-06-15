@@ -64,29 +64,21 @@ void game() {
 		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
 
-		int numPossibilities = 0;
-		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
-		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities, &promo);
+		if (gameState == PLAYING) {
+			int numPossibilities = 0;
+			Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
+			testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities, &promo);
 
-		drawBoard(window, board, textures, squareSize, *last);
-		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
-		drawSidePanel(window, &panel, textures);
+			drawBoard(window, board, textures, squareSize, *last);
+			drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
+			drawSidePanel(window, &panel, textures);
 
-		if (gameState == PLAYING && window->keyDown == SDLK_F5) {
-			freePlayer(players[0]);
-			freePlayer(players[1]);
-			destroyBoard(board);
+			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
+			panel.whoPlays = whoPlays;
+			free(possibilities);
 
-			players[0] = initPlayers(WHITE, window);
-			players[1] = initPlayers(BLACK, window);
-			board = createBoard(8);
-			putInBoard(players[0], board);
-			putInBoard(players[1], board);
-
-			whoPlays = WHITE;
-
-			panel.playerWhite = players[0];
-			panel.playerBlack = players[1];
+			if (window->keyDown == SDLK_F5)
+				resetBoard(window, board, players, &whoPlays, &panel);
 		}
 
 		if (gameState == START) {
@@ -134,10 +126,6 @@ void game() {
 		}
 
 		presentWindow(window);
-
-		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
-		panel.whoPlays = whoPlays;
-		free(possibilities);
 		
 		// Toggle Music
 		toggleMusic(window, &enableMusic);
@@ -156,6 +144,25 @@ void game() {
 	freePlayer(players[1]);
 	destroyBoard(board);
 	destroyWindow(window);
+}
+
+void resetBoard(Window* window, Board** board, Player*** players, TypeColor* whoPlays, SidePanel* panel) {
+	freePlayer(*players[0]);
+	freePlayer(*players[1]);
+	destroyBoard(*board);
+
+	*players[0] = initPlayers(WHITE, window);
+	*players[1] = initPlayers(BLACK, window);
+	*board = createBoard(8);
+	putInBoard(*players[0], board);
+	putInBoard(*players[1], board);
+
+	whoPlays = WHITE;
+
+	gameState = PLAYING;
+
+	panel->playerWhite = players[0];
+	panel->playerBlack = players[1];
 }
 
 void toggleMusic(Window* window, int* enableMusic) {
