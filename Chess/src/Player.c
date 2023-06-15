@@ -49,18 +49,18 @@ Player* initPlayers(TypeColor coloor, Window* window) {
 }
 
 void freePlayer(Player* player) {
-	for (int i = 0; i < 16; i++) {
-		if (player->table[i]) {
-			LOG_FN("freed player->table[%d] at %#010x\n", i, player->table[i]);
-			free(player->table[i]);
-		}
-	}
-	for (int i = 0; i < 16; i++) {
-		if (player->eaten[i]) {
-			LOG_FN("freed player->eaten[%d] at %#010x\n", i, player->eaten[i]);
-			free(player->eaten[i]);
-		}
-	}
+	// for (int i = 0; i < 16; i++) {
+	// 	if (player->table[i]) {
+	// 		LOG_FN("freed player->table[%d] at %#010x\n", i, player->table[i]);
+	// 		free(player->table[i]);
+	// 	}
+	// }
+	// for (int i = 0; i < 16; i++) {
+	// 	if (player->eaten[i]) {
+	// 		LOG_FN("freed player->eaten[%d] at %#010x\n", i, player->eaten[i]);
+	// 		free(player->eaten[i]);
+	// 	}
+	// }
 
 
 	LOG_FN("freed player->table at %#010x\n", player->table);

@@ -25,12 +25,12 @@ Board* createBoard(int size) {
 
 void destroyBoard(Board* board) {
 	for (int i = 0; i < 8; i++) {
-		// for (int j = 0; j < 8; j++) {
-		// 	if (board->table[i][j]) {
-		// 		LOG_FN("freed board->table[%d][%d] at %#010x\n", i, j, board->table[i][j]);
-		// 		free(board->table[i][j]);
-		// 	}
-		// }
+		for (int j = 0; j < 8; j++) {
+			if (board->table[i][j]) {
+				LOG_FN("freed board->table[%d][%d] at %#010x\n", i, j, board->table[i][j]);
+				free(board->table[i][j]);
+			}
+		}
 		LOG_FN("freed board->table[%d] at %#010x\n", i, board->table[i]);
 		free(board->table[i]);
 	}
