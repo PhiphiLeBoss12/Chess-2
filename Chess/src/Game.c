@@ -27,6 +27,9 @@ void game() {
 	putInBoard(players[0], board);
 	putInBoard(players[1], board);
 	LastMove* last = initLastMove();
+	int promo = 0;
+
+	printf("\npromo %d\n", promo);
 
 	Piece* selectedPiece = NULL;
 	int squareSize = 0;
@@ -65,7 +68,7 @@ void game() {
 
 		int numPossibilities = 0;
 		Cell* possibilities = getPossibilities(selectedPiece, whoPlays, board, &numPossibilities, last);
-		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities);
+		testPossibilitiesCheck(board, whoPlays, players[0], players[1], last, selectedPiece, possibilities, numPossibilities, &promo);
 
 		drawBoard(window, board, textures, squareSize, *last);
 		drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
@@ -134,7 +137,7 @@ void game() {
 
 		presentWindow(window);
 
-		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last);
+		handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
 		panel.whoPlays = whoPlays;
 		free(possibilities);
 		
@@ -291,7 +294,7 @@ void drawPossibilities(Window* window, Board* board, Cell* possibilities, int nu
 	}
 }
 
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last) {
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last, int* promo) {
 	static int leftButtonHeld = 0;
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
@@ -321,20 +324,28 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 						rook = board->table[board->selectedX][board->selectedY];
 						//Castling right
 						if (board->selectedX > 4) {
-							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last);
-							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last);
+							movePiece(*selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last, promo);
+							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last, promo);
 						}
 						else { //Castling left
-							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last);
-							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1], last);
+							movePiece(*selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last, promo);
+							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1], last, promo);
 						}
 					}
 					else {
-						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last);
+						pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
+						if (*promo == 1) {
+							Window* wintest = winPromo("test", *selectedPiece);
+							*promo = 0;
+						}
 					}
 				}
 				else {
-					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last);
+					pieceEaten = movePiece(*selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
+					if (*promo == 1) {
+						Window* wintest = winPromo("test", *selectedPiece);
+						*promo = 0;
+					}
 				}
 
 				*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color
@@ -343,13 +354,13 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 					playSound(killSound);
 				if (isCheck(board, *whoPlays) || isCheck(board, !(*whoPlays))) {
 					playSound(funnySound);
-					if (isCheckmate(board, *whoPlays, players[0], players[1], last)) {
+					if (isCheckmate(board, *whoPlays, players[0], players[1], last, promo)) {
 						gameState = END;
 						playSound(funnySound2);
 						*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color again
 					}
 				}
-				if (isStalemate(board, players, last)) {
+				if (isStalemate(board, players, last, promo)) {
 					gameState = STALEMATE;
 					playSound(stalemateSound);
 				}
@@ -370,4 +381,41 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 	}
 	if (!window->mouseLeftButton)
 		leftButtonHeld = 0;
+}
+
+Window* winPromo(const char* title, Piece* pawn) {
+	Window* wintest = initWindow(title, 100*4, 100);
+	SDL_Texture** texturePromo = createTextureArray(wintest);
+	clear(wintest);
+	for (int i = 0; i < 4; i++) {
+		Rect rect;
+		rect.x = i * 100;
+		rect.y = 0 * 100;
+		rect.width = 100;
+		rect.height = 100;
+		rect.angle = 0.0f;
+		TypeColor color = pawn->color;
+		printf("\ncolor : %d\n", pawn->color);
+		TypePiece type = i + 1;
+		int index = type + 6 * color;
+		if (i % 2 != 0) {
+			setDrawColor(wintest, 64, 64, 64, 255);
+		}
+		else {
+			setDrawColor(wintest, 200, 200, 200, 255);
+		}
+		drawRect(wintest, &rect);
+		drawTexture(wintest, &rect, texturePromo[index]);
+	}
+	presentWindow(wintest);
+
+	static int leftButtonHeld = 0;
+
+	if (wintest->mouseLeftButton && !leftButtonHeld) {
+		int x, y;
+		getInputOnBoard(wintest, &x, &y, 100);
+		printf("\nx : %d, y : %d\n", x, y);
+	}
+
+	return wintest;
 }

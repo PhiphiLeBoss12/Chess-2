@@ -27,4 +27,6 @@ void drawBoard(Window* window, Board* board, SDL_Texture** textures, int squareS
 void drawPossibilities(Window* window, Board* board, Cell* possibilities, int numPossibilities, int squareSize, Piece* selectedPiece);
 
 // Big ahh function to react when the mouse is clicked
-void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last);
+void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Player** players, Cell* possibilities, int numPossibilities, int squareSize, TypeColor* whoPlays, LastMove* last, int* promo);
+
+Window* winPromo(const char* title, Piece* pawn);

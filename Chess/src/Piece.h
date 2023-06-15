@@ -17,7 +17,7 @@ Cell* movePossibilitiesQueen(Piece* piece, Board* board, int* sizeTabPossibiliti
 Cell* movePossibilitiesKing(Piece* piece, Board* board, int* sizeTabPossibilities);
 
 
-int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last);
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last, int* promo);
 int searchPieceInTablePlay(Player play, Piece piece);
 int getPosVideEaten(Player play);
 void affTabPlayer(Player play);
@@ -26,8 +26,8 @@ LastMove* initLastMove();
 void affLastCoup(LastMove last);
 
 int isCheck(Board* board, TypeColor color);
-Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last);
-int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last);
-void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities);
+Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last, int* promo);
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, int* promo);
+void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities, int* promo);
 
-int isStalemate(Board* board, Player** players, LastMove* last);
+int isStalemate(Board* board, Player** players, LastMove* last, int* promo);

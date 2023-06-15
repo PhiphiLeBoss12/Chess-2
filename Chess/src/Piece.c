@@ -104,7 +104,7 @@ void showPiece(Piece* piece) {
 			� Player* playNice (joueur � qui app la pi�ce)
 			� Player* playBad (joeur adverse)
 	output :	¤ 1 si une pièce s'est faite mangée, 0 sinon */
-int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last) {
+int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player* playBad, LastMove* last, int* promo) {
 
 	last->prevX = piece->x;
 	last->prevY = piece->y;
@@ -148,6 +148,7 @@ int movePiece(Piece* piece, int x, int y, Board* board, Player* playNice, Player
 	if (piece->type == PAWN && ((piece->color == WHITE && piece->y == 7) || (piece->color == BLACK && piece->y == 0)))
 	{
 		piece->type = QUEEN;
+		*promo = 1;
 	}
 
 	board->table[x][y] = piece; //pi�ce d�placer
@@ -792,7 +793,7 @@ int isCheck(Board* board, TypeColor color) {
 		pawnMenacing(board, color, king);
 }
 
-Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last) {
+Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNice, Player* playBad, LastMove* last, int* promo) {
 	Board* boardCopy = createBoardCopy(board);
 	Player* playNiceCopy = createPlayerCopy(playNice);
 	Player* playBadCopy = createPlayerCopy(playBad);
@@ -804,12 +805,14 @@ Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNi
 	lastCopy->prevY = last->prevY;
 	lastCopy->piece = malloc(sizeof(Piece));
 
+	int promoCopy = *promo;
+
 	if (last->piece)
 		*lastCopy->piece = *last->piece;
 	else
 		lastCopy->piece = NULL;
 
-	movePiece(pieceCopy, possibility.x, possibility.y, boardCopy, playNiceCopy, playBadCopy, lastCopy);
+	movePiece(pieceCopy, possibility.x, possibility.y, boardCopy, playNiceCopy, playBadCopy, lastCopy, &promoCopy);
 
 	freePlayer(playNiceCopy);
 	freePlayer(playBadCopy);
@@ -819,7 +822,8 @@ Board* simulateMove(Board* board, Piece* piece, Cell possibility, Player* playNi
 }
 
 // wtf
-int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last) {
+int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, int* promo) {
+
 	// Loop through every piece
 	for (int y = 0; y < 8; y++) {
 		for (int x = 0; x < 8; x++) {
@@ -834,7 +838,8 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 
 			// Loop through every possibility for this piece
 			for (int i = 0; i < numPossibilities; i++) {
-				Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last);
+
+				Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last, promo);
 
 				if (!isCheck(newBoard, color)) {
 					destroyBoard(newBoard);
@@ -852,9 +857,9 @@ int isCheckmate(Board* board, TypeColor color, Player* playNice, Player* playBad
 }
 
 // wtf
-void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities) {
+void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Player* playBad, LastMove* last, Piece* piece, Cell* possibilities, int numPossibilities, int* promo) {
 	for (int i = 0; i < numPossibilities; i++) {
-		Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last);
+		Board* newBoard = simulateMove(board, piece, possibilities[i], playNice, playBad, last, promo);
 
 		if (isCheck(newBoard, color)) {
 			possibilities[i].x = -1;
@@ -865,7 +870,7 @@ void testPossibilitiesCheck(Board* board, TypeColor color, Player* playNice, Pla
 	}
 }
 
-int isStalemate(Board* board, Player** players, LastMove* last) {
-	return (isCheckmate(board, players[0]->color, players[0], players[1], last) || isCheckmate(board, players[1]->color, players[1], players[0], last)) &&
+int isStalemate(Board* board, Player** players, LastMove* last, int* promo) {
+	return (isCheckmate(board, players[0]->color, players[0], players[1], last, promo)) || isCheckmate(board, players[1]->color, players[1], players[0], last, promo) &&
 		   (!isCheck(board, players[0]->color) && !isCheck(board, players[1]->color));
 }
