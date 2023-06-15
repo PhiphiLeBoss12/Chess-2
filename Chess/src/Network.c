@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct Packet {
-	int Int;
-	float Float;
-	int Sent;
-} Packet;
-
 void initNetworkServer(IPaddress* ip, TCPsocket* tcpServer, TCPsocket* tcpClient) {
 	// Server creation
 	if (SDLNet_ResolveHost(ip, NULL, 6969) != 0) {
@@ -44,13 +38,17 @@ void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer, const char* distIp) 
 		printf("Failed to connect to server! NET error: %s\n", SDLNet_GetError());
 		return;
 	}
+
+	IPaddress* ipAdd = SDLNet_TCP_GetPeerAddress(*tcpServer);
+	if (ipAdd)
+		printf("Server connected! Client IP: %s\n", SDLNet_ResolveIP(ipAdd));
 }
 
-void recievePacket(TCPsocket* tcpServer, void* data, unsigned int size, unsigned int* result) {
-	*result = SDLNet_TCP_Recv(*tcpServer, data, size);
+void recievePacket(TCPsocket* tcpServer, void* data, unsigned int size) {
+	int result = SDLNet_TCP_Recv(*tcpServer, data, size);
 
-	if (*result <= 0)
-		printf("Connection closed! NET error: %s\n", SDLNet_GetError());
+	if (result <= 0)
+		printf("Connection closed!\n");
 }
 
 void netExampleServer() {
@@ -100,7 +98,7 @@ void netExampleClient() {
 	Packet packet;
 	packet.Sent = 0;
 	while (!packet.Sent)
-		recievePacket(&tcpServer, &packet, sizeof(Packet), &result);
+		recievePacket(&tcpServer, &packet, sizeof(Packet));
 	printf("Got a packet! Int: %d, Float: %f, Sent: %d\n", packet.Int, packet.Float, packet.Sent);
 
 	SDL_Delay(5000);

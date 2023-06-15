@@ -19,6 +19,8 @@ GameState gameState = START;
 
 IPaddress ipServer, ipClient;
 TCPsocket tcpServer, tcpClient;
+int multiplayerServer = 0;
+int multiplayerClient = 0;
 
 void game() {
 	// INIT
@@ -75,9 +77,49 @@ void game() {
 			drawPossibilities(window, board, possibilities, numPossibilities, squareSize, selectedPiece);
 			drawSidePanel(window, &panel, textures);
 
-			handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
-			panel.whoPlays = whoPlays;
-			free(possibilities);
+			if (multiplayerServer && whoPlays == WHITE) {
+				handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
+				panel.whoPlays = whoPlays;
+				free(possibilities);
+				if (window->keyDown == SDLK_p) {
+					printf("Packet sent\n");
+					Packet packet = { 0, 1.0f, 1 };
+					SDLNet_TCP_Send(tcpClient, &packet, sizeof(Packet));
+					whoPlays = BLACK;
+				}
+			}
+			else if (multiplayerClient && whoPlays == BLACK) {
+				handleMouseClicking(window, board, &selectedPiece, players, possibilities, numPossibilities, squareSize, &whoPlays, last, &promo);
+				panel.whoPlays = whoPlays;
+				free(possibilities);
+				if (window->keyDown == SDLK_p) {
+					printf("Packet sent\n");
+					Packet packet = { 0, 1.0f, 1 };
+					SDLNet_TCP_Send(tcpServer, &packet, sizeof(Packet));
+					whoPlays = WHITE;
+				}
+			}
+			else {
+				if (whoPlays == WHITE) {
+					printf("Waiting for packet...\n");
+					Packet packet;
+					packet.Sent = 0;
+					while (!packet.Sent)
+						recievePacket(&tcpServer, &packet, sizeof(Packet));
+					whoPlays = BLACK;
+					printf("Received packet!\n");
+				}
+				else if (whoPlays == BLACK) {
+					printf("Waiting for packet...\n");
+					Packet packet;
+					packet.Sent = 0;
+					while (!packet.Sent) {
+						recievePacket(&tcpClient, &packet, sizeof(Packet));
+					}
+					whoPlays = WHITE;
+					printf("Received packet!\n");
+				}
+			}
 
 			if (window->keyDown == SDLK_F5)
 				resetBoard(window, board, players, &whoPlays, &panel);
@@ -94,11 +136,15 @@ void game() {
 				gameState = QUIT;
 			if (window->keyDown == SDLK_s) {
 				// Open server
-				initNetworkServer(&ipServer, &tcpServer, &tcpClient);
+				if (!multiplayerServer)
+					initNetworkServer(&ipServer, &tcpServer, &tcpClient);
+				multiplayerServer = 1;
 			}
 			if (window->keyDown == SDLK_z) {
 				// Open client
-				initNetworkClient(&ipClient, &tcpServer, "localhost");
+				if (!multiplayerClient)
+					initNetworkClient(&ipClient, &tcpServer, "localhost");
+				multiplayerClient = 1;
 			}
 		}
 
