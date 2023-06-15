@@ -23,7 +23,7 @@ void initNetworkServer(IPaddress* ip, TCPsocket* tcpServer, TCPsocket* tcpClient
 	}
 	IPaddress* ipAdd = SDLNet_TCP_GetPeerAddress(*tcpClient);
 	if (ipAdd)
-		printf("Client connected! Client IP: %s\n", SDLNet_ResolveIP(ipAdd));
+		printf("Client connected! Client name: %s\n", SDLNet_ResolveIP(ipAdd));
 }
 
 void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer, const char* distIp) {
@@ -41,7 +41,7 @@ void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer, const char* distIp) 
 
 	IPaddress* ipAdd = SDLNet_TCP_GetPeerAddress(*tcpServer);
 	if (ipAdd)
-		printf("Server connected! Client IP: %s\n", SDLNet_ResolveIP(ipAdd));
+		printf("Server connected! Server name: %s\n", SDLNet_ResolveIP(ipAdd));
 }
 
 void recievePacket(TCPsocket* tcpServer, void* data, unsigned int size) {

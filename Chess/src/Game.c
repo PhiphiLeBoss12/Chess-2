@@ -81,13 +81,13 @@ void playing(Window* window, Game* game) {
 	panel.whoPlays = game->whoPlays;
 	drawSidePanel(window, &panel, game->textures);
 
+	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
+
 	if (game->multiplayerServer || game->multiplayerClient)
 		doNetwork(window, game);
 
 	if (window->keyDown == SDLK_F5)
 		resetBoard(window, game);
-
-	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
 }
 
 void end(Window* window, Game* game) {
@@ -190,9 +190,8 @@ void doNetwork(Window* window, Game* game) {
 			printf("Waiting for packet...\n");
 			Packet packet;
 			packet.Sent = 0;
-			while (!packet.Sent) {
+			while (!packet.Sent)
 				recievePacket(&game->tcpClient, &packet, sizeof(Packet));
-			}
 			game->whoPlays = WHITE;
 			printf("Received packet!\n");
 		}
@@ -421,6 +420,19 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 				Player* tempo = players[0];
 				players[0] = players[1];
 				players[1] = tempo;
+
+				// Network stuff
+				if (game->multiplayerServer) {
+					printf("Packet sent\n");
+					Packet packet = { 0, 1.0f, 1 };
+					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(Packet));
+				}
+				else if (game->multiplayerClient) {
+					printf("Packet sent\n");
+					Packet packet = { 0, 1.0f, 1 };
+					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(Packet));
+				}
+				
 			}
 		}
 
