@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI.h"
 #include "Sound.h"
+#include "Network.h"
 #include <stdio.h>
 
 // Global variables (very bad)
@@ -15,6 +16,9 @@ Mix_Chunk* stalemateSound;
 Mix_Chunk* funnySound;
 Mix_Chunk* funnySound2;
 GameState gameState = START;
+
+IPaddress ipServer, ipClient;
+TCPsocket tcpServer, tcpClient;
 
 void game() {
 	// INIT
@@ -88,6 +92,14 @@ void game() {
 			}
 			if (window->keyDown == SDLK_ESCAPE)
 				gameState = QUIT;
+			if (window->keyDown == SDLK_s) {
+				// Open server
+				initNetworkServer(&ipServer, &tcpServer, &tcpClient);
+			}
+			if (window->keyDown == SDLK_z) {
+				// Open client
+				initNetworkClient(&ipClient, &tcpServer, "localhost");
+			}
 		}
 
 		if (gameState == END || gameState == STALEMATE) {

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
 
 // Global variable (very bad)
 unsigned int NumWindows = 0;
@@ -24,6 +25,10 @@ void initSDL() {
 		return NULL;
 	}
 	Mix_OpenAudio(48000, AUDIO_F32SYS, 2, 2048);
+	if (SDLNet_Init() != 0) {
+		printf("Failed to initialize SDL_net! NET error: %s\n", SDLNet_GetError());
+		return;
+	}
 }
 
 void quitSDL() {
