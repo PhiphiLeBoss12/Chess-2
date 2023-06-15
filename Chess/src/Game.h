@@ -20,6 +20,7 @@ typedef struct Game {
 	LastMove* last;
 	Piece* selectedPiece;
 	TypeColor whoPlays;
+	int promo;
 
 	SDL_Texture** textures;
 
@@ -33,20 +34,31 @@ typedef struct Game {
 	int multiplayerClient;
 } Game;
 
-// Main game loop
+// Main game logic
 void gameLoop();
+void start(Window* window, Game* game);
+void playing(Window* window, Game* game);
+void end(Window* window, Game* game);
 
-SDL_Texture** createTextureArray(Window* window);
-
+// Initializes a game object
+// It needs to be destroyed afterwards
 Game* initGame(Window* window);
+
+// Destroys an existing game object
 void destroyGame(Game* game);
+
+// Allocates and returns an array containing all the textures
+// You can access a texture at index `type + 6 * color`
+SDL_Texture** createTextureArray(Window* window);
 
 void doNetwork(Window* window, Game* game);
 
+// Resets the board to the starting position
 void resetBoard(Window* window, Game* game);
 
+// Toggles music
+// This doesn't need documentation
 void toggleMusic(Window* window, Game* game);
-
 
 // Gets the input
 void getInputOnBoard(Window* window, int* boardX, int* boardY);
@@ -65,4 +77,5 @@ void drawPossibilities(Window* window, Game* game, Cell* possibilities, int numP
 // Big ahh function to react when the mouse is clicked
 void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int numPossibilities, int* promo);
 
+// jsp c'est à marie ça
 Window* winPromo(const char* title, Piece* pawn, TypePiece* newType);

@@ -12,14 +12,6 @@ void gameLoop() {
 	// INIT
 	Window* window = initWindow("Chess 2", 800 + 400, 800, 1);
 	Game* game = initGame(window);
-	int promo = 0;
-
-	SidePanel panel;
-	panel.width = 400;
-	panel.offsetX = 800;
-	panel.whoPlays = game->whoPlays;
-	panel.playerWhite = game->players[0];
-	panel.playerBlack = game->players[1];
 
 	playMusic(game->musics[MUSIC_MENU]);
 
@@ -28,68 +20,17 @@ void gameLoop() {
 		handleEvents(window);
 		setDrawColor(window,64, 64, 64, 255);
 		clear(window);
+		
+		if (game->gameState == START)
+			start(window, game);
 
-		if (game->gameState == PLAYING) {
-			int numPossibilities = 0;
-			Cell* possibilities = getPossibilities(game, &numPossibilities);
-			testPossibilitiesCheck(game->board, game->whoPlays, game->players[0], game->players[1], game->last, game->selectedPiece, possibilities, numPossibilities, &promo);
+		if (game->gameState == PLAYING)
+			playing(window, game);
 
-			drawBoard(window, game);
-			drawPossibilities(window, game, possibilities, numPossibilities);
-			drawSidePanel(window, &panel, game->textures);
-
-			if (game->multiplayerServer || game->multiplayerClient)
-				doNetwork(window, game);
-
-			if (window->keyDown == SDLK_F5)
-				resetBoard(window, game);
-
-			handleMouseClicking(window, game, possibilities, numPossibilities, &promo);
-		}
-
-		if (game->gameState == START) {
-			drawStartScreen(window, game->textures);
-			if (window->keyDown == SDLK_RETURN) {
-				game->gameState = PLAYING;
-				if (game->enableMusic)
-					playMusic(game->musics[MUSIC_GAME]);
-			}
-			if (window->keyDown == SDLK_ESCAPE)
-				game->gameState = QUIT;
-			if (window->keyDown == SDLK_s) {
-				// Open server
-				if (!game->multiplayerServer)
-					initNetworkServer(&game->ipServer, &game->tcpServer, &game->tcpClient);
-				game->multiplayerServer = 1;
-			}
-			if (window->keyDown == SDLK_z) {
-				// Open client
-				if (!game->multiplayerClient)
-					initNetworkClient(&game->ipClient, &game->tcpServer, "localhost");
-				game->multiplayerClient = 1;
-			}
-		}
-
-		if (game->gameState == END || game->gameState == STALEMATE) {
-			EndScreen es;
-			es.width = 800;
-			es.height = 300;
-			if (game->gameState == END)
-				es.whoWon = game->whoPlays;
-			else
-				es.whoWon = -1;
-			drawEndScreen(window, &es);
-
-			if (window->keyDown == SDLK_RETURN)
-				resetBoard(window, game);
-
-			if (window->keyDown == SDLK_ESCAPE)
-				game->gameState = QUIT;
-		}
+		if (game->gameState == END || game->gameState == STALEMATE)
+			end(window, game);
 
 		presentWindow(window);
-		
-		panel.whoPlays = game->whoPlays;
 
 		// Toggle Music
 		toggleMusic(window, game);
@@ -97,6 +38,73 @@ void gameLoop() {
 
 	destroyGame(game);
 	destroyWindow(window);
+}
+
+void start(Window* window, Game* game) {
+	drawStartScreen(window, game->textures);
+	if (window->keyDown == SDLK_RETURN) {
+		game->gameState = PLAYING;
+		if (game->enableMusic)
+			playMusic(game->musics[MUSIC_GAME]);
+	}
+	if (window->keyDown == SDLK_ESCAPE)
+		game->gameState = QUIT;
+	if (window->keyDown == SDLK_s) {
+		// Open server
+		if (!game->multiplayerServer)
+			initNetworkServer(&game->ipServer, &game->tcpServer, &game->tcpClient);
+		game->multiplayerServer = 1;
+	}
+	if (window->keyDown == SDLK_z) {
+		// Open client
+		if (!game->multiplayerClient)
+			initNetworkClient(&game->ipClient, &game->tcpServer, "localhost");
+		game->multiplayerClient = 1;
+	}
+}
+
+void playing(Window* window, Game* game) {
+	SidePanel panel;
+	panel.width = 400;
+	panel.offsetX = 800;
+	panel.whoPlays = game->whoPlays;
+	panel.playerWhite = game->players[0];
+	panel.playerBlack = game->players[1];
+
+	int numPossibilities = 0;
+	Cell* possibilities = getPossibilities(game, &numPossibilities);
+	testPossibilitiesCheck(game->board, game->whoPlays, game->players[0], game->players[1], game->last, game->selectedPiece, possibilities, numPossibilities, &game->promo);
+
+	drawBoard(window, game);
+	drawPossibilities(window, game, possibilities, numPossibilities);
+
+	panel.whoPlays = game->whoPlays;
+	drawSidePanel(window, &panel, game->textures);
+
+	if (game->multiplayerServer || game->multiplayerClient)
+		doNetwork(window, game);
+
+	if (window->keyDown == SDLK_F5)
+		resetBoard(window, game);
+
+	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
+}
+
+void end(Window* window, Game* game) {
+	EndScreen es;
+	es.width = 800;
+	es.height = 300;
+	if (game->gameState == END)
+		es.whoWon = game->whoPlays;
+	else
+		es.whoWon = -1;
+	drawEndScreen(window, &es);
+
+	if (window->keyDown == SDLK_RETURN)
+		resetBoard(window, game);
+
+	if (window->keyDown == SDLK_ESCAPE)
+		game->gameState = QUIT;
 }
 
 Game* initGame(Window* window) {
