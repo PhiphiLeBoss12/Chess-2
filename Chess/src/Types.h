@@ -4,13 +4,6 @@
 #include <stdlib.h>
 #include "Window.h"
 
-// Temp
-#if 0
-#define LOG_FN(msg, ...) printf("%s: ", __func__); printf(msg, __VA_ARGS__)
-#else
-#define LOG_FN(msg, ...)
-#endif
-
 #define SIZE 8
 
 typedef enum EnumPiece { PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING } TypePiece;
