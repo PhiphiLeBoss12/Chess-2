@@ -10,7 +10,6 @@
 Mix_Music* mainMenuMusic;
 Mix_Music* gameMusic;
 Mix_Chunk* stepSound;
-Mix_Chunk* winSound;
 Mix_Chunk* killSound;
 Mix_Chunk* stalemateSound;
 Mix_Chunk* funnySound;
@@ -19,7 +18,7 @@ GameState gameState = START;
 
 void game() {
 	// INIT
-	Window* window = initWindow("Chess 2", 800 + 400, 800);
+	Window* window = initWindow("Chess 2", 800 + 400, 800, 1);
 	Board* board = createBoard(8);
 	Player* players[2];
 	players[0] = initPlayers(WHITE, window);
@@ -41,7 +40,6 @@ void game() {
 	mainMenuMusic = loadMusic("Deadly Roulette.mp3");
 	gameMusic = loadMusic("Walking Along.mp3");
 	stepSound = loadSound("step.mp3");
-	winSound = loadSound("Danse Macabre.mp3");
 	killSound = loadSound("kill.mp3");
 	stalemateSound = loadSound("impasta.mp3");
 	funnySound = loadSound("funny.mp3");
@@ -148,7 +146,6 @@ void game() {
 	destroyMusic(gameMusic);
 	destroyMusic(mainMenuMusic);
 	destroySound(stepSound);
-	destroySound(winSound);
 	destroySound(killSound);
 	destroySound(funnySound);
 	destroySound(funnySound2);
@@ -384,7 +381,7 @@ void handleMouseClicking(Window* window, Board* board, Piece** selectedPiece, Pl
 }
 
 Window* winPromo(const char* title, Piece* pawn) {
-	Window* wintest = initWindow(title, 100*4, 100);
+	Window* wintest = initWindow(title, 100*4, 100, 0);
 	SDL_Texture** texturePromo = createTextureArray(wintest);
 	clear(wintest);
 	for (int i = 0; i < 4; i++) {

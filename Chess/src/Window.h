@@ -33,7 +33,7 @@ void quitSDL();
 
 // Initializes SDL and a creates a window object.
 // Returns NULL if something goes wrong
-Window* initWindow(const char* title, unsigned int width, unsigned int height);
+Window* initWindow(const char* title, unsigned int width, unsigned int height, int decorations);
 
 // Destroys the window and quits SDL
 void destroyWindow(Window* window);

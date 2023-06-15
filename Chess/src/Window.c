@@ -34,13 +34,16 @@ void quitSDL() {
 	SDL_Quit();
 }
 
-Window* initWindow(const char* title, unsigned int width, unsigned int height) {
+Window* initWindow(const char* title, unsigned int width, unsigned int height, int decorations) {
 	if (NumWindows == 0)
 		initSDL();
 
 	Window* window = (Window*)malloc(sizeof(Window));
 
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+	unsigned int windowFlags = 0;
+	if (!decorations)
+		windowFlags = SDL_WINDOW_BORDERLESS;
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags);
 	if (!window->window) {
 		printf("Failed to create window! SDL error: %s\n", SDL_GetError());
 		return NULL;
