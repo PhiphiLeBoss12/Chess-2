@@ -28,7 +28,7 @@ void initNetworkServer(IPaddress* ip, TCPsocket* tcpServer, TCPsocket* tcpClient
 
 void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer) {
 	const char distIp[128];
-	FILE* netFile = fopen("Network", "r");
+	FILE* netFile = fopen("network.setting", "r");
 	fscanf(netFile, "%s", distIp);
 
 	if (SDLNet_ResolveHost(ip, distIp, 6969) != 0) {
