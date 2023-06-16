@@ -58,6 +58,7 @@ void start(Window* window, Game* game) {
 			presentWindow(window);
 			initNetworkServer(&game->ipServer, &game->tcpServer, &game->tcpClient);
 			game->gameState = PLAYING;
+			playMusic(game->musics[MUSIC_GAME]);
 		}
 		game->multiplayerServer = 1;
 	}
@@ -67,6 +68,7 @@ void start(Window* window, Game* game) {
 			initNetworkClient(&game->ipClient, &game->tcpServer);
 			game->gameState = PLAYING;
 			game->multiplayerState = 1;
+			playMusic(game->musics[MUSIC_GAME]);
 		}
 		game->multiplayerClient = 1;
 	}
