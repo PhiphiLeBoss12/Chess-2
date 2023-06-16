@@ -154,13 +154,13 @@ Game* initGame(Window* window) {
 
 	game->textures = createTextureArray(window);
 
-	game->musics[MUSIC_MENU] = loadMusic("Deadly Roulette.mp3");
-	game->musics[MUSIC_GAME] = loadMusic("Walking Along.mp3");
-	game->sounds[SOUND_STEP] = loadSound("step.mp3");
-	game->sounds[SOUND_KILL] = loadSound("kill.mp3");
-	game->sounds[SOUND_STALEMATE] = loadSound("impasta.mp3");
-	game->sounds[SOUND_CHECK] = loadSound("funny.mp3");
-	game->sounds[SOUND_FUNNY] = loadSound("funny2.mp3");
+	game->musics[MUSIC_MENU] = loadMusic("musics/Deadly Roulette.mp3");
+	game->musics[MUSIC_GAME] = loadMusic("musics/Walking Along.mp3");
+	game->sounds[SOUND_STEP] = loadSound("sounds/step.mp3");
+	game->sounds[SOUND_KILL] = loadSound("sounds/kill.mp3");
+	game->sounds[SOUND_STALEMATE] = loadSound("sounds/impasta.mp3");
+	game->sounds[SOUND_CHECK] = loadSound("sounds/funny.mp3");
+	game->sounds[SOUND_FUNNY] = loadSound("sounds/funny2.mp3");
 	game->enableMusic = 1;
 
 	game->multiplayerServer = 0;
@@ -243,18 +243,18 @@ void toggleMusic(Window* window, Game* game) {
 
 SDL_Texture** createTextureArray(Window* window) {
 	SDL_Texture** textures = (SDL_Texture**)malloc(sizeof(SDL_Texture*) * 12);
-	textures[0] = createTexture(window, "White_Pawn.png");
-	textures[1] = createTexture(window, "White_Bishop.png");
-	textures[2] = createTexture(window, "White_Knight.png");
-	textures[3] = createTexture(window, "White_Rook.png");
-	textures[4] = createTexture(window, "White_Queen.png");
-	textures[5] = createTexture(window, "White_King.png");
-	textures[6] = createTexture(window, "Black_Pawn.png");
-	textures[7] = createTexture(window, "Black_Bishop.png");
-	textures[8] = createTexture(window, "Black_Knight.png");
-	textures[9] = createTexture(window, "Black_Rook.png");
-	textures[10] = createTexture(window, "Black_Queen.png");
-	textures[11] = createTexture(window, "Black_King.png");
+	textures[0] = createTexture(window, "textures/White_Pawn.png");
+	textures[1] = createTexture(window, "textures/White_Bishop.png");
+	textures[2] = createTexture(window, "textures/White_Knight.png");
+	textures[3] = createTexture(window, "textures/White_Rook.png");
+	textures[4] = createTexture(window, "textures/White_Queen.png");
+	textures[5] = createTexture(window, "textures/White_King.png");
+	textures[6] = createTexture(window, "textures/Black_Pawn.png");
+	textures[7] = createTexture(window, "textures/Black_Bishop.png");
+	textures[8] = createTexture(window, "textures/Black_Knight.png");
+	textures[9] = createTexture(window, "textures/Black_Rook.png");
+	textures[10] = createTexture(window, "textures/Black_Queen.png");
+	textures[11] = createTexture(window, "textures/Black_King.png");
 	return textures;
 }
 
