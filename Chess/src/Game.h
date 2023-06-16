@@ -38,6 +38,7 @@ typedef struct Game {
 	TCPsocket tcpServer, tcpClient;
 	int multiplayerServer;
 	int multiplayerClient;
+	int multiplayerState;
 } Game;
 
 // Main game logic

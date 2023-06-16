@@ -52,14 +52,22 @@ void start(Window* window, Game* game) {
 		game->gameState = QUIT;
 	if (window->keyDown == SDLK_s) {
 		// Open server
-		if (!game->multiplayerServer)
+		if (!game->multiplayerServer) {
+			SDL_Color color = { 220, 220, 220, 255 };
+			drawText(window, color, "waiting for client...", window->width / 2 - 400, window->height / 2, 0.6);
+			presentWindow(window);
 			initNetworkServer(&game->ipServer, &game->tcpServer, &game->tcpClient);
+			game->gameState = PLAYING;
+		}
 		game->multiplayerServer = 1;
 	}
 	if (window->keyDown == SDLK_z) {
 		// Open client
-		if (!game->multiplayerClient)
+		if (!game->multiplayerClient) {
 			initNetworkClient(&game->ipClient, &game->tcpServer);
+			game->gameState = PLAYING;
+			game->multiplayerState = 1;
+		}
 		game->multiplayerClient = 1;
 	}
 }
@@ -71,6 +79,7 @@ void playing(Window* window, Game* game) {
 	panel.whoPlays = game->whoPlays;
 	panel.playerWhite = game->players[0];
 	panel.playerBlack = game->players[1];
+	panel.multiplayerState = game->multiplayerState;
 
 	int numPossibilities = 0;
 	Cell* possibilities = getPossibilities(game, &numPossibilities);
@@ -90,12 +99,6 @@ void playing(Window* window, Game* game) {
 		doNetwork(window, game);
 	}
 
-	drawBoard(window, game);
-	drawPossibilities(window, game, possibilities, numPossibilities);
-
-	panel.whoPlays = game->whoPlays;
-	drawSidePanel(window, &panel, game->textures);
-
 	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
 
 	if (window->keyDown == SDLK_F5)
@@ -112,8 +115,11 @@ void end(Window* window, Game* game) {
 		es.whoWon = -1;
 	drawEndScreen(window, &es);
 
-	if (window->keyDown == SDLK_RETURN)
-		resetBoard(window, game);
+	if (window->keyDown == SDLK_RETURN) {
+		destroyGame(game);
+		*game = *initGame(window);
+		game->gameState = PLAYING;
+	}
 
 	if (window->keyDown == SDLK_ESCAPE)
 		game->gameState = QUIT;
@@ -147,6 +153,7 @@ Game* initGame(Window* window) {
 
 	game->multiplayerServer = 0;
 	game->multiplayerClient = 0;
+	game->multiplayerState = -1;
 
 	return game;
 }
@@ -180,10 +187,11 @@ void doNetwork(Window* window, Game* game) {
 		while (!packet.sent) {
 			handleEvents(window);
 			if (recievePacket(&game->tcpServer, &packet, sizeof(MovePacket)) <= 0)
-				break;
+				return;
 		}
 		fillGamePacketRecieve(game, &packet);
 		game->whoPlays = BLACK;
+		game->multiplayerState = 0;
 		printf("Received packet!\n");
 	}
 	else if (game->multiplayerServer && game->whoPlays == BLACK) {
@@ -193,10 +201,11 @@ void doNetwork(Window* window, Game* game) {
 		while (!packet.sent) {
 			handleEvents(window);
 			if (recievePacket(&game->tcpClient, &packet, sizeof(MovePacket)) <= 0)
-				break;
+				return;
 		}
 		fillGamePacketRecieve(game, &packet);
 		game->whoPlays = WHITE;
+		game->multiplayerState = 0;
 		printf("Received packet!\n");
 	}
 }
@@ -419,7 +428,7 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 						*whoPlays = *whoPlays == WHITE ? BLACK : WHITE; // Change the color again
 					}
 				}
-				if (isStalemate(board, players, last, promo)) {
+				else if (isStalemate(board, players, last, promo)) {
 					game->gameState = STALEMATE;
 					playSound(game->sounds[SOUND_STALEMATE]);
 				}
@@ -432,6 +441,7 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.newX = board->selectedX;
 					packet.newY = board->selectedY;
 					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(MovePacket));
+					game->multiplayerState = 1;
 					printf("Packet sent\n");
 				}
 				else if (game->multiplayerClient) {
@@ -441,6 +451,7 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.newX = board->selectedX;
 					packet.newY = board->selectedY;
 					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(MovePacket));
+					game->multiplayerState = 1;
 					printf("Packet sent\n");
 				}
 

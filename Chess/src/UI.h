@@ -8,6 +8,7 @@ typedef struct SidePanel {
 	TypeColor whoPlays;
 	Player* playerWhite;
 	Player* playerBlack;
+	int multiplayerState;
 } SidePanel;
 
 typedef struct EndScreen {

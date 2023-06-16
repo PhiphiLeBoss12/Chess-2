@@ -72,6 +72,15 @@ void drawSidePanel(Window* window, SidePanel* panel, SDL_Texture** textures) {
 	int textOffset = panel->offsetX + 16; // TODO: better offset calculation
 	drawText(window, color, text, textOffset, window->height / 2, 0.3f);
 
+	switch (panel->multiplayerState) {
+	case 1:
+		drawText(window, color, "waiting for opponent...", textOffset, window->height / 2 - 100, 0.25f);
+		break;
+	case 0:
+	default:
+		break;
+	}
+
 	for (int i = 0; i < 16; i++) {
 		if (!panel->playerWhite->eaten[i])
 			continue;
