@@ -13,7 +13,8 @@ void gameLoop() {
 	Window* window = initWindow("Chess 2", 800 + 400, 800, 1);
 	Game* game = initGame(window);
 
-	playMusic(game->musics[MUSIC_MENU]);
+	if (game->enableMusic)
+		playMusic(game->musics[MUSIC_MENU]);
 
 	// MAIN LOOP
 	while (game->gameState != QUIT && !window->shouldClose) {
@@ -58,7 +59,7 @@ void start(Window* window, Game* game) {
 	if (window->keyDown == SDLK_z) {
 		// Open client
 		if (!game->multiplayerClient)
-			initNetworkClient(&game->ipClient, &game->tcpServer, "localhost");
+			initNetworkClient(&game->ipClient, &game->tcpServer);
 		game->multiplayerClient = 1;
 	}
 }
@@ -75,6 +76,20 @@ void playing(Window* window, Game* game) {
 	Cell* possibilities = getPossibilities(game, &numPossibilities);
 	testPossibilitiesCheck(game->board, game->whoPlays, game->players[0], game->players[1], game->last, game->selectedPiece, possibilities, numPossibilities, &game->promo);
 
+	if (game->multiplayerServer || game->multiplayerClient) {
+		clear(window);
+
+		drawBoard(window, game);
+		drawPossibilities(window, game, possibilities, numPossibilities);
+
+		panel.whoPlays = game->whoPlays;
+		drawSidePanel(window, &panel, game->textures);
+
+		presentWindow(window);
+
+		doNetwork(window, game);
+	}
+
 	drawBoard(window, game);
 	drawPossibilities(window, game, possibilities, numPossibilities);
 
@@ -82,9 +97,6 @@ void playing(Window* window, Game* game) {
 	drawSidePanel(window, &panel, game->textures);
 
 	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
-
-	if (game->multiplayerServer || game->multiplayerClient)
-		doNetwork(window, game);
 
 	if (window->keyDown == SDLK_F5)
 		resetBoard(window, game);
@@ -131,7 +143,7 @@ Game* initGame(Window* window) {
 	game->sounds[SOUND_STALEMATE] = loadSound("impasta.mp3");
 	game->sounds[SOUND_CHECK] = loadSound("funny.mp3");
 	game->sounds[SOUND_FUNNY] = loadSound("funny2.mp3");
-	game->enableMusic = 1;
+	game->enableMusic = 0;
 
 	game->multiplayerServer = 0;
 	game->multiplayerClient = 0;
@@ -155,47 +167,42 @@ void destroyGame(Game* game) {
 
 	if (game->multiplayerServer || game->multiplayerClient) {
 		SDLNet_TCP_Close(game->tcpServer);
-		SDLNet_TCP_Close(game->tcpClient);
 	}
+	if (game->multiplayerServer)
+		SDLNet_TCP_Close(game->tcpClient);
 }
 
 void doNetwork(Window* window, Game* game) {
-	if (game->multiplayerServer && game->whoPlays == WHITE) {
-		if (window->keyDown == SDLK_p) {
-			printf("Packet sent\n");
-			Packet packet = { 0, 1.0f, 1 };
-			SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(Packet));
-			game->whoPlays = BLACK;
+	if (game->multiplayerClient && game->whoPlays == WHITE) {
+		printf("Waiting for packet...\n");
+		MovePacket packet;
+		packet.sent = 0;
+		while (!packet.sent) {
+			handleEvents(window);
+			if (recievePacket(&game->tcpServer, &packet, sizeof(MovePacket)) <= 0)
+				break;
 		}
+		fillGamePacketRecieve(game, &packet);
+		game->whoPlays = BLACK;
+		printf("Received packet!\n");
 	}
-	else if (game->multiplayerClient && game->whoPlays == BLACK) {
-		if (window->keyDown == SDLK_p) {
-			printf("Packet sent\n");
-			Packet packet = { 0, 1.0f, 1 };
-			SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(Packet));
-			game->whoPlays = WHITE;
+	else if (game->multiplayerServer && game->whoPlays == BLACK) {
+		printf("Waiting for packet...\n");
+		MovePacket packet;
+		packet.sent = 0;
+		while (!packet.sent) {
+			handleEvents(window);
+			if (recievePacket(&game->tcpClient, &packet, sizeof(MovePacket)) <= 0)
+				break;
 		}
+		fillGamePacketRecieve(game, &packet);
+		game->whoPlays = WHITE;
+		printf("Received packet!\n");
 	}
-	else {
-		if (game->whoPlays == WHITE) {
-			printf("Waiting for packet...\n");
-			Packet packet;
-			packet.Sent = 0;
-			while (!packet.Sent)
-				recievePacket(&game->tcpServer, &packet, sizeof(Packet));
-			game->whoPlays = BLACK;
-			printf("Received packet!\n");
-		}
-		else if (game->whoPlays == BLACK) {
-			printf("Waiting for packet...\n");
-			Packet packet;
-			packet.Sent = 0;
-			while (!packet.Sent)
-				recievePacket(&game->tcpClient, &packet, sizeof(Packet));
-			game->whoPlays = WHITE;
-			printf("Received packet!\n");
-		}
-	}
+}
+
+void fillGamePacketRecieve(Game* game, MovePacket* packet) {
+	movePiece(game->board->table[packet->oldX][packet->oldY], packet->newX, packet->newY, game->board, game->players[0], game->players[1], game->last, &game->promo);
 }
 
 void resetBoard(Window* window, Game* game) {
@@ -364,6 +371,9 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 			}
 
 			if (board->selectedX == possibilities[i].x && board->selectedY == possibilities[i].y && *whoPlays == game->selectedPiece->color) {
+				int pieceOldX = game->selectedPiece->x;
+				int pieceOldY = game->selectedPiece->y;
+
 				//Verify castling 
 				if (board->table[board->selectedX][board->selectedY] != NULL) {
 					if (board->table[board->selectedX][board->selectedY]->type == ROOK && board->table[board->selectedX][board->selectedY]->color == *whoPlays) {
@@ -414,25 +424,32 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					playSound(game->sounds[SOUND_STALEMATE]);
 				}
 
+				// Network stuff
+				if (game->multiplayerServer) {
+					MovePacket packet;
+					packet.oldX = pieceOldX;
+					packet.oldY = pieceOldY;
+					packet.newX = board->selectedX;
+					packet.newY = board->selectedY;
+					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(MovePacket));
+					printf("Packet sent\n");
+				}
+				else if (game->multiplayerClient) {
+					MovePacket packet;
+					packet.oldX = pieceOldX;
+					packet.oldY = pieceOldY;
+					packet.newX = board->selectedX;
+					packet.newY = board->selectedY;
+					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(MovePacket));
+					printf("Packet sent\n");
+				}
+
 				// Unselect the square
 				board->selectedX = -1;
 				board->selectedY = -1;
 				Player* tempo = players[0];
 				players[0] = players[1];
-				players[1] = tempo;
-
-				// Network stuff
-				if (game->multiplayerServer) {
-					printf("Packet sent\n");
-					Packet packet = { 0, 1.0f, 1 };
-					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(Packet));
-				}
-				else if (game->multiplayerClient) {
-					printf("Packet sent\n");
-					Packet packet = { 0, 1.0f, 1 };
-					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(Packet));
-				}
-				
+				players[1] = tempo;				
 			}
 		}
 

@@ -26,7 +26,11 @@ void initNetworkServer(IPaddress* ip, TCPsocket* tcpServer, TCPsocket* tcpClient
 		printf("Client connected! Client name: %s\n", SDLNet_ResolveIP(ipAdd));
 }
 
-void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer, const char* distIp) {
+void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer) {
+	const char distIp[128];
+	FILE* netFile = fopen("Network", "r");
+	fscanf(netFile, "%s", distIp);
+
 	if (SDLNet_ResolveHost(ip, distIp, 6969) != 0) {
 		printf("Failed to resolve host! NET error: %s\n", SDLNet_GetError());
 		return;
@@ -44,7 +48,7 @@ void initNetworkClient(IPaddress* ip, TCPsocket* tcpServer, const char* distIp) 
 		printf("Server connected! Server name: %s\n", SDLNet_ResolveIP(ipAdd));
 }
 
-void recievePacket(TCPsocket* tcpServer, void* data, unsigned int size) {
+int recievePacket(TCPsocket* tcpServer, void* data, unsigned int size) {
 	int result = SDLNet_TCP_Recv(*tcpServer, data, size);
 
 	if (result <= 0)

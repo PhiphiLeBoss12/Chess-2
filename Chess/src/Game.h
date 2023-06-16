@@ -12,6 +12,12 @@ typedef enum GameState { START, PLAYING, END, STALEMATE, QUIT } GameState;
 typedef enum Musics { MUSIC_MENU, MUSIC_GAME } Musics;
 typedef enum Sounds { SOUND_STEP, SOUND_KILL, SOUND_STALEMATE, SOUND_CHECK, SOUND_FUNNY } Sounds;
 
+typedef struct MovePacket {
+	int oldX, oldY;
+	int newX, newY;
+	int sent;
+} MovePacket;
+
 typedef struct Game {
 	GameState gameState;
 
@@ -52,6 +58,7 @@ void destroyGame(Game* game);
 SDL_Texture** createTextureArray(Window* window);
 
 void doNetwork(Window* window, Game* game);
+void fillGamePacketRecieve(Game* game, MovePacket* packet);
 
 // Resets the board to the starting position
 void resetBoard(Window* window, Game* game);
