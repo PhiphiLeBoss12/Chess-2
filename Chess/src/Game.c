@@ -143,7 +143,7 @@ Game* initGame(Window* window) {
 	game->sounds[SOUND_STALEMATE] = loadSound("impasta.mp3");
 	game->sounds[SOUND_CHECK] = loadSound("funny.mp3");
 	game->sounds[SOUND_FUNNY] = loadSound("funny2.mp3");
-	game->enableMusic = 0;
+	game->enableMusic = 1;
 
 	game->multiplayerServer = 0;
 	game->multiplayerClient = 0;
