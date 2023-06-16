@@ -85,4 +85,4 @@ project "Chess"
 
 	-- If the project is generated with the Debug configuration it will apply these rules
 	filter "configurations:Release"
-		symbols "Off"
+		optimize "On"

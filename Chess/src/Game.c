@@ -95,8 +95,6 @@ void playing(Window* window, Game* game) {
 	panel.whoPlays = game->whoPlays;
 	drawSidePanel(window, &panel, game->textures);
 
-	presentWindow(window);
-
 	if (game->multiplayerServer || game->multiplayerClient) {
 		clear(window);
 
@@ -110,6 +108,8 @@ void playing(Window* window, Game* game) {
 
 		doNetwork(window, game);
 	}
+
+	presentWindow(window);
 
 	handleMouseClicking(window, game, possibilities, numPossibilities, &game->promo);
 
@@ -193,7 +193,6 @@ void destroyGame(Game* game) {
 
 void doNetwork(Window* window, Game* game) {
 	if (game->multiplayerClient && game->whoPlays == WHITE) {
-		printf("Waiting for packet...\n");
 		MovePacket packet;
 		packet.sent = 0;
 		while (!packet.sent) {
@@ -204,10 +203,8 @@ void doNetwork(Window* window, Game* game) {
 		fillGamePacketRecieve(game, &packet);
 		game->whoPlays = BLACK;
 		game->multiplayerState = 0;
-		printf("Received packet!\n");
 	}
 	else if (game->multiplayerServer && game->whoPlays == BLACK) {
-		printf("Waiting for packet...\n");
 		MovePacket packet;
 		packet.sent = 0;
 		while (!packet.sent) {
@@ -218,7 +215,6 @@ void doNetwork(Window* window, Game* game) {
 		fillGamePacketRecieve(game, &packet);
 		game->whoPlays = WHITE;
 		game->multiplayerState = 0;
-		printf("Received packet!\n");
 	}
 }
 
@@ -454,7 +450,6 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.newY = board->selectedY;
 					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(MovePacket));
 					game->multiplayerState = 1;
-					printf("Packet sent\n");
 				}
 				else if (game->multiplayerClient) {
 					MovePacket packet;
@@ -464,7 +459,6 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.newY = board->selectedY;
 					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(MovePacket));
 					game->multiplayerState = 1;
-					printf("Packet sent\n");
 				}
 
 				// Unselect the square
