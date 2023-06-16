@@ -87,6 +87,16 @@ void playing(Window* window, Game* game) {
 	Cell* possibilities = getPossibilities(game, &numPossibilities);
 	testPossibilitiesCheck(game->board, game->whoPlays, game->players[0], game->players[1], game->last, game->selectedPiece, possibilities, numPossibilities, &game->promo);
 
+	clear(window);
+
+	drawBoard(window, game);
+	drawPossibilities(window, game, possibilities, numPossibilities);
+
+	panel.whoPlays = game->whoPlays;
+	drawSidePanel(window, &panel, game->textures);
+
+	presentWindow(window);
+
 	if (game->multiplayerServer || game->multiplayerClient) {
 		clear(window);
 
