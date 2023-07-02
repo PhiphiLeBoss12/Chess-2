@@ -15,6 +15,9 @@ typedef enum Sounds { SOUND_STEP, SOUND_KILL, SOUND_STALEMATE, SOUND_CHECK, SOUN
 typedef struct MovePacket {
 	int oldX, oldY;
 	int newX, newY;
+	TypePiece type;
+	int castledRight;
+	int castledLeft;
 	int sent;
 } MovePacket;
 

@@ -220,6 +220,10 @@ void doNetwork(Window* window, Game* game) {
 
 void fillGamePacketRecieve(Game* game, MovePacket* packet) {
 	movePiece(game->board->table[packet->oldX][packet->oldY], packet->newX, packet->newY, game->board, game->players[0], game->players[1], game->last, &game->promo);
+	game->board->table[packet->newX][packet->newY]->type = packet->type;
+	// if (packet->castledRight) {
+	// 	movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last, promo);
+	// }
 }
 
 void resetBoard(Window* window, Game* game) {
@@ -370,6 +374,7 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 
 	if (window->mouseLeftButton && !leftButtonHeld) {
 		int pieceEaten = 0;
+		int castledRight = 0, castledLeft = 0;
 		int x, y;
 		getInputOnBoard(window, &x, &y);
 
@@ -400,15 +405,18 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 						if (board->selectedX > 4) {
 							movePiece(game->selectedPiece, board->selectedX - 1, board->selectedY, board, players[0], players[1], last, promo);
 							movePiece(rook, board->selectedX - 2, board->selectedY, board, players[0], players[1], last, promo);
+							castledRight = 1;
 						}
 						else { //Castling left
 							movePiece(game->selectedPiece, board->selectedX + 2, board->selectedY, board, players[0], players[1], last, promo);
 							movePiece(rook, board->selectedX + 3, board->selectedY, board, players[0], players[1], last, promo);
+							castledLeft = 1;
 						}
 					}
 					else {
 						pieceEaten = movePiece(game->selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
-						if (*promo == 1) {
+						int promoteMultiplayer = game->multiplayerClient && game->whoPlays == BLACK || game->multiplayerServer && game->whoPlays == WHITE || (game->multiplayerClient == 0 && game->multiplayerServer == 0);
+						if (*promo == 1 && promoteMultiplayer) {
 							Window* wintest = winPromo("promotion", game->selectedPiece, &game->selectedPiece->type);
 							*promo = 0;
 							destroyWindow(wintest);
@@ -417,7 +425,8 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 				}
 				else {
 					pieceEaten = movePiece(game->selectedPiece, board->selectedX, board->selectedY, board, players[0], players[1], last, promo);
-					if (*promo == 1) {
+					int promoteMultiplayer = game->multiplayerClient && game->whoPlays == BLACK || game->multiplayerServer && game->whoPlays == WHITE || (game->multiplayerClient == 0 && game->multiplayerServer == 0);
+					if (*promo == 1 && promoteMultiplayer) {
 						Window* wintest = winPromo("promotion", game->selectedPiece, &game->selectedPiece->type);
 						*promo = 0;
 						destroyWindow(wintest);
@@ -448,6 +457,10 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.oldY = pieceOldY;
 					packet.newX = board->selectedX;
 					packet.newY = board->selectedY;
+					packet.type = game->selectedPiece->type;
+					packet.castledRight = castledRight;
+					packet.castledLeft = castledLeft;
+					packet.sent = 1;
 					SDLNet_TCP_Send(game->tcpClient, &packet, sizeof(MovePacket));
 					game->multiplayerState = 1;
 				}
@@ -457,6 +470,10 @@ void handleMouseClicking(Window* window, Game* game, Cell* possibilities, int nu
 					packet.oldY = pieceOldY;
 					packet.newX = board->selectedX;
 					packet.newY = board->selectedY;
+					packet.type = game->selectedPiece->type;
+					packet.castledRight = castledRight;
+					packet.castledLeft = castledLeft;
+					packet.sent = 1;
 					SDLNet_TCP_Send(game->tcpServer, &packet, sizeof(MovePacket));
 					game->multiplayerState = 1;
 				}

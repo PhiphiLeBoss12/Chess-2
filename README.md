@@ -1,23 +1,34 @@
 # Chess 2
 ## The long awaited sequel
 
-## Ajouter un fichier pour l'utiliser dans le programme
+## How to play
 
-Il faut le mettre dans le dossier `dev-assets/`. L'entièreté du dossier est copiée pour être envoyée dans le même dossier que l'exécutable.
+- Grab the lastest release of the game.
+- Unzip the archive in some folder in your computer.
+- Launch `Chess2.exe`.
+- Have fun!
 
-## Comment ça marche premake ?
+## How to play multiplayer
 
-[Docs de premake](https://premake.github.io/docs/)
+### Hosting the game
 
-Premake est un petit programme tout sympa qui permet de générer des projets pour plein d'IDE différents. En gros ça permet de pouvoir faciliter le partage du projet sur plusieurs plateformes différentes.
+- Go to your router settings and open the `6969` port. This is the port used by the game to play multiplayer.
+- Open `Chess2.exe`.
+- Press the `S` key.
 
-Il utilise le fichier `premake5.lua` pour connaître la spécification du projet. J'ai mis plein de jolis commentaires le fichier pour pas être perdu si vous devez vous y aventurer.
+#### Getting your IP adress
 
-### Ajouter une bibliothèque
+- To play locally:
+    - Open the Windows command prompt (Windows 10) or terminal (Windows 11).
+    - Type `ipconfig` then press enter. 
+    - Write down your IPv4 adress.
+- To play on the Internet
+    - Go to [https://whatismyipaddress.com/](whatismyip.com).
+    - Write down your IPv4 adress.
 
-Pour ajouter une bibliothèque il faut :
-- Ajouter les fichiers `*.lib` dans le dossier `libs/windows/` du projet.
-- Aller dans `premake5.lua`, dans `filter 'system:windows'` trouver la partie `links`
-- Ajouter le nom de la bibliothèque sans l'extension
-- ???
-- Profit
+### Joining a game
+
+- First open the folder where you installed the game.
+- Open the `network.setting` file.
+- Put the IP adress of the host in there. There should ONLY be the IP adress and nothing else in the file.
+- Open `Chess2.exe` and press the `Z` key.
