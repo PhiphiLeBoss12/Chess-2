@@ -23,7 +23,7 @@
     - Type `ipconfig` then press enter. 
     - Write down your IPv4 adress.
 - To play on the Internet
-    - Go to [https://whatismyipaddress.com/](whatismyip.com).
+    - Go to [whatismyip.com](https://whatismyipaddress.com/).
     - Write down your IPv4 adress.
 
 ### Joining a game
